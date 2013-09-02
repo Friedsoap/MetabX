@@ -63,7 +63,7 @@ if os.name == 'nt':
     #create "images" directory already if it does not exists in the working directory.
 elif os.name == 'posix':
     #dirPath=input("Type the absolute working directory in single quotes (ex: '/this/is/a/linux/path'):")    
-    dirPath='/home/aleix/PhD/Dropbox/PhyMetEc/spyder_project/PhyMetEc'
+    dirPath='/home/aleix/PhD/Dropbox/PhyMetEc/spyder_project/PhyMetEc_DATA'
     #enter the working dir
     os.chdir(dirPath)
     #create "images" directory already if it does not exists in the working directory.
@@ -71,7 +71,7 @@ else:
     sys.exit('''Error: the operating system was not recognised as 'nt' nor 'posix', exiting.''')
 
 #loading the input data
-#data_filename=input("Type the name of the xls file containing Z,r and f in brackets (relative to the working dir):")
+#data_filename=input("Type the name of the xls file containing Z,r and f in brackets (it is assumed to be inside it, or type a relative address relative to the working dir):")
 data_filename='PIOT_ITA.xls'
 #data_filename='MIOT_Br_1995_10_setores2.xls'
 #data_filename='Ulanowicz example.xls'
@@ -82,10 +82,10 @@ output_filename='' #temporary for debugging
 #fill the name if left blank
 time_at_start = time.strftime("%Y%m%d_%H%M")
 if output_filename == '':
-    output_filename=data_filename+'_OUT_'+time_at_start+'.xls'
-output_binary_file=output_filename+'.npz'    
+    output_filename=os.path.splitext(data_filename)[0]+'_OUT_'+time_at_start+'.xls'
+output_binary_file=os.path.splitext(output_filename)[0]+'.npz'    
 #open a logfile to be able to write to it. Note: the log file is only writen when it is closed at the end of the program.
-logfile = open(output_filename+".log", "w")
+logfile = open(os.path.splitext(output_filename)[0]+".log", "w")
 #write to a log file and the standard output at the same time using the Tee function
 sys.stdout = Tee(sys.stdout, logfile)
 
