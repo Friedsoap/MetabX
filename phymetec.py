@@ -90,6 +90,10 @@ logfile = open(os.path.splitext(output_filename)[0]+".log", "w")
 sys.stdout = Tee(sys.stdout, logfile)
 
 
+# Other configuration options
+# TODO: create a parseable config file containing program switches
+
+# Config for the circos_interface module
 circos_draw = False
 circos_execute = True
 circos_open_images = True
