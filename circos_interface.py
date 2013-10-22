@@ -1425,7 +1425,7 @@ background = white
    
 ###################### /etc/image.conf END ######################## 
 
-###################### /etc/normalisation.conf END ######################## 
+###################### /etc/normalisation.conf START ######################## 
 
 def create_normalisation_conf(diagram_type, scale_type, working_dir, nbr_sectors,sector_names, arrays):
     '''Creates the normalisation.conf file in etc directory.
