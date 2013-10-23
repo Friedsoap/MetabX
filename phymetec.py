@@ -341,27 +341,27 @@ actual_structure_dictionary['r_coefs']=np.dot(r_array,LA.inv(np.diag(total_outpu
 #   wi_array    array containing all wji # XXX: ERASE
 
 
-for i in range(NBR_sectors):
-    exec 'f'+str(i)+'=np.zeros(NBR_sectors)'#fi=(0...0)
-    exec 'f'+str(i)+'['+str(i)+']=1'#f1=(1 0 0) with 1 in the i position
-    exec 'f'+str(i)+'_array=np.array(f'+str(i)+').reshape(('+str(NBR_sectors)+',1))'
-    exec 'x'+str(i)+'=np.dot(L,f'+str(i)+')'#xi=L*fi
-    exec 'total_outputs_'+ str(i)+ '= x'+str(i)
-    exec 'r'+str(i)+'=np.dot(np.diag(r_coefs.flatten()),x'+str(i)+')'#ri=diag(r_coefs)*xi    
-    exec 'Tw'+str(i)+'=np.zeros((1,'+str(NBR_sectors)+'))'#initialise an array of zeros for the Total emissions. Remember that NBR_sectors has extra number.
-    exec 'f'+str(i)+'_array=f'+str(i)+'.reshape((NBR_sectors,1))'# will be hstacked later with emission vectors
-    for j in range(NBR_disposals):
-        exec "w"+str(j)+str(i)+"=np.dot(E"+str(j)+",x"+str(i)+')'#calculate each emission type wji - w_emType_Prod_struct
-        exec 'Tw'+str(i)+'+=w'+str(j)+str(i)#calculate the total emissions for the production structure Twi
-        exec 'f'+str(i)+'_array=np.hstack([f'+str(i)+'_array,w'+str(j)+str(i)+'.reshape((NBR_sectors,1))])'
-    if NBR_disposals == 0:
-        exec 'w'+str(i)+'_array= w0'+str(i)+'.reshape(('+str(NBR_sectors)+',1))'
-    elif NBR_disposals > 0:
-        exec 'w'+str(i)+'_array= w0'+str(i)+'.reshape(('+str(NBR_sectors)+',1))'
-        for p in range(NBR_disposals-1):
-            exec 'w'+str(i)+'_array= np.hstack([w'+str(i)+'_array, w'+str(p+1)+str(i)+'.reshape(('+str(NBR_sectors)+',1))])'       
-    exec "Z"+str(i)+"=np.dot(A,np.diag(x"+str(i)+".flatten()))"
-    exec 'To'+str(i)+'=Tw'+str(i)+'+f'+str(i)#calculate total external outputs (emissions+final goods)
+for i in range(NBR_sectors): # XXX: ERASE
+    exec 'f'+str(i)+'=np.zeros(NBR_sectors)'#fi=(0...0) # XXX: ERASE
+    exec 'f'+str(i)+'['+str(i)+']=1'#f1=(1 0 0) with 1 in the i position # XXX: ERASE
+    exec 'f'+str(i)+'_array=np.array(f'+str(i)+').reshape(('+str(NBR_sectors)+',1))' # XXX: ERASE
+    exec 'x'+str(i)+'=np.dot(L,f'+str(i)+')'#xi=L*fi # XXX: ERASE
+    exec 'total_outputs_'+ str(i)+ '= x'+str(i) # XXX: ERASE
+    exec 'r'+str(i)+'=np.dot(np.diag(r_coefs.flatten()),x'+str(i)+')'#ri=diag(r_coefs)*xi     # XXX: ERASE
+    exec 'Tw'+str(i)+'=np.zeros((1,'+str(NBR_sectors)+'))'#initialise an array of zeros for the Total emissions. Remember that NBR_sectors has extra number. # XXX: ERASE
+    exec 'f'+str(i)+'_array=f'+str(i)+'.reshape((NBR_sectors,1))'# will be hstacked later with emission vectors # XXX: ERASE
+    for j in range(NBR_disposals): # XXX: ERASE
+        exec "w"+str(j)+str(i)+"=np.dot(E"+str(j)+",x"+str(i)+')'#calculate each emission type wji - w_emType_Prod_struct # XXX: ERASE
+        exec 'Tw'+str(i)+'+=w'+str(j)+str(i)#calculate the total emissions for the production structure Twi # XXX: ERASE
+        exec 'f'+str(i)+'_array=np.hstack([f'+str(i)+'_array,w'+str(j)+str(i)+'.reshape((NBR_sectors,1))])' # XXX: ERASE
+    if NBR_disposals == 0: # XXX: ERASE
+        exec 'w'+str(i)+'_array= w0'+str(i)+'.reshape(('+str(NBR_sectors)+',1))' # XXX: ERASE
+    elif NBR_disposals > 0: # XXX: ERASE
+        exec 'w'+str(i)+'_array= w0'+str(i)+'.reshape(('+str(NBR_sectors)+',1))' # XXX: ERASE
+        for p in range(NBR_disposals-1): # XXX: ERASE
+            exec 'w'+str(i)+'_array= np.hstack([w'+str(i)+'_array, # XXX: ERASE w'+str(p+1)+str(i)+'.reshape(('+str(NBR_sectors)+',1))])'        # XXX: ERASE
+    exec "Z"+str(i)+"=np.dot(A,np.diag(x"+str(i)+".flatten()))" # XXX: ERASE
+    exec 'To'+str(i)+'=Tw'+str(i)+'+f'+str(i)#calculate total external outputs (emissions+final goods) # XXX: ERASE
 
 
 # now all product-based structures will be stored within product_based_structures
@@ -405,33 +405,33 @@ print(
 '+++++++  FINDING SECTORAL EFFICIENCIES (Meso-economic efficiencies)  ++++++++'
 )
 
-##for the whole economy
+##for the whole economy # XXX: ERASE
 
-list_sectoral_eff_vars=[]
-#   name and description of the calculated variables
+list_sectoral_eff_vars=[] # XXX: ERASE
+#   name and description of the calculated variables # XXX: ERASE
 #eff_all_i  efficiency of sector i,  defined as intermediate output + final outputs divided by intermediate inputs plus raw inputs. 
-for i in range(NBR_sectors):
-    #eff=(sum(Z(row i))+f(i))/((Z(column i)+r(i))
-    exec "eff_all_"+str(i)+"=(sum(Z_array["+str(i)+",:])+fd_all.flatten()["+str(i)+"])/(sum(Z_array[:,"+str(i)+"])+r_array.flatten()["+str(i)+"])"
-    list_sectoral_eff_vars.append(eval("eff_all_"+str(i)))
-list_sectoral_eff_vars = np.array(list_sectoral_eff_vars)
+for i in range(NBR_sectors): # XXX: ERASE
+    #eff=(sum(Z(row i))+f(i))/((Z(column i)+r(i)) # XXX: ERASE
+    exec "eff_all_"+str(i)+"=(sum(Z_array["+str(i)+",:])+fd_all.flatten()["+str(i)+"])/(sum(Z_array[:,"+str(i)+"])+r_array.flatten()["+str(i)+"])" # XXX: ERASE
+    list_sectoral_eff_vars.append(eval("eff_all_"+str(i))) # XXX: ERASE
+list_sectoral_eff_vars = np.array(list_sectoral_eff_vars) # XXX: ERASE
 
 meso_efficiencies=np.zeros(NBR_sectors)
 for i in range(NBR_sectors):
     meso_efficiencies[i]=(sum(actual_structure_dictionary['Z'][i,:])+actual_structure_dictionary['fd'].flatten()[i])/(sum(actual_structure_dictionary['Z'][:,i])+actual_structure_dictionary['r'].flatten()[i])
 
-## Meso efficiencies for each production structure
-#eff_j_i  production structure of sector j, efficiency of sector i,  defined as intermediate output + final outputs divided by intermediate inputs plus raw inputs.
-## IMPORTANT: this is worthless because the sectoral efficiencies are the same in all the production structures!!! but anyway.. it is done.
-for prod_struct in range(NBR_sectors):
-    exec 'list_sectoral_eff_vars_'+str(prod_struct)+'=[]'
-    for i in range(NBR_sectors):
-        #intuitive definition: eff=(sum(Z(row i))+f(i))/((Z(column i)+r(i))
+## Meso efficiencies for each production structure # XXX: ERASE
+#eff_j_i  production structure of sector j, efficiency of sector i,  defined as intermediate output + final outputs divided by intermediate inputs plus raw inputs. # XXX: ERASE
+## IMPORTANT: this is worthless because the sectoral efficiencies are the same in all the production structures!!! but anyway.. it is done. # XXX: ERASE
+for prod_struct in range(NBR_sectors): # XXX: ERASE
+    exec 'list_sectoral_eff_vars_'+str(prod_struct)+'=[]' # XXX: ERASE
+    for i in range(NBR_sectors): # XXX: ERASE
+        #intuitive definition: eff=(sum(Z(row i))+f(i))/((Z(column i)+r(i)) # XXX: ERASE
         exec "eff_"+str(prod_struct)+"_"+str(i)+"=(sum(Z"+str(prod_struct)+"["+str(i)+",:])+f"+str(prod_struct)+".flatten()["+str(i)+"])/(sum(Z"+str(prod_struct)+"[:,"+str(i)+"])+r"+str(prod_struct)+".flatten()["+str(i)+"])"
-        exec 'list_sectoral_eff_vars_'+str(prod_struct)+'.append(eval("eff_"+str(prod_struct)+"_"+str(i)))'
-    exec 'list_sectoral_eff_vars_'+str(prod_struct)+'=np.array(list_sectoral_eff_vars_'+str(prod_struct)+')'
+        exec 'list_sectoral_eff_vars_'+str(prod_struct)+'.append(eval("eff_"+str(prod_struct)+"_"+str(i)))' # XXX: ERASE
+    exec 'list_sectoral_eff_vars_'+str(prod_struct)+'=np.array(list_sectoral_eff_vars_'+str(prod_struct)+')' # XXX: ERASE
 
-print('The sectoral efficiencies have been calculated individually but they should be the same in every production structure')
+print('The sectoral efficiencies have been calculated individually but they should be the same in every production structure') # XXX: ERASE
 
 #### TOP-LEVEL MACRO INDICATORS ####
 
