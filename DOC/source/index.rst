@@ -13,6 +13,7 @@ Contents:
 
    intro
    data_input
+   internal_data_structure
    calculations
 
 
