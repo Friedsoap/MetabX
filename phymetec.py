@@ -319,6 +319,11 @@ for waste_index in range(NBR_disposals):
 L=LA.inv(np.eye(NBR_sectors)-A-Etot) # XXX: ERASE
 actual_structure_dictionary['L']=LA.inv(L_tmp)
 
+r_coefs=np.dot(r_array,LA.inv(np.diag(total_outputs.flatten()))) # XXX: ERASE
+actual_structure_dictionary['r_coefs']=np.dot(r_array,LA.inv(np.diag(total_outputs.flatten())))
+
+
+
 ##############################################################################
 ######  Calculation of the PRODUCT-BASED production structure for each good (there will be "NBR_sectors" production structures)
 #   name and description of the calculated variables
@@ -334,7 +339,6 @@ actual_structure_dictionary['L']=LA.inv(L_tmp)
 #   fi_array    array containing fi and all wji
 #   wi_array    array containing all wji
 
-r_coefs=np.dot(r_array,LA.inv(np.diag(total_outputs.flatten())))
 
 for i in range(NBR_sectors):
     exec 'f'+str(i)+'=np.zeros(NBR_sectors)'#fi=(0...0)
