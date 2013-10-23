@@ -296,8 +296,9 @@ print(
 #   name and description of the calculated variables
 #   A     technical coefficient matrix for all flows
 #   Ei    output coefficient matrices to endogenise the disposals to nature
-#   Etot  auxiliar variable to calculate L
+#   Etot  auxiliar variable to calculate L # XXX: ERASE
 #   L     Leontief inverse matrix taking endogenising all disposals to nature - see Altimiras-Martin (2013) for a detailed explanation
+#   r_coefs input (resource) coeficients
 
 A=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))#CAREFUL: total_outputs and tota_inputs are 2D arrays, so np.diag will extract their diagonal, that is why I took the first element of total_inputs, which is the vector (it would not work for total_outputs # XXX: ERASE
 actual_structure_dictionary['A']=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))
@@ -326,18 +327,18 @@ actual_structure_dictionary['r_coefs']=np.dot(r_array,LA.inv(np.diag(total_outpu
 
 ##############################################################################
 ######  Calculation of the PRODUCT-BASED production structure for each good (there will be "NBR_sectors" production structures)
-#   name and description of the calculated variables
-#   r_coefs   input coefficients for the materials
-#   fi        one unit of final demand of sector i (i belongs to 0 to NBR_sectors-1)
-#the variable for each production structure are the same as the main variable with i appended to it. For example:
-#   ri        resources required to satisfy fi
-#   wji       type-j emissions generated to satisfy fi
-#   Twi     total emissions to satisfy fi
-#   Zi       intersectoral flows required to satisfy fi
-#   xi      total outputs generated to satisfy fi
-#   Toi     total external outputs (emissions+final goods) to satisfy fi
-#   fi_array    array containing fi and all wji
-#   wi_array    array containing all wji
+#   name and description of the calculated variables # XXX: ERASE
+#   r_coefs   input coefficients for the materials # XXX: ERASE
+#   fi        one unit of final demand of sector i (i belongs to 0 to NBR_sectors-1) # XXX: ERASE
+#the variable for each production structure are the same as the main variable with i appended to it. For example: # XXX: ERASE
+#   ri        resources required to satisfy fi # XXX: ERASE
+#   wji       type-j emissions generated to satisfy fi # XXX: ERASE
+#   Twi     total emissions to satisfy fi # XXX: ERASE
+#   Zi       intersectoral flows required to satisfy fi # XXX: ERASE
+#   xi      total outputs generated to satisfy fi # XXX: ERASE
+#   Toi     total external outputs (emissions+final goods) to satisfy fi # XXX: ERASE
+#   fi_array    array containing fi and all wji # XXX: ERASE
+#   wi_array    array containing all wji # XXX: ERASE
 
 
 for i in range(NBR_sectors):
@@ -363,6 +364,20 @@ for i in range(NBR_sectors):
     exec 'To'+str(i)+'=Tw'+str(i)+'+f'+str(i)#calculate total external outputs (emissions+final goods)
 
 
+# now all product-based structures will be stored within product_based_structures
+# each product-based structure entails: r, Z, f, wi, x
+product_based_structures=dict()
+for sector_index in range(NBR_sectors):
+    tmp_structure=dict()
+    tmp_structure['fd']=np.zeros(NBR_sectors)
+    tmp_structure['fd'][sector_index]=1
+    tmp_structure['fd']=tmp_structure['fd'].reshape((NBR_sectors,1))
+    tmp_structure['x']=np.dot(actual_structure_dictionary['L'],tmp_structure['fd'])
+    tmp_structure['r']=np.dot(np.diag(actual_structure_dictionary['r_coefs'].flatten()),tmp_structure['x'])
+    for waste_index in range(NBR_disposals):
+        tmp_structure['w'+str(waste_index)]=np.dot(actual_structure_dictionary['E'+str(waste_index)],tmp_structure['x'])
+    tmp_structure['Z']=np.dot(actual_structure_dictionary['A'],np.diag(tmp_structure['x'].flatten()))
+    product_based_structures['prod_based_struct_'+str(sector_index)]=tmp_structure
 
 ##############################################################################
 #############################################################################
@@ -400,6 +415,10 @@ for i in range(NBR_sectors):
     exec "eff_all_"+str(i)+"=(sum(Z_array["+str(i)+",:])+fd_all.flatten()["+str(i)+"])/(sum(Z_array[:,"+str(i)+"])+r_array.flatten()["+str(i)+"])"
     list_sectoral_eff_vars.append(eval("eff_all_"+str(i)))
 list_sectoral_eff_vars = np.array(list_sectoral_eff_vars)
+
+meso_efficiencies=np.zeros(NBR_sectors)
+for i in range(NBR_sectors):
+    meso_efficiencies[i]=(sum(actual_structure_dictionary['Z'][i,:])+actual_structure_dictionary['fd'].flatten()[i])/(sum(actual_structure_dictionary['Z'][:,i])+actual_structure_dictionary['r'].flatten()[i])
 
 ## Meso efficiencies for each production structure
 #eff_j_i  production structure of sector j, efficiency of sector i,  defined as intermediate output + final outputs divided by intermediate inputs plus raw inputs.
