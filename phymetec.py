@@ -253,8 +253,10 @@ actual_structure_dictionary=dict()
 actual_structure_dictionary['r']=np.array([[c for c in row[1:]] for row in r_PRE_array[0:]])
 actual_structure_dictionary['Z']=np.array([[c for c in row[1:]] for row in Z_PRE_array[1:]])
 actual_structure_dictionary['fd']=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,0:1] # assuming only one column --- could be [:,0]
+actual_structure_dictionary['tot_final_outputs']=actual_structure_dictionary['fd']
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['w'+str(waste_index)]=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,str(waste_index+1)].reshape((NBR_sectors,1))
+    actual_structure_dictionary['tot_final_outputs']=actual_structure_dictionary['tot_final_outputs']+actual_structure_dictionary['w'+str(waste_index)]
 
 
 
@@ -374,8 +376,10 @@ for sector_index in range(NBR_sectors):
     tmp_structure['fd']=tmp_structure['fd'].reshape((NBR_sectors,1))
     tmp_structure['x']=np.dot(actual_structure_dictionary['L'],tmp_structure['fd'])
     tmp_structure['r']=np.dot(np.diag(actual_structure_dictionary['r_coefs'].flatten()),tmp_structure['x'])
+    tmp_structure['tot_final_outputs']=tmp_structure['fd']
     for waste_index in range(NBR_disposals):
         tmp_structure['w'+str(waste_index)]=np.dot(actual_structure_dictionary['E'+str(waste_index)],tmp_structure['x'])
+        tmp_structure['tot_final_outputs']=tmp_structure['tot_final_outputs']+tmp_structure['w'+str(waste_index)]
     tmp_structure['Z']=np.dot(actual_structure_dictionary['A'],np.diag(tmp_structure['x'].flatten()))
     product_based_structures['prod_based_struct_'+str(sector_index)]=tmp_structure
 
@@ -496,7 +500,34 @@ for prod_struct in range(NBR_sectors): # XXX: ERASE
 ##############################################################################
 #### Cycle decomposition of all flow   ###################################################
 
-print('\n ++++++++++ CYCLE DECOMPOSITION OF THE ORIGINAL PIOT ++++++++++++++++')
+print('\n ++++++++++ CYCLE DECOMPOSITION OF THE ORIGINAL PIOT ++++++++++++++++') # XXX: ERASE
+print('\n ++++++ CYCLIC-ACYCLIC/DIRECT-INDIRECT DECOMPOSITION OF ALL PRODUCT-BASED STRUCTURES +++++++++')
+
+
+for sector_index in range(NBR_sectors):
+    print('\n +++++ Started structural decomposition for product-based structure'+str(sector_index)+' +++++')
+    print('\n +++ Decomposing Z between Zc and Zind +++')
+    [product_based_structures['prod_based_struct_'+str(sector_index)]['Zc'],product_based_structures['prod_based_struct_'+str(sector_index)]['Zind'],product_based_structures['prod_based_struct_'+str(sector_index)]['self_cycling']]=cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(sector_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(sector_index)]['tot_final_outputs'].__copy__())
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 print('\n +++ creating cycling indicators +++')
