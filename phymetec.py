@@ -279,7 +279,7 @@ total_outputs=np.sum(Z_array,axis=1).reshape(NBR_sectors,1)+np.sum(f_array,axis=
 total_outputs=np.sum(actual_structure_dictionary['Z'],axis=1).reshape(NBR_sectors,1)+actual_structure_dictionary['fd']
 for waste_index in range(NBR_disposals):
     total_outputs=total_outputs+actual_structure_dictionary['w'+str(waste_index)]
-
+actual_structure_dictionary['x']=total_outputs
 # raise error if total_inputs are different from total_outputs for more than 'acceptable value'
 acceptable_difference=0.00001 # this is already in percentage (so 1 is 100%)
 for i_index in range(NBR_sectors):
@@ -299,20 +299,26 @@ print(
 #   Etot  auxiliar variable to calculate L
 #   L     Leontief inverse matrix taking endogenising all disposals to nature - see Altimiras-Martin (2013) for a detailed explanation
 
-A=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))#CAREFUL: total_outputs and tota_inputs are 2D arrays, so np.diag will extract their diagonal, that is why I took the first element of total_inputs, which is the vector (it would not work for total_outputs
+A=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))#CAREFUL: total_outputs and tota_inputs are 2D arrays, so np.diag will extract their diagonal, that is why I took the first element of total_inputs, which is the vector (it would not work for total_outputs # XXX: ERASE
+actual_structure_dictionary['A']=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))
 
 # create all Ei and the sum of the Etot
 # Remember: they are valid for all output structures
-Etot=np.zeros((NBR_sectors,NBR_sectors))#the shape is a list (3,3), so the syntax is zeros((3,3))
-for i in range(NBR_disposals):#need +1 because the range does not count the last
-    exec 'E'+str(i)+'=np.dot(LA.inv(np.diag(total_outputs.flatten())),w'+str(i)+'_all)'
-    exec 'E'+str(i)+'=np.diag(E'+str(i)+'.flatten())'
-    Etot=Etot+eval('E'+str(i))
+Etot=np.zeros((NBR_sectors,NBR_sectors))#the shape is a list (3,3), so the syntax is zeros((3,3)) # XXX: ERASE
+for i in range(NBR_disposals):#need +1 because the range does not count the last # XXX: ERASE
+    exec 'E'+str(i)+'=np.dot(LA.inv(np.diag(total_outputs.flatten())),w'+str(i)+'_all)' # XXX: ERASE
+    exec 'E'+str(i)+'=np.diag(E'+str(i)+'.flatten())' # XXX: ERASE
+    Etot=Etot+eval('E'+str(i)) # XXX: ERASE
 
-Etot_test=np.diag(np.dot(LA.inv(np.diag(total_outputs.flatten())),np.sum(w_all,1)))
+L_tmp=np.eye(NBR_sectors)-actual_structure_dictionary['A']
+for waste_index in range(NBR_disposals):
+    actual_structure_dictionary['E'+str(waste_index)]=np.diag(np.dot(LA.inv(np.diag(actual_structure_dictionary['x'].flatten())),actual_structure_dictionary['w'+str(waste_index)]).flatten())
+    L_tmp=L_tmp-actual_structure_dictionary['E'+str(waste_index)]
+
 #create Leontief including all wastes
-L=LA.inv(np.eye(NBR_sectors)-A-Etot)
- 
+L=LA.inv(np.eye(NBR_sectors)-A-Etot) # XXX: ERASE
+actual_structure_dictionary['L']=LA.inv(L_tmp)
+
 ##############################################################################
 ######  Calculation of the PRODUCT-BASED production structure for each good (there will be "NBR_sectors" production structures)
 #   name and description of the calculated variables
