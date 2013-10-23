@@ -94,7 +94,7 @@ sys.stdout = Tee(sys.stdout, logfile)
 # TODO: create a parseable config file containing program switches
 
 # Config for the circos_interface module
-circos_draw = True
+circos_draw = False
 circos_execute = True
 circos_open_images = True
 
@@ -129,18 +129,20 @@ else:
     
 
 ######  Creating the arrays     ##############################################
-# first the headers and matrix/vectors are read together from the xls and called x_PRE_array
+# first the headers and arrays of each worksheet are extracted as x_PRE_array
 # then, the matrix/vector are transformed to float and stored as x_array
-#finally, the headers and the x_array are stored together as x_array_with_headers# but I am not sure I am going to use that...
+# finally, the headers and the x_array are stored together as x_array_with_headers# but I am not sure I am going to use that...
+
+# 
 
 ####    Z       ################################################
-##      Reading all values from Z
+##      Reading all values from Z worksheet
 Z_PRE_array = []
 for row_index in range(Z_worksheet.nrows):
      Z_PRE_array.append(Z_worksheet.row_values(row_index)) # in"Z_PRE_array.append(Z_worksheet.row(row_index))" the rows are lists of  xlrd.sheet.Cell objects. These objects have very few attributes, of which 'value' contains the actual value of the cell and 'ctype' contains the type of the cell. That is why I used row_values instead
 
 ##      create the Z array
-Z_array = [[c for c in row[1:]] for row in Z_PRE_array[1:]]
+Z_array = [[c for c in row[1:]] for row in Z_PRE_array[1:]] # XXX: ERASE
 #this was supposed to be the same as below, but it is not. The issue is how to "rewrite! the [] that contains "loat(c)...row[1:]".
 #for row in Z_PRE_array[1:]:
 #    print row #each row is a list of cells
@@ -149,7 +151,7 @@ Z_array = [[c for c in row[1:]] for row in Z_PRE_array[1:]]
 #        Z_array = float(col_index)
 
 ##      merge headers and array in dictionary entry
-Z_array_with_headers = {'column headings': Z_PRE_array[0][1:],'row headings': [row[0] for row in Z_PRE_array[1:]], 'array': np.array(Z_array)}
+Z_array_with_headers = {'column headings': Z_PRE_array[0][1:],'row headings': [row[0] for row in Z_PRE_array[1:]], 'array': np.array(Z_array)} # XXX: ERASE
 
 
 ####    r       ################################################
@@ -159,11 +161,11 @@ for row_index in range(r_worksheet.nrows):
      r_PRE_array.append(r_worksheet.row_values(row_index)) # in"Z_PRE_array.append(Z_worksheet.row(row_index))" the rows are lists of  xlrd.sheet.Cell objects. These objects have very few attributes, of which 'value' contains the actual value of the cell and 'ctype' contains the type of the cell. That is why I used row_values instead
 
 ##      create the r array
-r_array = [[c for c in row[1:]] for row in r_PRE_array[0:]]
+r_array = [[c for c in row[1:]] for row in r_PRE_array[0:]] # XXX: ERASE
 
 ##      merge headers and array in dictionary entry
-r_array_with_headers = {'row headings': [row[0] for row in r_PRE_array[0:]], 'array': np.array(r_array)}
-
+r_array_with_headers = {'row headings': [row[0] for row in r_PRE_array[0:]], 'array': np.array(r_array)} # XXX: ERASE
+ 
 ####    f       ################################################
 ##      Reading all values from f
 f_PRE_array = []
@@ -172,20 +174,21 @@ for row_index in range(f_worksheet.nrows):
 
 ##      create the f array #I had previously f_array = [[float(c) for c in row[0:]] for row in f_PRE_array[1:]]
 # the f_array contains the fd and emissions
-f_array = [[c for c in row[0:]] for row in f_PRE_array[1:]]
+f_array = [[c for c in row[0:]] for row in f_PRE_array[1:]] # XXX: ERASE
 
 ##      merge headers and array in dictionary entry
-f_array_with_headers = {'column headings': f_PRE_array[0][0:], 'array': np.array(f_array)}
+f_array_with_headers = {'column headings': f_PRE_array[0][0:], 'array': np.array(f_array)} # XXX: ERASE
 # note: the different column vectors are extracted later: the final demand (or useful outputs) is called fd_all, and the different related outputs are called 'w'+str(waste_index)+'_array', i.e. wi_array
     
 ####    title       ################################################
 ##      Reading all values from title sheet
-title =  title_worksheet.row_values(0)
-title = str(title[0])
-units =  title_worksheet.row_values(1)
-units = str(units[0])
-comments =  title_worksheet.row_values(2)
-comments = str(comments[0])
+title =  title_worksheet.row_values(0) # XXX: ERASE
+title = str(title[0]) # XXX: ERASE
+units =  title_worksheet.row_values(1) # XXX: ERASE
+units = str(units[0]) # XXX: ERASE
+comments =  title_worksheet.row_values(2) # XXX: ERASE
+comments = str(comments[0]) # XXX: ERASE
+
 
 
 
@@ -202,9 +205,13 @@ else:
     sys.exit('''Error: the \'f\' worksheet does not contain any waste because no column header name starts by 'w', exiting.''')
 
 ###### convert the "arrays" (which are in fact lists) into numpy arrays
-f_array=np.array(f_array)
-Z_array=np.array(Z_array)
-r_array=np.array(r_array)
+f_array=np.array(f_array) # XXX: ERASE
+Z_array=np.array(Z_array) # XXX: ERASE
+r_array=np.array(r_array) # XXX: ERASE
+
+
+
+   
 
 
 ##############################################################################
@@ -228,22 +235,51 @@ if Z_rows != f_rows:
 NBR_sectors=Z_rows#could be Z_cols as well
 print('''The Z matrix has {0} sectors.\n'''.format(NBR_sectors))
 
+
+# label dictionary
+label_dictionary=dict()
+label_dictionary['title']=str(title_worksheet.row_values(0)[0])
+label_dictionary['units']=str(title_worksheet.row_values(1)[0])
+label_dictionary['comments']=str(title_worksheet.row_values(2)[0])
+label_dictionary['resource_labels']= [row[0] for row in r_PRE_array[0:]]
+label_dictionary['row_sector_labels']= [row[0] for row in Z_PRE_array[1:]]
+label_dictionary['column_sector_labels']= Z_PRE_array[0][1:]
+label_dictionary['waste_labels']= f_PRE_array[0][1:] # assumes only one final demand
+label_dictionary['fd_labels']= f_PRE_array[0][0] # assumes only one final demand
+
+
+# Actual structure dictionary
+actual_structure_dictionary=dict()
+actual_structure_dictionary['r']=np.array([[c for c in row[1:]] for row in r_PRE_array[0:]])
+actual_structure_dictionary['Z']=np.array([[c for c in row[1:]] for row in Z_PRE_array[1:]])
+actual_structure_dictionary['fd']=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,0:1] # assuming only one column --- could be [:,0]
+for waste_index in range(NBR_disposals):
+    actual_structure_dictionary['w'+str(waste_index)]=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,str(waste_index+1)].reshape((NBR_sectors,1))
+
+
+
+
 #Create a column for each type of output
 # fd_all      final demand vector  [assuming first vector is the one corresponding to fd!]
 # wi_all      waste i vector
 
-fd_all = f_array[:][:,0:1] # not sure if correct
-w_all=f_array[:][:,1:1+NBR_disposals]
-for waste_index in range(NBR_disposals):
-    exec 'w'+str(waste_index)+'_all = f_array[:,'+str(waste_index+1)+'].reshape((NBR_sectors,1))'
+fd_all = f_array[:][:,0:1] # not sure if correct # XXX: ERASE
+w_all=f_array[:][:,1:1+NBR_disposals] # XXX: ERASE
+for waste_index in range(NBR_disposals): # XXX: ERASE
+    exec 'w'+str(waste_index)+'_all = f_array[:,'+str(waste_index+1)+'].reshape((NBR_sectors,1))' # XXX: ERASE
 
 
 ######      check that the PIOT is balanced, i.e. total inputs= total outputs
 #total_inputs=column sum of Z + r
-total_inputs=np.sum(Z_array,axis=0)+r_array
+total_inputs=np.sum(Z_array,axis=0)+r_array # XXX: ERASE
+total_inputs=np.sum(actual_structure_dictionary['Z'],axis=0)+actual_structure_dictionary['r']
 #total_inputs=total_inputs[0] # gives error because it is not a matrix anymore
 #total_inputs=row sum of Z + f
-total_outputs=np.sum(Z_array,axis=1).reshape(NBR_sectors,1)+np.sum(f_array,axis=1).reshape(NBR_sectors,1)
+total_outputs=np.sum(Z_array,axis=1).reshape(NBR_sectors,1)+np.sum(f_array,axis=1).reshape(NBR_sectors,1) # XXX: ERASE
+total_outputs=np.sum(actual_structure_dictionary['Z'],axis=1).reshape(NBR_sectors,1)+actual_structure_dictionary['fd']
+for waste_index in range(NBR_disposals):
+    total_outputs=total_outputs+actual_structure_dictionary['w'+str(waste_index)]
+
 # raise error if total_inputs are different from total_outputs for more than 'acceptable value'
 acceptable_difference=0.00001 # this is already in percentage (so 1 is 100%)
 for i_index in range(NBR_sectors):
@@ -273,6 +309,7 @@ for i in range(NBR_disposals):#need +1 because the range does not count the last
     exec 'E'+str(i)+'=np.diag(E'+str(i)+'.flatten())'
     Etot=Etot+eval('E'+str(i))
 
+Etot_test=np.diag(np.dot(LA.inv(np.diag(total_outputs.flatten())),np.sum(w_all,1)))
 #create Leontief including all wastes
 L=LA.inv(np.eye(NBR_sectors)-A-Etot)
  
