@@ -435,42 +435,61 @@ print('The sectoral efficiencies have been calculated individually but they shou
 
 #### TOP-LEVEL MACRO INDICATORS ####
 
-## resource efficiencies/intensities
-#for the whole economy
-tot_res_eff_all=np.sum(fd_all.flatten())/np.sum(r_array.flatten())
-tot_res_int_all=1/tot_res_eff_all
+## resource efficiencies, intensities and emission intensity for the whole economy
+#
+tot_res_eff_all=np.sum(fd_all.flatten())/np.sum(r_array.flatten()) # XXX: ERASE
+tot_res_int_all=1/tot_res_eff_all # XXX: ERASE
 
-#for each prod struct
-for prod_struct in range(NBR_sectors):
-    exec 'tot_res_eff_'+str(prod_struct)+'=np.sum(f'+str(prod_struct)+'.flatten())/np.sum(r'+str(prod_struct)+'.flatten())'
-    exec 'tot_res_int_'+str(prod_struct)+'=1/tot_res_eff_'+str(prod_struct)
+actual_structure_dictionary['tot_res_eff']=sum(actual_structure_dictionary['fd'].flatten())/sum(actual_structure_dictionary['r'].flatten())
+actual_structure_dictionary['tot_res_int']=1/tot_res_eff_all/actual_structure_dictionary['tot_res_eff']
+
+#for each prod struct # XXX: ERASE
+for prod_struct in range(NBR_sectors): # XXX: ERASE
+    exec 'tot_res_eff_'+str(prod_struct)+'=np.sum(f'+str(prod_struct)+'.flatten())/np.sum(r'+str(prod_struct)+'.flatten())' # XXX: ERASE
+    exec 'tot_res_int_'+str(prod_struct)+'=1/tot_res_eff_'+str(prod_struct) # XXX: ERASE
 
 ## TOP-LEVEL Emission intensities 
 #for the whole economy
-tot_em_int_all=(np.sum(f_array.flatten())-np.sum(fd_all.flatten()))/np.sum(fd_all.flatten())
-#for each prod struct
-for prod_struct in range(NBR_sectors):
-    exec 'tot_em_int_'+str(prod_struct)+'=np.sum(Tw'+str(prod_struct)+'.flatten())/np.sum(f'+str(prod_struct)+'.flatten())'
+tot_em_int_all=(np.sum(f_array.flatten())-np.sum(fd_all.flatten()))/np.sum(fd_all.flatten()) # XXX: ERASE
 
-#### MACRO INDICATORS ####
+actual_structure_dictionary['tot_em_int']=0
+for waste_index in range(NBR_disposals):
+    actual_structure_dictionary['tot_em_int']=actual_structure_dictionary['tot_em_int']+sum(actual_structure_dictionary['w'+str(waste_index)].flatten())/sum(actual_structure_dictionary['r'].flatten())
+
+
+for prod_struct in range(NBR_sectors): # XXX: ERASE
+    exec 'tot_em_int_'+str(prod_struct)+'=np.sum(Tw'+str(prod_struct)+'.flatten())/np.sum(f'+str(prod_struct)+'.flatten())' # XXX: ERASE
+
+# and for each prod struct
+
+for sector_index in range(NBR_sectors):
+    product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']=sum(product_based_structures['prod_based_struct_'+str(sector_index)]['fd'].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'].flatten())
+    product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_int']=1/product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']
+    product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=0
+    for waste_index in range(NBR_disposals):
+        product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']+sum(product_based_structures['prod_based_struct_'+str(sector_index)]['w'+str(waste_index)].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'].flatten())
+
+#### MACRO INDICATORS #### 
+# NOTE: I do not need to calculate them since they do not make sense for the actual structure
+# and they are given by the product-based decomposition in case of each product-based.
 
 ##resource intensity of each sector for all production
-res_int_all=r_array.flatten()/np.sum(fd_all.flatten())
+res_int_all=r_array.flatten()/np.sum(fd_all.flatten()) # XXX: ERASE
 
-for prod_struct in range(NBR_sectors):
-    exec 'res_eff_'+str(prod_struct)+'=r'+str(prod_struct)
-## Emission intensities for each emission type
-#for the whole economy
-for waste_index in range(NBR_disposals):
-    exec 'em_int_'+str(waste_index)+'_all = np.sum(w'+str(waste_index)+'_all.flatten()) / np.sum(fd_all.flatten())'
-    for sector in range(NBR_sectors):
-        exec 'em_int_'+str(waste_index)+'_all_'+str(sector)+' = w'+str(waste_index)+'_all.flatten()['+str(sector)+'] / np.sum(fd_all.flatten())'
+for prod_struct in range(NBR_sectors): # XXX: ERASE
+    exec 'res_eff_'+str(prod_struct)+'=r'+str(prod_struct) # XXX: ERASE
+## Emission intensities for each emission type # XXX: ERASE
+#for the whole economy # XXX: ERASE
+for waste_index in range(NBR_disposals): # XXX: ERASE
+    exec 'em_int_'+str(waste_index)+'_all = np.sum(w'+str(waste_index)+'_all.flatten()) / np.sum(fd_all.flatten())' # XXX: ERASE
+    for sector in range(NBR_sectors): # XXX: ERASE
+        exec 'em_int_'+str(waste_index)+'_all_'+str(sector)+' = w'+str(waste_index)+'_all.flatten()['+str(sector)+'] / np.sum(fd_all.flatten())' # XXX: ERASE
         
-#for each prod struct. REMEMBER:  wji type-j emissions generated to satisfy fi
-for prod_struct in range(NBR_sectors):
-    for waste_index in range(NBR_disposals):
-        exec 'em_int_'+str(waste_index)+'_'+str(prod_struct)+' = np.sum(w'+str(waste_index)+str(prod_struct)+'.flatten()) / np.sum(f'+str(prod_struct)+'.flatten())'    
-#    exec 'tot_em_int_'+str(prod_struct)+'=np.sum(Tw'+str(prod_struct)+'.flatten())/np.sum(f'+str(prod_struct)+'.flatten())'
+#for each prod struct. REMEMBER:  wji type-j emissions generated to satisfy fi # XXX: ERASE
+for prod_struct in range(NBR_sectors): # XXX: ERASE
+    for waste_index in range(NBR_disposals): # XXX: ERASE
+        exec 'em_int_'+str(waste_index)+'_'+str(prod_struct)+' =  np.sum(w'+str(waste_index)+str(prod_struct)+'.flatten()) / np.sum(f'+str(prod_struct)+'.flatten())'     # XXX: ERASE
+#    exec 'tot_em_int_'+str(prod_struct)+'=np.sum(Tw'+str(prod_struct)+'.flatten())/np.sum(f'+str(prod_struct)+'.flatten())' # XXX: ERASE
 
 
 
