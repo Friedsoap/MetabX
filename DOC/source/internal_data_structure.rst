@@ -61,6 +61,22 @@ The structure of ``actual_structure_dictionary`` is :
 |                        |            | (emissions/primary inputs)     |
 +------------------------+------------+--------------------------------+
 
+.. note::
+   
+    The meso-efficiencies are not included in the structural arrays because
+    it this would be duplicating the data since they are the same for all
+    structures. They are stored separately in the ``meso_efficiencies``.
+    In other words, for each product-based structure,  ``r`` and  ``w``:sub:`m`
+    are the intensities.
+
+    The sectoral resource and emissions intensities are not calculated 
+    explicitly since the resources and emissions of the product-based 
+    structures *are* the intensities themselves since they represent the 
+    resources and emissions required to produce each specific final good.
+    
+    The sectoral resource and emissions intensities for the aggregate
+    structure are not calculated because they are not structurally meaningful.
+
 .. rubric:: Footnotes
 
 .. [#1] The dimension are for 2D arrays. The IOT has n sectors and m emissions.
