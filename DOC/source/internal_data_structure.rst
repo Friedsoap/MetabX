@@ -83,6 +83,22 @@ The structure of ``actual_structure_dictionary`` is :
 +------------------------+------------+------------------------------------+
 | ``find``               | n x 1      | final demand produced indirectly   |
 +------------------------+------------+------------------------------------+
+| ``Zind_ac_a``          | n x n      | matrix with the indirect acyclic   |
+|                        |            | flows producing final goods        |
++------------------------+------------+------------------------------------+
+| ``Zind_ac_c``          | n x n      | matrix with the indirect flows     |
+|                        |            | feeding ``Zind_c``                 |
++------------------------+------------+------------------------------------+
+| ``rind_ac_a``          | 1 x n      | primary resources required to      |
+|                        |            | produce ``find``                   |
++------------------------+------------+------------------------------------+
+| ``rind_ac_c``          | 1 x n      | primary resources required to      |
+|                        |            | maintain cycling indirectly, i.e.  |
+|                        |            | ``Zind_c`` and ``Zind_ac_c``       |
++------------------------+------------+------------------------------------+
+
+
+
 
 
 
