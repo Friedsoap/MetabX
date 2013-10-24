@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Filename: Phymetec.py
+# Filename: metabx.py
 #revision history
 #v0.1 change calculation of minimum flow : after check if the sum of cycles going a node is inferior or equal to the node minimal throughput. If not, the cycles flows need to be resized according to their flow probabilities to pass through the node (NOW according to CIRCUIT PROBABILITIES INSTEAD OF THE FLOW PROB)
 #v0.2: added 2 sub-routines: cycle_decomposition_v01 (imported as cd) which uses Ulanowicz (1983) to calculate and extract all cycles; and draw_sankeys_v02 (imported as draw_sankeys) which draws the sankey diagrams for cycling matrix only (I wanted to do for the straight flows as well but I found a better way to represent the flows so I just did the other one). The function saves a png in the working directory/images with the name and then the image is recovered later in the main program to be added in the xls output. 
