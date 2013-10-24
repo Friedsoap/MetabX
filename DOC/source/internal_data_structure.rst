@@ -81,7 +81,8 @@ The structure of ``actual_structure_dictionary`` is :
 | ``rind_ac``            | 1 x n      | primary resources associated to    |
 |                        |            | ``Zind_ac``                        |
 +------------------------+------------+------------------------------------+
-
+| ``find``               | n x 1      | final demand produced indirectly   |
++------------------------+------------+------------------------------------+
 
 
 

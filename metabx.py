@@ -535,12 +535,17 @@ for struct_index in range(NBR_sectors):
     ,LA.inv(np.diag(meso_efficiencies))
     ) - np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'],0)
 
+    print('\n + Calculating find  +')
+    # finding find
+    product_based_structures['prod_based_struct_'+str(struct_index)]['find'] = np.dot(
+    np.dot(
+    np.diag(meso_efficiencies),
+    np.diag(np.dot(np.ones(NBR_sectors),
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac']
+    ))),
+    product_based_structures['prod_based_struct_'+str(struct_index)]['fd'])
 
-
-
-
-
-
+    print('\n + Decomposing Zind,ac between Zind,ac,a and Zind,ac,c  +')
 
 
 
