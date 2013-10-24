@@ -508,7 +508,7 @@ for struct_index in range(NBR_sectors):
     print('\n +++++ Started structural decomposition for product-based structure'+str(struct_index)+' +++++')
     print('\n +++ Decomposing Z between Zc and Zind +++')
     # finding Zc and Zind
-    [product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'], product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],product_based_structures['prod_based_struct_' +str(struct_index)]['self_cycling']] = cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(struct_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(struct_index)]['tot_final_outputs'].__copy__())
+    [product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'], product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'], product_based_structures['prod_based_struct_' +str(struct_index)]['self_cycling']] = cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(struct_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(struct_index)]['tot_final_outputs'].__copy__())
     # finding cycling throughput (1xn)
     product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] = [np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'],1)]
     
@@ -545,8 +545,14 @@ for struct_index in range(NBR_sectors):
     ))),
     product_based_structures['prod_based_struct_'+str(struct_index)]['fd'])
 
-    print('\n + Decomposing Zind,ac between Zind,ac,a and Zind,ac,c  +')
-
+    print('\n + Decomposing Zind,ac between Zind,ac,a and Zind,ac,c and finding rind,ac,a and rind,ac,c +')
+    [product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a'],
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_c'],
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a'],
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_c']] = backward_trace.main(
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'],
+    product_based_structures['prod_based_struct_'+str(struct_index)]['find'],
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac'])
 
 
 
