@@ -71,7 +71,13 @@ The structure of ``actual_structure_dictionary`` is :
 | ``cycling_throughput`` | 1 x n      | amount of cycling through each     |
 |                        |            | sector                             |
 +------------------------+------------+------------------------------------+
-
+| ``Zind_c``             | n x n      | intermediate flows used to         |
+|                        |            | maintain cycling                   |
++------------------------+------------+------------------------------------+
+| ``Zind_ac``            | n x n      | intermediate flows that feed the   |
+|                        |            | acyclic production and carry the   |
+|                        |            | resources for ``Zind_c``           |
++------------------------+------------+------------------------------------+
 
 
 .. note::

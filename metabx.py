@@ -504,15 +504,29 @@ print('\n ++++++++++ CYCLE DECOMPOSITION OF THE ORIGINAL PIOT ++++++++++++++++')
 print('\n ++++++ CYCLIC-ACYCLIC/DIRECT-INDIRECT DECOMPOSITION OF ALL PRODUCT-BASED STRUCTURES +++++++++')
 
 
-for sector_index in range(NBR_sectors):
-    print('\n +++++ Started structural decomposition for product-based structure'+str(sector_index)+' +++++')
+for struct_index in range(NBR_sectors):
+    print('\n +++++ Started structural decomposition for product-based structure'+str(struct_index)+' +++++')
     print('\n +++ Decomposing Z between Zc and Zind +++')
-    [product_based_structures['prod_based_struct_'+str(sector_index)]['Zc'], product_based_structures['prod_based_struct_'+str(sector_index)]['Zind'],product_based_structures['prod_based_struct_' +str(sector_index)]['self_cycling']] = cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(sector_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(sector_index)]['tot_final_outputs'].__copy__())
-    # finding cycling throughput
-    product_based_structures['prod_based_struct_'+str(sector_index)]['cycling_throughput'] = np.sum(product_based_structures['prod_based_struct_'+str(sector_index)]['Zc'],1)
+    # finding Zc and Zind
+    [product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'], product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],product_based_structures['prod_based_struct_' +str(struct_index)]['self_cycling']] = cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(struct_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(struct_index)]['tot_final_outputs'].__copy__())
+    # finding cycling throughput (1xn)
+    product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] = [np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'],1)]
     
 
-
+    print('\n +++ Finding the indirect-cyclic and indirect-acyclic structures +++')
+    print('\n + Decomposing Zind between Zind,c and Zind,ac +++')
+    prop_c=np.zeros((1,3))
+    prop_f=np.zeros((1,3))
+    prop_z=np.zeros((1,3))
+    for sector_index in range(NBR_sectors):
+        prop_c[0][sector_index]= product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index] / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index])
+        prop_f[0][sector_index]= product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index])
+        prop_z[0][sector_index]= np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index])
+    # finding proportion for acyclic flows
+    prop_ac=prop_f+prop_z
+    # using the proportions to find Zind_c and Zind_ac
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c'] = np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],np.diag(prop_c.flatten()))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'] = np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],np.diag(prop_ac.flatten()))
 
 
 
