@@ -514,7 +514,7 @@ for struct_index in range(NBR_sectors):
     
 
     print('\n +++ Finding the indirect-cyclic and indirect-acyclic structures +++')
-    print('\n + Decomposing Zind between Zind,c and Zind,ac +++')
+    print('\n + Decomposing Zind between Zind,c and Zind,ac +')
     prop_c=np.zeros((1,3))
     prop_f=np.zeros((1,3))
     prop_z=np.zeros((1,3))
@@ -528,8 +528,12 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c'] = np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],np.diag(prop_c.flatten()))
     product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'] = np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],np.diag(prop_ac.flatten()))
 
-
-
+    print('\n + Calculating rind_ac  +')
+    # finding rind_ac: rind_ac = (Zind . i + f ) . <meso_efficiencies>^(-1) - i . Zind,ac
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac'] = np.dot(
+    (    np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'],1) + product_based_structures['prod_based_struct_'+str(struct_index)]['fd'].flatten())
+    ,LA.inv(np.diag(meso_efficiencies))
+    ) - np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'],0)
 
 
 

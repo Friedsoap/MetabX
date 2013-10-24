@@ -78,13 +78,18 @@ The structure of ``actual_structure_dictionary`` is :
 |                        |            | acyclic production and carry the   |
 |                        |            | resources for ``Zind_c``           |
 +------------------------+------------+------------------------------------+
+| ``rind_ac`             | 1 x n      | primary resources associated to    |
+|                        |            | ``Zind_ac``                        |
++------------------------+------------+------------------------------------+
+
+
 
 
 .. note::
    
     The meso-efficiencies are not included in the structural arrays because
     it this would be duplicating the data since they are the same for all
-    structures. They are stored separately in the ``meso_efficiencies``.
+    structures. They are stored separately in the ``meso_efficiencies`` [1xn].
     In other words, for each product-based structure,  ``r`` and  ``w``:sub:`m`
     are the intensities.
 
