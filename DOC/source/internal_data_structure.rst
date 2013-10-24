@@ -92,7 +92,9 @@ The structure of ``actual_structure_dictionary`` is :
 
 .. rubric:: Footnotes
 
-.. [#1] The dimension are for 2D arrays. The IOT has n sectors and m emissions.
+.. [#1] The dimension are for 2D arrays: 1xn means one row, n columns.
+        Here, IOTs have *n* sectors and *m* emissions. 
+        1 means it is a single scalar.
 .. [#2] Only one column is allowed
 .. [#3] The Leontief inverse is calculated by endogenising the emissions, as shown in [AAM13]_
 

@@ -16,7 +16,7 @@ If the total outputs differ from the total inputs by a difference superior to 0.
 .. _agg_comp:
 
 Structural and calculated components (aggregate structure)
----------------------------------------
+----------------------------------------------------------
 
 explain that they come from the data_input and then how to calulate each component A, L, etc.
 
