@@ -283,7 +283,7 @@ for waste_index in range(NBR_disposals):
     total_outputs=total_outputs+actual_structure_dictionary['w'+str(waste_index)]
 actual_structure_dictionary['x']=total_outputs
 # raise error if total_inputs are different from total_outputs for more than 'acceptable value'
-max_balancing_difference=0.00001 # this is already in percentage (so 1 is 100%)
+max_balancing_difference=0.00001 # max_balancing_difference represents a percentage (so 1 is 100%)
 for i_index in range(NBR_sectors):
     if total_inputs[0][i_index]-total_outputs[i_index][0] > max_balancing_difference*(total_inputs[0][i_index]+total_outputs[i_index][0])/2 :
         sys.exit('''Error: Total outputs different from total inputs for sector {0}, i.e, the IOT is not balanced, exiting.'''.format(i_index))
