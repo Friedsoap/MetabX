@@ -78,7 +78,7 @@ The structure of ``actual_structure_dictionary`` is :
 |                        |            | acyclic production and carry the   |
 |                        |            | resources for ``Zind_c``           |
 +------------------------+------------+------------------------------------+
-| ``rind_ac`             | 1 x n      | primary resources associated to    |
+| ``rind_ac``            | 1 x n      | primary resources associated to    |
 |                        |            | ``Zind_ac``                        |
 +------------------------+------------+------------------------------------+
 
