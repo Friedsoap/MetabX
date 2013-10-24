@@ -27,12 +27,14 @@ Basic components (product based structures)
 
 to fill
 
-.. _indicators:
+.. _macro_ind:
 
-Indicators
-----------
+Macroscopic Indicators
+----------------------
 
 to fill
+
+.. _cy_ac_ind:
 
 Cyclic-acyclic and direct-indirect decomposition for product-based structures
 -----------------------------------------------------------------------------

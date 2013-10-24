@@ -507,8 +507,9 @@ print('\n ++++++ CYCLIC-ACYCLIC/DIRECT-INDIRECT DECOMPOSITION OF ALL PRODUCT-BAS
 for sector_index in range(NBR_sectors):
     print('\n +++++ Started structural decomposition for product-based structure'+str(sector_index)+' +++++')
     print('\n +++ Decomposing Z between Zc and Zind +++')
-    [product_based_structures['prod_based_struct_'+str(sector_index)]['Zc'],product_based_structures['prod_based_struct_'+str(sector_index)]['Zind'],product_based_structures['prod_based_struct_'+str(sector_index)]['self_cycling']]=cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(sector_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(sector_index)]['tot_final_outputs'].__copy__())
-    [product_based_structures['prod_based_struct_'+str(sector_index)]['cycling_throughput']
+    [product_based_structures['prod_based_struct_'+str(sector_index)]['Zc'], product_based_structures['prod_based_struct_'+str(sector_index)]['Zind'],product_based_structures['prod_based_struct_' +str(sector_index)]['self_cycling']] = cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(sector_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(sector_index)]['tot_final_outputs'].__copy__())
+    # finding cycling throughput
+    product_based_structures['prod_based_struct_'+str(sector_index)]['cycling_throughput'] = np.sum(product_based_structures['prod_based_struct_'+str(sector_index)]['Zc'],1)
     
 
 
@@ -609,16 +610,16 @@ print('\n +++ creating cycling indicators +++')
 ## THE cd.cycle_decomposition function is an example because it modifies the array by subtracting the diagonal from it
 #####################################################################
 [Z_array_cyclic,Z_array_acyclic,self_cycling_all]=cd.cycle_decomposition(Z_array.__copy__(), f_array.__copy__())
-self_cycling_all=self_cycling_all.flatten()
+self_cycling_all=self_cycling_all.flatten() # XXX: ERASE
 
 #Indicators of cyclic component
-cycling_throughput_all= np.sum(Z_array_cyclic,axis=1)
-inter_cycling_all=cycling_throughput_all-self_cycling_all
-tot_cycling_throughput_all = np.sum(cycling_throughput_all.flatten())
-tot_self_cycling_all = np.sum(self_cycling_all.flatten())
-tot_inter_cycling_all = np.sum(inter_cycling_all.flatten())
-Z_array_self_cycling=np.diag(self_cycling_all)
-Z_array_inter_cycling=Z_array_cyclic-Z_array_self_cycling
+cycling_throughput_all= np.sum(Z_array_cyclic,axis=1) # XXX: ERASE
+inter_cycling_all=cycling_throughput_all-self_cycling_all # XXX: ERASE
+tot_cycling_throughput_all = np.sum(cycling_throughput_all.flatten()) # XXX: ERASE
+tot_self_cycling_all = np.sum(self_cycling_all.flatten()) # XXX: ERASE
+tot_inter_cycling_all = np.sum(inter_cycling_all.flatten()) # XXX: ERASE
+Z_array_self_cycling=np.diag(self_cycling_all) # XXX: ERASE
+Z_array_inter_cycling=Z_array_cyclic-Z_array_self_cycling # XXX: ERASE
 
 
 #Indicators derived from indicators of cyclic component
