@@ -14,7 +14,7 @@ Data structure
 The components and indicators related to a given structure are kept together even if they are calculated at different stages. For example, the components and indicators related to the actual, aggregated structure are kept in the ``actual_structure_dictionary`` which belongs to the dictionary class.
 Similarly, all components and indicators related to each product-based structure are kept together in a similar structure as ``actual_structure_dictionary``, which in turn are gathered under the array ``product_based_structures``.
 
-The structure of ``actual_structure_dictionary`` is :
+The structure of ``actual_structure_dictionary`` and of each entry in ``product_based_structures`` is :
 
 +------------------------+------------+------------------------------------+
 | Key                    | Dim [#1]_  | Content                            |
