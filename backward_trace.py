@@ -95,36 +95,38 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     return(Zind_ac_a, Zind_ac_c, rind_ac_a, rind_ac_c)
     
 
-def topological_ordering(Zind_ac, find, rind_ac):
-     '''This function find the topological order of Zind,ac, and tranforms 
-     Zind_ac, find, rind_ac accordingly, also providing an array undo the
-     ordering.
-    
-       
-    Parameters
-    ---------- 
-        1. Zind_ac matrix [nxn]
-        2. find vector [nx1]
-        3. rind_ac vector [1xn]
 
-    Returns
-    -------
-        1. Zind_ac matrix in topological order [nxn]
-        2. find vector in topological order  [nx1]
-        3. rind_ac vector in topological order [1xn]
-        4. topological_order: vector enabling to undo the ordering (n list)
-
-    Notes
-    -----
-    See documentation for calculations
-    
-    References
-    ----------
-    
-    '''   
-    # find topological order
-    topological_order = nx.topological_sort(nx.Digraph(Zind_ac))
-    
-    
-    
-    return(Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_order)
+# TODO: ERASE topological_ordering function IF NOT REQUIRED
+#def topological_ordering(Zind_ac, find, rind_ac):
+#     '''This function find the topological order of Zind,ac, and tranforms 
+#     Zind_ac, find, rind_ac accordingly, also providing an array undo the
+#     ordering.
+#    
+#       
+#    Parameters
+#    ---------- 
+#        1. Zind_ac matrix [nxn]
+#        2. find vector [nx1]
+#        3. rind_ac vector [1xn]
+#
+#    Returns
+#    -------
+#        1. Zind_ac matrix in topological order [nxn]
+#        2. find vector in topological order  [nx1]
+#        3. rind_ac vector in topological order [1xn]
+#        4. topological_order: vector enabling to undo the ordering (n list)
+#
+#    Notes
+#    -----
+#    See documentation for calculations
+#    
+#    References
+#    ----------
+#    
+#    '''   
+#    # find topological order
+#    topological_order = nx.topological_sort(nx.Digraph(Zind_ac))
+#    
+#    
+#    
+#    return(Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_order)
