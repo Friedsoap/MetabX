@@ -552,7 +552,8 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_c']] = backward_trace.main(
     product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'],
     product_based_structures['prod_based_struct_'+str(struct_index)]['find'],
-    product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac'],
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c'])
 
 
 
