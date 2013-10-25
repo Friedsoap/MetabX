@@ -91,7 +91,7 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``Zind_ac_c``          | n x n      | Matrix with the indirect flows     |
 |                        |            | feeding ``Zind_c``                 |
 +------------------------+------------+------------------------------------+
-| ``rind_ac_a``          | 1 x n      | primary resources required to      |
+| ``rind_ac_a``          | 1 x n      | Primary resources required to      |
 |                        |            | produce ``find``                   |
 +------------------------+------------+------------------------------------+
 | ``rind_ac_c``          | 1 x n      | Primary resources required to      |
