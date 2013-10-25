@@ -30,7 +30,7 @@ The structure of ``actual_structure_dictionary`` is :
 | ``fd``                 | n x 1      |  Final demand vector [#2]_         |
 +------------------------+------------+------------------------------------+
 | ``w``:sub:`m`          | n x 1      | Emission vectors (one for each     |
-|                        |            | of the *m* different emissions)    |
+|                        | (m arrays) | of the *m* different emissions)    |
 +------------------------+------------+------------------------------------+
 | ``x``                  | n x 1      | total outputs vector               |
 +------------------------+------------+------------------------------------+
@@ -47,7 +47,7 @@ The structure of ``actual_structure_dictionary`` is :
 | ``r_coefs``            | 1 x n      |  input coeficients for pri res     |
 +------------------------+------------+------------------------------------+
 | ``E``:sub:`m`          | n x n      | Emission coef matrix,1 for each    |
-|                        |            | of the *m* different emissions     |
+|                        | (m arrays) | of the *m* different emissions     |
 +------------------------+------------+------------------------------------+
 | **Macroscopic\  Indicators** See :ref:`macro_ind`                        |
 +------------------------+------------+------------------------------------+

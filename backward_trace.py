@@ -43,8 +43,36 @@ def main(Zind_ac, find, rind_ac):
     ----------
     
     '''
-    [Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_correspondence] = \
-        topological_ordering(Zind_ac.copy(), find.copy(), rind_ac.copy())
+    # Arrange the IOT structure in topological order
+    # I do not need to rearrange the whole array, just to treat them in the
+    # order    
+    #[Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_order] = \
+    #    topological_ordering(Zind_ac.copy(), find.copy(), rind_ac.copy())
+    # the topological order puts the secot p as the last sector
+    topological_order = nx.topological_sort(nx.Digraph(Zind_ac))
+    # we need to start with the last sector so we invert the order:
+    topological_order.reverse()
+    
+    # intialise arrays
+    Zind_ac_a_tmp=np.zeros((NBR_sectors,NBR_sectors))
+    Zind_ac_c_tmp=np.zeros((NBR_sectors,NBR_sectors))
+    
+    # however, the first sector (the p sector) is a especial case, so it is 
+    # treated separately. tThe first sector from topological_order it taken out
+    # and stores as p_sector
+    p_sector=topological_order.pop(0)
+    for sector_index in range(NBR_sectors):
+        Zind_ac_a_tmp[sector_index][p_sector] = Zind_ac[sector_index][p_sector]
+        # Zind_ac_c_tmp[sector_index][p_sector] = 0, a redundant operation given Zind_ac_c_tmp definition
+        
+    
+    # backtrace the flows and allocate each to either Zind_ac_a or Zind_ac_c
+    for order_index in topological_order:
+        prop_c=
+        prop_a=
+        for sector_index in range(NBR_sectors):
+            Zind_ac_a_tmp[sector_index][order_index] = prop_a * Zind_ac[sector_index][order_index]
+            Zind_ac_c_tmp[sector_index][order_index] = prop_c * Zind_ac[sector_index][order_index]
     
     
     
@@ -68,7 +96,7 @@ def topological_ordering(Zind_ac, find, rind_ac):
         1. Zind_ac matrix in topological order [nxn]
         2. find vector in topological order  [nx1]
         3. rind_ac vector in topological order [1xn]
-        4. topological_correspondence: vector enabling to undo the ordering [1xn]
+        4. topological_order: vector enabling to undo the ordering (n list)
 
     Notes
     -----
@@ -78,7 +106,9 @@ def topological_ordering(Zind_ac, find, rind_ac):
     ----------
     
     '''   
+    # find topological order
+    topological_order = nx.topological_sort(nx.Digraph(Zind_ac))
     
     
     
-    return(Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_correspondence)
+    return(Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_order)
