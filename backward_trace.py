@@ -25,7 +25,7 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     Parameters
     ---------- 
         1. Zind_ac matrix [nxn]
-        2. find vector [nx1] (most probably redundant  since the topological ordering leaves the p sector as the last one)
+        2. find vector [nx1]
         3. rind_ac vector [1xn]
         4. Zind_c matrix [nxn]
 
@@ -38,7 +38,9 @@ def main(Zind_ac, find, rind_ac, Zind_c):
 
     Notes
     -----
-    See documentation for calculations
+    * See documentation for calculations
+    * find is most probably redundant since the topological ordering leaves
+    the p-sector as the last one but I use it to check if that is true.
     
     References
     ----------
@@ -70,8 +72,11 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     p_sector=topological_order[0]
     
     # check is the p_sector is the last one
-    if p_sector != list(find.flatten()).index(1):
-    sys.exit('Abnornal error: the Zind_c of a based structure is not correctly ordered in topological order : the p-sector found in the topological order does not correspond to the product-based one.')
+    for i in range(NBR_sectors):
+        if find[i] != 0:
+            product_based_sector = i
+    if p_sector != product_based_sector:
+            sys.exit('Abnornal error: the Zind_c of a based structure is not correctly ordered in topological order : the p-sector found in the topological order does not correspond to the product-based one.')
     
     for sector_index in range(NBR_sectors):
         Zind_ac_a[sector_index][p_sector] = Zind_ac[sector_index][p_sector]

@@ -547,6 +547,7 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['fd'])
 
     print('\n + Decomposing Zind,ac between Zind,ac,a and Zind,ac,c and finding rind,ac,a and rind,ac,c +')
+    pdb.set_trace()
     [product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a'],
     product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_c'],
     product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a'],
