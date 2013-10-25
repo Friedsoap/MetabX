@@ -71,7 +71,8 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     # and stores as p_sector
     p_sector=topological_order[0]
     
-    # check is the p_sector is the last one
+    # check is the topologically ordered p_sector is the one from the product-based structure
+    # it could be that in a singular case it is not
     for i in range(NBR_sectors):
         if find[i] != 0:
             product_based_sector = i
