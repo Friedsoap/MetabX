@@ -25,7 +25,7 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     Parameters
     ---------- 
         1. Zind_ac matrix [nxn]
-        2. find vector [nx1] # I think this is redundant since the topological order already orders so that this sector is the last one.
+        2. find vector [nx1] (most probably redundant  since the topological ordering leaves the p sector as the last one)
         3. rind_ac vector [1xn]
         4. Zind_c matrix [nxn]
 
@@ -44,25 +44,21 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     ----------
     
     '''
-    #test arrays
-#    Zind_ac=np.array([[0,0,0],[1,0,1],[1,0,0]])
-#    find = np.array([[1],[0],[0]])
-#    rind_ac = np.array([0, 1,1]) 
-#    NBR_sectors = 3
-    
-    
-    
     # Arrange the IOT structure in topological order
     # I do not need to rearrange the whole array, just to treat them in the
     # order    
     #[Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_order] = \
     #    topological_ordering(Zind_ac.copy(), find.copy(), rind_ac.copy())
     # the topological order puts the secot p as the last sector
+    #Zind_ac_Digraph = nx.DiGraph(Zind_ac)
+    #topological_order = nx.topological_sort(Zind_ac_Digraph)
+    
     topological_order = nx.topological_sort(nx.DiGraph(Zind_ac))
-    # we need to start with the last sector becayse we backtrack so we invert the order:
+    # we need to start with the last sector because we backtrack so we invert the order:
     topological_order.reverse()
     
     # intialise arrays
+    NBR_sectors=np.shape(Zind_ac)[0]
     Zind_ac_a = np.zeros((NBR_sectors,NBR_sectors))
     Zind_ac_c = np.zeros((NBR_sectors,NBR_sectors))
     rind_ac_a = np.zeros(NBR_sectors)
@@ -72,15 +68,20 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     # treated separately. The first sector from topological_order it taken out
     # and stores as p_sector
     p_sector=topological_order[0]
+    
+    # check is the p_sector is the last one
+    if p_sector != list(find.flatten()).index(1):
+    sys.exit('Abnornal error: the Zind_c of a based structure is not correctly ordered in topological order : the p-sector found in the topological order does not correspond to the product-based one.')
+    
     for sector_index in range(NBR_sectors):
         Zind_ac_a[sector_index][p_sector] = Zind_ac[sector_index][p_sector]
         # Zind_ac_c[sector_index][p_sector] = 0, a redundant operation given Zind_ac_c definition
         
     # backtrace the flows according to inverse topo order starting from 2nd sector
     for order_index in topological_order[1:]:
-        prop_a = np.sum(Zind_ac_a[order_index]) / (np.sum(Zind_ac_c[order_index]) + np.sum(Zind_ac_a[order_index]))
-        prop_c = np.sum(Zind_ac_a[order_index]) / (np.sum(Zind_ac_c[order_index]) + np.sum(Zind_ac_a[order_index]))
-        
+        prop_a = np.sum(Zind_ac_a[order_index]) / (np.sum(Zind_ac_c[order_index]+Zind_ac_a[order_index]+ Zind_c[order_index]))
+        prop_c = np.sum(Zind_ac_c[order_index] + Zind_c[order_index]) / (np.sum(Zind_ac_c[order_index]+Zind_ac_a[order_index]+ Zind_c[order_index]))
+        print('output proportion for sector {2} \n prop_a ={0} \n prop_c ={1}'.format(prop_a,prop_c,order_index))
         # find resources rind_ac_a and rind_ac_c
         rind_ac_a[order_index] = prop_a * rind_ac[order_index]
         rind_ac_c[order_index] = prop_c * rind_ac[order_index]
@@ -94,39 +95,3 @@ def main(Zind_ac, find, rind_ac, Zind_c):
     
     return(Zind_ac_a, Zind_ac_c, rind_ac_a, rind_ac_c)
     
-
-
-# TODO: ERASE topological_ordering function IF NOT REQUIRED
-#def topological_ordering(Zind_ac, find, rind_ac):
-#     '''This function find the topological order of Zind,ac, and tranforms 
-#     Zind_ac, find, rind_ac accordingly, also providing an array undo the
-#     ordering.
-#    
-#       
-#    Parameters
-#    ---------- 
-#        1. Zind_ac matrix [nxn]
-#        2. find vector [nx1]
-#        3. rind_ac vector [1xn]
-#
-#    Returns
-#    -------
-#        1. Zind_ac matrix in topological order [nxn]
-#        2. find vector in topological order  [nx1]
-#        3. rind_ac vector in topological order [1xn]
-#        4. topological_order: vector enabling to undo the ordering (n list)
-#
-#    Notes
-#    -----
-#    See documentation for calculations
-#    
-#    References
-#    ----------
-#    
-#    '''   
-#    # find topological order
-#    topological_order = nx.topological_sort(nx.Digraph(Zind_ac))
-#    
-#    
-#    
-#    return(Zind_ac_ordered, find_ordered, rind_ac_ordered, topological_order)

@@ -31,6 +31,7 @@ import xlrd as xlrd
 import cycle_decomposition as cd
 #import draw_sankeys as draw_sankeys # the draw sankeys does not work very well
 import circos_interface as circos_interface
+import backward_trace as backward_trace
 
 # Make some shorcuts
 T = np.transpose    #    np.transpose(A) --> T(A)
