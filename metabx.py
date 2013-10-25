@@ -315,8 +315,10 @@ for i in range(NBR_disposals):#need +1 because the range does not count the last
     Etot=Etot+eval('E'+str(i)) # XXX: ERASE
 
 L_tmp=np.eye(NBR_sectors)-actual_structure_dictionary['A']
+actual_structure_dictionary['Etot']=np.zeros((NBR_sectors,NBR_sectors))
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['E'+str(waste_index)]=np.diag(np.dot(LA.inv(np.diag(actual_structure_dictionary['x'].flatten())),actual_structure_dictionary['w'+str(waste_index)]).flatten())
+    actual_structure_dictionary['Etot'] += actual_structure_dictionary['E'+str(waste_index)]
     L_tmp=L_tmp-actual_structure_dictionary['E'+str(waste_index)]
 
 #create Leontief including all wastes
@@ -556,9 +558,24 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac'],
     product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c'])
 
-
-
-
+    # finding wind_ac_a, wind_ac_c and wind_c (as totals, i.e. all emissions generated)
+    # the discrimination between different emissions is done later
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] = np.dot(
+    (np.dot(np.ones(NBR_sectors), product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a']) + product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a']),np.diag(np.ones(NBR_sectors))-np.diag(meso_efficiencies)).reshape((NBR_sectors,1))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'] = np.dot(
+    (np.dot(np.ones(NBR_sectors), product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_c']) + product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_c']),np.diag(np.ones(NBR_sectors))-np.diag(meso_efficiencies)).reshape((NBR_sectors,1))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c'] = np.dot(np.ones(NBR_sectors), product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c']).reshape((NBR_sectors,1))
+    
+    # disaggregation of wind_ac_a, wind_ac_c and wind_c between the NBR_disposals
+    # find the total outputs that generate the total emissions wind_ac_a, wind_ac_c and wind_c
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c'])
+    # find the emissions for each emission type
+    for waste_index in range(NBR_disposals):
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'])
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'])
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c'])
 
 
 

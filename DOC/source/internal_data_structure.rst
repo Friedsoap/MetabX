@@ -44,60 +44,78 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``A``                  | n x n      | Technical coeficient matrix        |
 +------------------------+------------+------------------------------------+
-| ``r_coefs``            | 1 x n      |  input coeficients for pri res     |
+| ``r_coefs``            | 1 x n      |  Input coeficients for pri res     |
 +------------------------+------------+------------------------------------+
 | ``E``:sub:`m`          | n x n      | Emission coef matrix,1 for each    |
 |                        | (m arrays) | of the *m* different emissions     |
 +------------------------+------------+------------------------------------+
+| ``Etot``               | n x n      | Total emission coef matrix         |
++------------------------+------------+------------------------------------+
 | **Macroscopic\  Indicators** See :ref:`macro_ind`                        |
 +------------------------+------------+------------------------------------+
-| ``tot_res_eff``        | 1          | total resource efficiency          |
+| ``tot_res_eff``        | 1          | Total resource efficiency          |
 |                        |            | (final goods/primary inputs)       |
 +------------------------+------------+------------------------------------+
-| ``tot_res_int``        | 1          | total resource intensity           |
+| ``tot_res_int``        | 1          | Total resource intensity           |
 |                        |            | (= 1/ ``tot_res_eff`` )            |
 +------------------------+------------+------------------------------------+
-| ``tot_em_int``         | 1          | total emissions intensity          |
+| ``tot_em_int``         | 1          | Total emissions intensity          |
 |                        |            | (emissions/primary inputs)         |
 +------------------------+------------+------------------------------------+
 | **Cyclic-acyclic/Direct-indirect\  Indicators** See :ref:`cy_ac_ind`     |
 +------------------------+------------+------------------------------------+
-| ``Zc``                 | n x n      | matrix containing intersectoral    |
+| ``Zc``                 | n x n      | Matrix containing intersectoral    |
 |                        |            | cycling                            |
 +------------------------+------------+------------------------------------+
-| ``Zind``               | n x n      | matrix containing the remaining    |
+| ``Zind``               | n x n      | Matrix containing the remaining    |
 |                        |            | intersectoral indirect flows       |
 +------------------------+------------+------------------------------------+
-| ``cycling_throughput`` | 1 x n      | amount of cycling through each     |
+| ``cycling_throughput`` | 1 x n      | Amount of cycling through each     |
 |                        |            | sector                             |
 +------------------------+------------+------------------------------------+
-| ``Zind_c``             | n x n      | intermediate flows used to         |
+| ``Zind_c``             | n x n      | Intermediate flows used to         |
 |                        |            | maintain cycling                   |
 +------------------------+------------+------------------------------------+
-| ``Zind_ac``            | n x n      | intermediate flows that feed the   |
+| ``Zind_ac``            | n x n      | Intermediate flows that feed the   |
 |                        |            | acyclic production and carry the   |
 |                        |            | resources for ``Zind_c``           |
 +------------------------+------------+------------------------------------+
-| ``rind_ac``            | 1 x n      | primary resources associated to    |
+| ``rind_ac``            | 1 x n      | Primary resources associated to    |
 |                        |            | ``Zind_ac``                        |
 +------------------------+------------+------------------------------------+
-| ``find``               | n x 1      | final demand produced indirectly   |
+| ``find``               | n x 1      | Final demand produced indirectly   |
 +------------------------+------------+------------------------------------+
-| ``Zind_ac_a``          | n x n      | matrix with the indirect acyclic   |
+| ``Zind_ac_a``          | n x n      | Matrix with the indirect acyclic   |
 |                        |            | flows producing final goods        |
 +------------------------+------------+------------------------------------+
-| ``Zind_ac_c``          | n x n      | matrix with the indirect flows     |
+| ``Zind_ac_c``          | n x n      | Matrix with the indirect flows     |
 |                        |            | feeding ``Zind_c``                 |
 +------------------------+------------+------------------------------------+
 | ``rind_ac_a``          | 1 x n      | primary resources required to      |
 |                        |            | produce ``find``                   |
 +------------------------+------------+------------------------------------+
-| ``rind_ac_c``          | 1 x n      | primary resources required to      |
+| ``rind_ac_c``          | 1 x n      | Primary resources required to      |
 |                        |            | maintain cycling indirectly, i.e.  |
 |                        |            | ``Zind_c`` and ``Zind_ac_c``       |
 +------------------------+------------+------------------------------------+
-
-
+| ``wind_ac_a``          | n x 1      | Total emissions due to indirect    |
+|                        |            | acyclic flows producing final goods|
++------------------------+------------+------------------------------------+
+| ``wind_ac_c``          | n x 1      | Total emissions due to indirect    |
+|                        |            | flows feeding ``Zind_c``           |
++------------------------+------------+------------------------------------+
+| ``wind_c``             | n x 1      | Total emissions due to indirect    |
+|                        |            | cycling                            |
++------------------------+------------+------------------------------------+
+| ``wind_ac_a_``:sub:`m` | n x 1      | Emission-m due to indirect acyclic |
+|                        | (m arrays) | flows producing final goods        |
++------------------------+------------+------------------------------------+
+| ``wind_ac_c_``:sub:`m` | n x 1      | Emission-m due to indirect flows   |
+|                        | (m arrays) | feeding ``Zind_c``                 |
++------------------------+------------+------------------------------------+
+| ``wind_c_``:sub:`m`    | n x 1      | Emission-m due to indirect cycling |
+|                        | (m arrays) |                                    |
++------------------------+------------+------------------------------------+
 
 
 
