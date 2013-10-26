@@ -179,6 +179,37 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wa_``:sub:`m`        | n x 1      | Emission-m due to                  |
 |                        | (m arrays) | producing final goods              |
 +------------------------+------------+------------------------------------+
+| **Direct-Indirect Structure**                                            |
+| See :ref:`cy_ac_ind`                                                     |
++------------------------+------------+------------------------------------+
+| ``Zd``                 | n x n      | Intersectoral direct flows.        |
+|                        |            | Unknown in this version  [#4]_     |
++------------------------+------------+------------------------------------+
+| ``Zi``                 | n x n      | Intersectoral indirect flows.      |
+|                        |            | Unknown in this version  [#4]_     |
++------------------------+------------+------------------------------------+
+| ``rd``                 | 1 x n      | Primary resources required to      |
+|                        |            | maintain cycling                   |
++------------------------+------------+------------------------------------+
+| ``ri``                 | 1 x n      | Primary resources required to      |
+|                        |            | produce final goods                |
++------------------------+------------+------------------------------------+
+| ``fdir``               | n x 1      | Same as above                      |
++------------------------+------------+------------------------------------+
+| ``find``               | n x 1      | Same as above                      |
++------------------------+------------+------------------------------------+
+| ``wd``                 | n x 1      | Emission due to                    |
+|                        |            | direct flows                       |
++------------------------+------------+------------------------------------+
+| ``wi``                 | n x 1      | Emission due to                    |
+|                        |            | indirect flows                     |
++------------------------+------------+------------------------------------+
+| ``wd_``:sub:`m`        | n x 1      | Emission-m due to                  |
+|                        | (m arrays) | direct flows                       |
++------------------------+------------+------------------------------------+
+| ``wi_``:sub:`m`        | n x 1      | Emission-m due to                  |
+|                        | (m arrays) | indirect flows                     |
++------------------------+------------+------------------------------------+
 
 .. note::
    
@@ -203,6 +234,11 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
         1 means it is a single scalar.
 .. [#2] Only one column is allowed
 .. [#3] The Leontief inverse is calculated by endogenising the emissions, as shown in [AAM13]_
+.. [#4] The direct and indirect cycling throughputs were found, but a method
+        to decompose ``Zc`` between the ``Zc_ind`` and ``Zc_dir`` is yet 
+        to be found. As a result, most of the direct and indirect structural
+        components can be calculated, with the exeption of ``Zc_ind`` and ``Zc_dir``.
+
 
 .. rubric:: Bibligraphy
 

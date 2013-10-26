@@ -638,7 +638,7 @@ for struct_index in range(NBR_sectors):
             if (product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(np.ones(NBR_sectors)-meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > 0.000001:
                 sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
                 
-    print('\n +++ Aggregating the sub-structures into the cyclic-acyclic meta-structure +++')  
+    print('\n +++ Aggregating the overlaped structures into the cyclic-acyclic meta-structure +++')  
     # intermediate structures
     # Zc is the same as previously calculated         
     product_based_structures['prod_based_struct_'+str(struct_index)]['Za'] = product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a']
@@ -656,7 +656,22 @@ for struct_index in range(NBR_sectors):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wc_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)]
     
 
+    print('\n +++ Aggregating the overlaped structures into the direct-indirect meta-structure +++')  
+    # intermediate structures
+    # No intermediate structures since I do not know Zc_ind nor Zc_dir   
 
+    # final goods: same as previously calculated
+    
+    # primary resources
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rd'] =     product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir']
+    product_based_structures['prod_based_struct_'+str(struct_index)]['ri'] = product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a']
+    # emissions
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wd'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir']
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wi'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c']
+    # for each emission type
+    for waste_index in range(NBR_disposals):
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wd_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)]
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wi_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)]
 
 
 
