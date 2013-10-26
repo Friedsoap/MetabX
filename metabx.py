@@ -560,6 +560,7 @@ for struct_index in range(NBR_sectors):
 
     # finding wind_ac_a, wind_ac_c and wind_c (as totals, i.e. all emissions generated)
     # the discrimination between different emissions is done later
+    print('\n + Finding wind_ac_a, wind_ac_c and wind_c as aggregates +')
     product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] = np.dot(
     (np.dot(np.ones(NBR_sectors), product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a']) + product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a']),np.diag(np.ones(NBR_sectors))-np.diag(meso_efficiencies)).reshape((NBR_sectors,1))
     product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'] = np.dot(
@@ -568,6 +569,7 @@ for struct_index in range(NBR_sectors):
     
     # disaggregation of wind_ac_a, wind_ac_c and wind_c between the NBR_disposals
     # find the total outputs that generate the total emissions wind_ac_a, wind_ac_c and wind_c
+    print('\n + Disaggregating wind_ac_a, wind_ac_c and wind_c into the different emission types +')
     product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'])
     product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'])
     product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c'])
@@ -577,7 +579,26 @@ for struct_index in range(NBR_sectors):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'])
         product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c'])
 
+    print('\n +++ Finding the direct-cyclic structure +++')
+    print('\n + Finding rc_dir and wc_dir +')
+    # Find c_ind
+    product_based_structures['prod_based_struct_'+str(struct_index)]['c_ind'] = np.dot(np.dot(np.dot(np.ones(NBR_sectors), product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c']),np.diag(meso_efficiencies)),LA.inv(np.diag(np.ones(NBR_sectors))-np.diag(meso_efficiencies)))
+    # Find c_dir
+    product_based_structures['prod_based_struct_'+str(struct_index)]['c_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] - product_based_structures['prod_based_struct_'+str(struct_index)]['c_ind']
+    # Find rc_dir and wc_dir
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'] = np.dot(np.dot(product_based_structures['prod_based_struct_' + str(struct_index)]['c_dir'], np.diag(np.ones(NBR_sectors)) - np.diag(meso_efficiencies)), LA.inv(np.diag(meso_efficiencies)))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'].reshape((NBR_sectors,1))
+    # Disaggregate wc_dir for each emission type
+    # find the total outputs
+    print('\n + Disaggregating wc_dir into the different emission types +')
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'])
+    # find the emissions for each emission type
+    for waste_index in range(NBR_disposals):
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'])
 
+
+
+# note I will need to disaggregate wc_dir as for  wind_ac_a, wind_ac_c and wind_c
 
 print('\n +++ creating cycling indicators +++')
 # name                          description of the calculated variables

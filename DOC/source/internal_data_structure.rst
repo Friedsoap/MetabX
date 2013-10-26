@@ -5,14 +5,14 @@
 Internal structure of variables
 =============================================================
 
-One of the issues with IOA is the large amount of data and specially in this program where the idea is to find several indicators and sub-structures, the data needs to be organised consistenly. 
-So, this section explains how the data concerning the IOT and the decompositions is organised so you can find what you need.
+IOA requires and generates large amount of data; specially in this program, where the idea is to find several indicators and sub-structures associated to an initial IOT and each of its product-based structures, so the data needs to be organised consistenly. 
+This section explains how the data representing each IOT and its decompositions is organised so you can find what you need.
 
 Data structure 
 ---------------------
 
-The components and indicators related to a given structure are kept together even if they are calculated at different stages. For example, the components and indicators related to the actual, aggregated structure are kept in the ``actual_structure_dictionary`` which belongs to the dictionary class.
-Similarly, all components and indicators related to each product-based structure are kept together in a similar structure as ``actual_structure_dictionary``, which in turn are gathered under the array ``product_based_structures``.
+The components and indicators related to a given structure are kept together even if they are calculated at different stages. The components and indicators related to the actual, aggregated structure are kept in the ``actual_structure_dictionary`` which belongs to the dictionary class.
+Similarly, all components and indicators related to each product-based structure are kept together in a similar structure:  the dictionary ``product_based_structures`` contains the *n* product-based structures, each with almost the same data structure as for the the ``actual_structure_dictionary``.
 
 The structure of ``actual_structure_dictionary`` and of each entry in ``product_based_structures`` is :
 
@@ -79,9 +79,13 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``Zind_ac``            | n x n      | Intermediate flows that feed the   |
 |                        |            | acyclic production and carry the   |
 |                        |            | resources for ``Zind_c``           |
+|                        |            | (will be decompoded between        |
+|                        |            | ``Zind_ac_a`` and ``Zind_ac_c``)   |
 +------------------------+------------+------------------------------------+
 | ``rind_ac``            | 1 x n      | Primary resources associated to    |
-|                        |            | ``Zind_ac``                        |
+|                        |            | ``Zind_ac``(will be decompoded     |
+|                        |            | between ``rind_ac_a`` and          |
+|                        |            | ``rind_ac_c``)                     |
 +------------------------+------------+------------------------------------+
 | ``find``               | n x 1      | Final demand produced indirectly   |
 +------------------------+------------+------------------------------------+
@@ -116,6 +120,22 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wind_c_``:sub:`m`    | n x 1      | Emission-m due to indirect cycling |
 |                        | (m arrays) |                                    |
 +------------------------+------------+------------------------------------+
+| ``c_ind``              | 1 x n      | Indirect cycling through each      |
+|                        |            | sector                             |
++------------------------+------------+------------------------------------+
+| ``c_dir``              | 1 x n      | Direct cycling through each        |
+|                        |            | sector                             |
++------------------------+------------+------------------------------------+
+| ``rc_dir``             | 1 x n      | Primary resources required to      |
+|                        |            | maintain cycling directly          |
++------------------------+------------+------------------------------------+
+| ``wc_dir``             | n x 1      | Total emissions due to direct      |
+|                        |            | cycling                            |
++------------------------+------------+------------------------------------+
+| ``wc_dir``:sub:`m`     | n x 1      | Emission-m due to direct           |
+|                        | (m arrays) | cycling                            |
++------------------------+------------+------------------------------------+
+
 
 
 
