@@ -64,7 +64,8 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``tot_em_int``         | 1          | Total emissions intensity          |
 |                        |            | (emissions/primary inputs)         |
 +------------------------+------------+------------------------------------+
-| **Cyclic-acyclic/Direct-indirect\  Indicators** See :ref:`cy_ac_ind`     |
+| **Overlapped\  Cyclic-acyclic/Direct-indirect\  Structures**             |
+| See :ref:`cy_ac_ind`                                                     |
 +------------------------+------------+------------------------------------+
 | ``Zc``                 | n x n      | Matrix containing intersectoral    |
 |                        |            | cycling                            |
@@ -148,7 +149,36 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wa_dir_``:sub:`m`    | n x 1      | Emission-m due to direct           |
 |                        | (m arrays) | production of final goods          |
 +------------------------+------------+------------------------------------+
-
+| **Cyclic-acyclic\  Structure**                                           |
+| See :ref:`cy_ac_ind`                                                     |
++------------------------+------------+------------------------------------+
+| ``Zc``                 | n x n      | Same as above                      |
++------------------------+------------+------------------------------------+
+| ``Za``                 | n x n      | Matrix containing the intersectoral|
+|                        |            | flows to produce final goods       |
++------------------------+------------+------------------------------------+
+| ``rc``                 | 1 x n      | Primary resources required to      |
+|                        |            | maintain cycling                   |
++------------------------+------------+------------------------------------+
+| ``ra``                 | 1 x n      | Primary resources required to      |
+|                        |            | produce final goods                |
++------------------------+------------+------------------------------------+
+| ``fa``                 | n x 1      | Equals ``fd`` since produced by    |
+|                        |            | acyclic structure only;            |
+|                        |            | the cyclic produces no final goods |
++------------------------+------------+------------------------------------+
+| ``wc``                 | n x 1      | Emission due to                    |
+|                        |            | maintaining cycling                |
++------------------------+------------+------------------------------------+
+| ``wa``                 | n x 1      | Emission due to                    |
+|                        |            | producing final goods              |
++------------------------+------------+------------------------------------+
+| ``wc_``:sub:`m`        | n x 1      | Emission-m due to                  |
+|                        | (m arrays) | maintaining cycling                |
++------------------------+------------+------------------------------------+
+| ``wa_``:sub:`m`        | n x 1      | Emission-m due to                  |
+|                        | (m arrays) | producing final goods              |
++------------------------+------------+------------------------------------+
 
 .. note::
    
