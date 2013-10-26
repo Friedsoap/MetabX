@@ -19,9 +19,9 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | Key                    | Dim [#1]_  | Content                            |
 +========================+============+====================================+
-| **Structural\  Components**  The aggregate structure is                  | 
-| taken from :ref:`data_input`; the product-based ones calculated in       |
-| :ref:`prod_based_comp`                                                   | 
+| **IOT  Components**  The aggregate structure is                          | 
+| taken from :ref:`data_input`; the product-based ones calculated using    |
+| the IOA components below, see :ref:`prod_based_comp`                     | 
 +------------------------+------------+------------------------------------+
 | ``r``                  | 1 x n      |  Primary resources vector          |
 +------------------------+------------+------------------------------------+
@@ -39,8 +39,8 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``tot_final_outputs``  | n x 1      | total final outputs vector         |
 |                        |            | (i.e. fd + sum(w\ :sub:`m`\ ))     |
 +------------------------+------------+------------------------------------+
-| **Calculated\  Components** only in ``actual_structure_dictionary``.     |
-| See :ref:`agg_comp`                                                      |
+| **Calculated\  IOA\  Components**\. Only in                              |
+| ``actual_structure_dictionary``. See :ref:`ioa_comp`                     |
 +------------------------+------------+------------------------------------+
 | ``L``                  | n x n      |  Leontief inverse as in [#3]_      |
 +------------------------+------------+------------------------------------+
@@ -65,7 +65,7 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 |                        |            | (emissions/primary inputs)         |
 +------------------------+------------+------------------------------------+
 | **Overlapped\  Cyclic-acyclic/Direct-indirect\  Structures**             |
-| See :ref:`cy_ac_ind`                                                     |
+| See :ref:`overl_str`                                                     |
 +------------------------+------------+------------------------------------+
 | ``Zc``                 | n x n      | Matrix containing intersectoral    |
 |                        |            | cycling                            |
@@ -150,7 +150,7 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 |                        | (m arrays) | production of final goods          |
 +------------------------+------------+------------------------------------+
 | **Cyclic-acyclic\  Structure**                                           |
-| See :ref:`cy_ac_ind`                                                     |
+| See :ref:`meta_str`                                                      |
 +------------------------+------------+------------------------------------+
 | ``Zc``                 | n x n      | Same as above                      |
 +------------------------+------------+------------------------------------+
@@ -180,7 +180,7 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 |                        | (m arrays) | producing final goods              |
 +------------------------+------------+------------------------------------+
 | **Direct-Indirect Structure**                                            |
-| See :ref:`cy_ac_ind`                                                     |
+| See :ref:`meta_str`                                                      |
 +------------------------+------------+------------------------------------+
 | ``Zd``                 | n x n      | Intersectoral direct flows.        |
 |                        |            | Unknown in this version  [#4]_     |
