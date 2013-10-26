@@ -251,14 +251,15 @@ label_dictionary['fd_labels']= f_PRE_array[0][0] # assumes only one final demand
 
 # Actual structure dictionary
 actual_structure_dictionary=dict()
-actual_structure_dictionary['r']=np.array([[c for c in row[1:]] for row in r_PRE_array[0:]])
+actual_structure_dictionary['r']=np.array([[c for c in row[1:]] for row in r_PRE_array[0:]]).flatten()
 actual_structure_dictionary['Z']=np.array([[c for c in row[1:]] for row in Z_PRE_array[1:]])
 actual_structure_dictionary['fd']=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,0:1] # assuming only one column --- could be [:,0]
-actual_structure_dictionary['tot_final_outputs']=actual_structure_dictionary['fd']
+actual_structure_dictionary['tot_final_outputs'] = actual_structure_dictionary['fd'].copy()
+actual_structure_dictionary['w'] = np.zeros((NBR_sectors,1))
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['w'+str(waste_index)]=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,str(waste_index+1)].reshape((NBR_sectors,1))
-    actual_structure_dictionary['tot_final_outputs']=actual_structure_dictionary['tot_final_outputs']+actual_structure_dictionary['w'+str(waste_index)]
-
+    actual_structure_dictionary['tot_final_outputs'] += actual_structure_dictionary['w'+str(waste_index)]
+    actual_structure_dictionary['w'] += actual_structure_dictionary['w'+str(waste_index)]
 
 
 
@@ -286,7 +287,7 @@ actual_structure_dictionary['x']=total_outputs
 # raise error if total_inputs are different from total_outputs for more than 'acceptable value'
 max_balancing_difference=0.00001 # max_balancing_difference represents a percentage (so 1 is 100%)
 for i_index in range(NBR_sectors):
-    if total_inputs[0][i_index]-total_outputs[i_index][0] > max_balancing_difference*(total_inputs[0][i_index]+total_outputs[i_index][0])/2 :
+    if total_inputs[i_index]-total_outputs[i_index][0] > max_balancing_difference*(total_inputs[i_index]+total_outputs[i_index][0])/2 :
         sys.exit('''Error: Total outputs different from total inputs for sector {0}, i.e, the IOT is not balanced, exiting.'''.format(i_index))
         
 ##############################################################################
@@ -303,8 +304,8 @@ print(
 #   L     Leontief inverse matrix taking endogenising all disposals to nature - see Altimiras-Martin (2013) for a detailed explanation
 #   r_coefs input (resource) coeficients
 
-A=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))#CAREFUL: total_outputs and tota_inputs are 2D arrays, so np.diag will extract their diagonal, that is why I took the first element of total_inputs, which is the vector (it would not work for total_outputs # XXX: ERASE
-actual_structure_dictionary['A']=np.dot(Z_array,LA.inv(np.diag(total_inputs[0])))
+A=np.dot(Z_array,LA.inv(np.diag(total_inputs)))#CAREFUL: total_outputs and tota_inputs are 2D arrays, so np.diag will extract their diagonal, that is why I took the first element of total_inputs, which is the vector (it would not work for total_outputs # XXX: ERASE
+actual_structure_dictionary['A']=np.dot(Z_array,LA.inv(np.diag(total_inputs)))
 
 # create all Ei and the sum of the Etot
 # Remember: they are valid for all output structures
@@ -378,11 +379,13 @@ for sector_index in range(NBR_sectors):
     tmp_structure['fd'][sector_index]=1
     tmp_structure['fd']=tmp_structure['fd'].reshape((NBR_sectors,1))
     tmp_structure['x']=np.dot(actual_structure_dictionary['L'],tmp_structure['fd'])
-    tmp_structure['r']=np.dot(np.diag(actual_structure_dictionary['r_coefs'].flatten()),tmp_structure['x'])
-    tmp_structure['tot_final_outputs']=tmp_structure['fd']
+    tmp_structure['r']=np.dot(np.diag(actual_structure_dictionary['r_coefs'].flatten()),tmp_structure['x']).flatten()
+    tmp_structure['tot_final_outputs']=tmp_structure['fd'].copy()
+    tmp_structure['w']=np.zeros((NBR_sectors,1))
     for waste_index in range(NBR_disposals):
         tmp_structure['w'+str(waste_index)]=np.dot(actual_structure_dictionary['E'+str(waste_index)],tmp_structure['x'])
-        tmp_structure['tot_final_outputs']=tmp_structure['tot_final_outputs']+tmp_structure['w'+str(waste_index)]
+        tmp_structure['tot_final_outputs'] += tmp_structure['w'+str(waste_index)]
+        tmp_structure['w'] += tmp_structure['w'+str(waste_index)]
     tmp_structure['Z']=np.dot(actual_structure_dictionary['A'],np.diag(tmp_structure['x'].flatten()))
     product_based_structures['prod_based_struct_'+str(sector_index)]=tmp_structure
 
@@ -425,7 +428,7 @@ list_sectoral_eff_vars = np.array(list_sectoral_eff_vars) # XXX: ERASE
 
 meso_efficiencies=np.zeros(NBR_sectors)
 for i in range(NBR_sectors):
-    meso_efficiencies[i]=(sum(actual_structure_dictionary['Z'][i,:])+actual_structure_dictionary['fd'].flatten()[i])/(sum(actual_structure_dictionary['Z'][:,i])+actual_structure_dictionary['r'].flatten()[i])
+    meso_efficiencies[i] = (sum(actual_structure_dictionary['Z'][i,:]) + actual_structure_dictionary['fd'].flatten()[i])/(sum(actual_structure_dictionary['Z'][:,i]) + actual_structure_dictionary['r'][i])
 
 ## Meso efficiencies for each production structure # XXX: ERASE
 #eff_j_i  production structure of sector j, efficiency of sector i,  defined as intermediate output + final outputs divided by intermediate inputs plus raw inputs. # XXX: ERASE
@@ -447,7 +450,7 @@ print('The sectoral efficiencies have been calculated individually but they shou
 tot_res_eff_all=np.sum(fd_all.flatten())/np.sum(r_array.flatten()) # XXX: ERASE
 tot_res_int_all=1/tot_res_eff_all # XXX: ERASE
 
-actual_structure_dictionary['tot_res_eff']=sum(actual_structure_dictionary['fd'].flatten())/sum(actual_structure_dictionary['r'].flatten())
+actual_structure_dictionary['tot_res_eff']=sum(actual_structure_dictionary['fd'].flatten())/sum(actual_structure_dictionary['r'])
 actual_structure_dictionary['tot_res_int']=1/tot_res_eff_all/actual_structure_dictionary['tot_res_eff']
 
 #for each prod struct # XXX: ERASE
@@ -461,7 +464,7 @@ tot_em_int_all=(np.sum(f_array.flatten())-np.sum(fd_all.flatten()))/np.sum(fd_al
 
 actual_structure_dictionary['tot_em_int']=0
 for waste_index in range(NBR_disposals):
-    actual_structure_dictionary['tot_em_int']=actual_structure_dictionary['tot_em_int']+sum(actual_structure_dictionary['w'+str(waste_index)].flatten())/sum(actual_structure_dictionary['r'].flatten())
+    actual_structure_dictionary['tot_em_int']=actual_structure_dictionary['tot_em_int']+sum(actual_structure_dictionary['w'+str(waste_index)].flatten())/sum(actual_structure_dictionary['r'])
 
 
 for prod_struct in range(NBR_sectors): # XXX: ERASE
@@ -470,11 +473,11 @@ for prod_struct in range(NBR_sectors): # XXX: ERASE
 # and for each prod struct
 
 for sector_index in range(NBR_sectors):
-    product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']=sum(product_based_structures['prod_based_struct_'+str(sector_index)]['fd'].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'].flatten())
+    product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']=sum(product_based_structures['prod_based_struct_'+str(sector_index)]['fd'].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'])
     product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_int']=1/product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']
     product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=0
     for waste_index in range(NBR_disposals):
-        product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']+sum(product_based_structures['prod_based_struct_'+str(sector_index)]['w'+str(waste_index)].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'].flatten())
+        product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']+sum(product_based_structures['prod_based_struct_'+str(sector_index)]['w'+str(waste_index)].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'])
 
 #### MACRO INDICATORS #### 
 # NOTE: I do not need to calculate them since they do not make sense for the actual structure
@@ -586,7 +589,7 @@ for struct_index in range(NBR_sectors):
     # Find c_dir
     product_based_structures['prod_based_struct_'+str(struct_index)]['c_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] - product_based_structures['prod_based_struct_'+str(struct_index)]['c_ind']
     # Find rc_dir and wc_dir
-    product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'] = np.dot(np.dot(product_based_structures['prod_based_struct_' + str(struct_index)]['c_dir'], np.diag(np.ones(NBR_sectors)) - np.diag(meso_efficiencies)), LA.inv(np.diag(meso_efficiencies)))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'] = np.dot(np.dot(product_based_structures['prod_based_struct_' + str(struct_index)]['c_dir'], np.diag(np.ones(NBR_sectors)) - np.diag(meso_efficiencies)), LA.inv(np.diag(meso_efficiencies))).flatten()
     product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'].reshape((NBR_sectors,1))
     # Disaggregate wc_dir for each emission type
     # find the total outputs
@@ -594,11 +597,50 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'])
     # find the emissions for each emission type
     for waste_index in range(NBR_disposals):
-        product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'])
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] = np.dot(actual_structure_dictionary['E'+str(waste_index)], product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'])
+
+    print('\n +++ Finding the direct-acyclic structure +++')
+    print('\n + Finding ra_dir +')
+    product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['r'] - product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'] - product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a'] - product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_c']
+
+    print('\n + Finding fdir +')
+    product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['fd'] - product_based_structures['prod_based_struct_'+str(struct_index)]['find']
+    
+    # error check with the two ways to find fdir
+    for i in range(NBR_sectors):
+        # clean ra_dir array
+        if product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'][i] < 1.0e-10:
+            product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'][i] = 0
+        # raise error if difference with other method is greater than 0.001%
+        if (product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > 0.000001:
+            sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
+
+    print('\n + Finding wdir +')
+    # as aggregate emissions
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['w'] - product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir']-product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c'] -product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] - product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c']
+    # clean wa_dir_
+    for i in range(NBR_sectors):
+        if np.abs(product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0]) < 1.0e-10:
+            product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0] = 0
+        elif product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0] < -1.0e-10:
+            sys.exit('Error: wa_dir from product_based structure_{0} is significantly negative'.format(str(struct_index)))
+    
+    # for each emission type
+    for waste_index in range(NBR_disposals):
+        product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)] = product_based_structures['prod_based_struct_'+str(struct_index)]['w'+str(waste_index)] - product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)]-product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)] -product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] - product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)]
+        # clean wa_dir_
+        for i in range(NBR_sectors):
+            if np.abs(product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0]) < 1.0e-10:
+                product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] = 0
+            elif product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] < -1.0e-10:
+                sys.exit('Error: wa_dir_{1} from product_based structure_{0} is significantly negative'.format(str(struct_index),str(waste_index)))
+            # raise error if difference with other method is greater than 0.001%
+            if (product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(np.ones(NBR_sectors)-meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > 0.000001:
+                sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
+                
+                
 
 
-
-# note I will need to disaggregate wc_dir as for  wind_ac_a, wind_ac_c and wind_c
 
 print('\n +++ creating cycling indicators +++')
 # name                          description of the calculated variables

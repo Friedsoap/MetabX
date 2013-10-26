@@ -29,6 +29,8 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``fd``                 | n x 1      |  Final demand vector [#2]_         |
 +------------------------+------------+------------------------------------+
+| ``w``                  | n x 1      | Total emissions                    |
++------------------------+------------+------------------------------------+
 | ``w``:sub:`m`          | n x 1      | Emission vectors (one for each     |
 |                        | (m arrays) | of the *m* different emissions)    |
 +------------------------+------------+------------------------------------+
@@ -132,12 +134,20 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wc_dir``             | n x 1      | Total emissions due to direct      |
 |                        |            | cycling                            |
 +------------------------+------------+------------------------------------+
-| ``wc_dir``:sub:`m`     | n x 1      | Emission-m due to direct           |
+| ``wc_dir_``:sub:`m`    | n x 1      | Emission-m due to direct           |
 |                        | (m arrays) | cycling                            |
 +------------------------+------------+------------------------------------+
-
-
-
+| ``ra_dir``             | 1 x n      | Primary resources required to      |
+|                        |            | produce final goods directly       |
++------------------------+------------+------------------------------------+
+| ``fdir``               | n x 1      | Final goods produced directly      |
++------------------------+------------+------------------------------------+
+| ``wa_dir``             | n x 1      | Total emissions due to direct      |
+|                        |            | production of final goods          |
++------------------------+------------+------------------------------------+
+| ``wa_dir_``:sub:`m`    | n x 1      | Emission-m due to direct           |
+|                        | (m arrays) | production of final goods          |
++------------------------+------------+------------------------------------+
 
 
 .. note::
