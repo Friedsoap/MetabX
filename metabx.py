@@ -506,7 +506,42 @@ for prod_struct in range(NBR_sectors): # XXX: ERASE
 ##############################################################################
 #### Cycle decomposition of all flow   ###################################################
 
-print('\n ++++++++++ CYCLE DECOMPOSITION OF THE ORIGINAL PIOT ++++++++++++++++') # XXX: ERASE
+print('\n ++++++++++ STRUCTURAL DECOMPOSITION OF THE PIOT ++++++++++++++++') # XXX: ERASE
+
+# initialise variables for the aggregate structure: they will be built as the
+# product-based structures are found to avoid another iteration
+# nxn arrays
+actual_structure_dictionary['Zc'] = np.zeros((NBR_sectors,NBR_sectors))
+actual_structure_dictionary['Zind'] = np.zeros((NBR_sectors,NBR_sectors))
+actual_structure_dictionary['Zind_c'] = np.zeros((NBR_sectors,NBR_sectors))
+actual_structure_dictionary['Zind_ac'] = np.zeros((NBR_sectors,NBR_sectors))
+actual_structure_dictionary['Zind_ac_c'] = np.zeros((NBR_sectors,NBR_sectors))
+actual_structure_dictionary['Zind_ac_a'] = np.zeros((NBR_sectors,NBR_sectors))
+# 1xn arrays
+actual_structure_dictionary['cycling_throughput'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['rind_ac'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['rind_ac_a'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['rind_ac_c'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['c_ind'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['c_dir'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['rc_dir'] = np.zeros(NBR_sectors)
+actual_structure_dictionary['ra_dir'] = np.zeros(NBR_sectors)
+# nx1 arrays
+actual_structure_dictionary['find'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['wind_ac_a'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['wind_ac_c'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['wind_c'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['wc_dir'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['fdir'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['wa_dir'] = np.zeros((NBR_sectors,1))
+# nx1 arrays for m emissions
+for waste_index in range(NBR_disposals):
+    actual_structure_dictionary['wind_ac_a_'+str(waste_index)] = np.zeros((NBR_sectors,1))
+    actual_structure_dictionary['wind_ac_c_'+str(waste_index)] = np.zeros((NBR_sectors,1))
+    actual_structure_dictionary['wind_c_'+str(waste_index)] = np.zeros((NBR_sectors,1))
+    actual_structure_dictionary['wc_dir_'+str(waste_index)] = np.zeros((NBR_sectors,1))
+    actual_structure_dictionary['wa_dir_'+str(waste_index)] = np.zeros((NBR_sectors,1))
+
 print('\n ++++++ CYCLIC-ACYCLIC/DIRECT-INDIRECT DECOMPOSITION OF ALL PRODUCT-BASED STRUCTURES +++++++++')
 
 
@@ -516,18 +551,17 @@ for struct_index in range(NBR_sectors):
     # finding Zc and Zind
     [product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'], product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'], product_based_structures['prod_based_struct_' +str(struct_index)]['self_cycling']] = cd.cycle_decomposition(product_based_structures['prod_based_struct_'+str(struct_index)]['Z'].__copy__(), product_based_structures['prod_based_struct_'+str(struct_index)]['tot_final_outputs'].__copy__())
     # finding cycling throughput (1xn)
-    product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] = [np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'],1)]
+    product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'],1)
     
-
     print('\n +++ Finding the indirect-cyclic and indirect-acyclic structures +++')
     print('\n + Decomposing Zind between Zind,c and Zind,ac +')
     prop_c=np.zeros((1,3))
     prop_f=np.zeros((1,3))
     prop_z=np.zeros((1,3))
     for sector_index in range(NBR_sectors):
-        prop_c[0][sector_index]= product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index] / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index])
-        prop_f[0][sector_index]= product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index])
-        prop_z[0][sector_index]= np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][0][sector_index])
+        prop_c[0][sector_index]= product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][sector_index] / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][sector_index])
+        prop_f[0][sector_index]= product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][sector_index])
+        prop_z[0][sector_index]= np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) / (product_based_structures['prod_based_struct_'+str(struct_index)]['fd'][sector_index][0] + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'][sector_index]) + product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'][sector_index])
     # finding proportion for acyclic flows
     prop_ac=prop_f+prop_z
     # using the proportions to find Zind_c and Zind_ac
@@ -674,14 +708,71 @@ for struct_index in range(NBR_sectors):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wi_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)]
 
 
+    print('\n +++ Using the product-based components to build the structural components of aggregated structure +++++')
+    # building the arrays  for the aggregate structure
+    actual_structure_dictionary['Zc'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['Zind'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['cycling_throughput'] += product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['Zind_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['Zind_ac'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['rind_ac'] += product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['find'] += product_based_structures['prod_based_struct_'+str(struct_index)]['find'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['Zind_ac_a'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['Zind_ac_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['rind_ac_a'] += product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_a'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['rind_ac_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['rind_ac_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['wind_ac_a'] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['wind_ac_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['wind_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['c_ind'] += product_based_structures['prod_based_struct_'+str(struct_index)]['c_ind'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['c_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['c_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['rc_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['rc_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['wc_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['ra_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['fdir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['wa_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    for waste_index in range(NBR_disposals):
+        actual_structure_dictionary['wind_ac_a_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
+        actual_structure_dictionary['wind_ac_c_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
+        actual_structure_dictionary['wind_c_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
+        actual_structure_dictionary['wc_dir_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
+        actual_structure_dictionary['wa_dir_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
 
 
+print('\n +++ Aggregating the overlaped structures of the aggregated structure into the cyclic-acyclic meta-structure +++')  
+# intermediate structures
+# Zc is the same as previously calculated         
+actual_structure_dictionary['Za'] = actual_structure_dictionary['Zind_ac_a']
+# final goods
+actual_structure_dictionary['fa'] = actual_structure_dictionary['fd']
+# primary resources
+actual_structure_dictionary['ra'] = actual_structure_dictionary['rind_ac_a'] + actual_structure_dictionary['ra_dir']
+actual_structure_dictionary['rc'] = actual_structure_dictionary['rind_ac_c'] + actual_structure_dictionary['rc_dir']
+# emissions
+actual_structure_dictionary['wa'] = actual_structure_dictionary['wind_ac_a'] + actual_structure_dictionary['wa_dir']
+actual_structure_dictionary['wc'] = actual_structure_dictionary['wind_ac_c'] + actual_structure_dictionary['wc_dir'] + actual_structure_dictionary['wind_c']
+# for each emission type
+for waste_index in range(NBR_disposals):
+    actual_structure_dictionary['wa_'+str(waste_index)] = actual_structure_dictionary['wind_ac_a_'+str(waste_index)] + actual_structure_dictionary['wa_dir_'+str(waste_index)]
+    actual_structure_dictionary['wc_'+str(waste_index)] = actual_structure_dictionary['wind_ac_c_'+str(waste_index)] + actual_structure_dictionary['wc_dir_'+str(waste_index)] + actual_structure_dictionary['wind_c_'+str(waste_index)]
 
 
+print('\n +++ Aggregating the overlaped structures of the aggregated structure into the direct-indirect meta-structure +++')  
+# intermediate structures
+# No intermediate structures since I do not know Zc_ind nor Zc_dir   
 
+# final goods: same as previously calculated
 
-
-
+# primary resources
+actual_structure_dictionary['rd'] = actual_structure_dictionary['rc_dir'] + actual_structure_dictionary['ra_dir']
+actual_structure_dictionary['ri'] = actual_structure_dictionary['rind_ac_c'] + actual_structure_dictionary['rind_ac_a']
+# emissions
+actual_structure_dictionary['wd'] = actual_structure_dictionary['wc_dir'] + actual_structure_dictionary['wa_dir']
+actual_structure_dictionary['wi'] = actual_structure_dictionary['wind_ac_c'] + actual_structure_dictionary['wind_ac_a'] + actual_structure_dictionary['wind_c']
+# for each emission type
+for waste_index in range(NBR_disposals):
+    actual_structure_dictionary['wd_'+str(waste_index)] = actual_structure_dictionary['wc_dir_'+str(waste_index)] + actual_structure_dictionary['wa_dir_'+str(waste_index)]
+    actual_structure_dictionary['wi_'+str(waste_index)] = actual_structure_dictionary['wind_ac_c_'+str(waste_index)] + actual_structure_dictionary['wind_ac_a_'+str(waste_index)] + actual_structure_dictionary['wind_c_'+str(waste_index)]
 
 
 
@@ -952,7 +1043,6 @@ print('\n The total_straight_output_all due to straight flows is:\n '+str(total_
 # w_array_DA_all # emissions for direct acyclic
 #==============================================================================
 
-#XXX: todo: current ribbon ordering is output based. It would be nice to have it also input-based.
 
 if circos_draw:
     #### CircosFolder: where you want to put the circos drawings
