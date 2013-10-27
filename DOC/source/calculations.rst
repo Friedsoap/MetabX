@@ -79,6 +79,7 @@ Then, the program run an *n*-iteration to find all cyclic-acyclic and direct-ind
 At the end of each iteration the cyclic-acyclic and direct-indirect of the aggregated structure is updated with the corresponding share of the product-based structure it has been found. So, at the end of that iteration all product-based structures and the aggregate structure are found.
 
 TODO: explain in detail the calculations.
+explain last check of data.
 
 
 .. _meta_str:

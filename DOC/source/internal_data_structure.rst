@@ -114,6 +114,15 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wind_c``             | n x 1      | Total emissions due to indirect    |
 |                        |            | cycling                            |
 +------------------------+------------+------------------------------------+
+| ``xind_ac_a``          | 1 x n      | Total outputs due to indirect      |
+|                        |            | acyclic flows producing final goods|
++------------------------+------------+------------------------------------+
+| ``xind_ac_c``          | 1 x n      | Total outputs due to indirect      |
+|                        |            | flows feeding ``Zind_c``           |
++------------------------+------------+------------------------------------+
+| ``xind_c``             | 1 x n      | Total outputs due to indirect      |
+|                        |            | cycling                            |
++------------------------+------------+------------------------------------+
 | ``wind_ac_a_``:sub:`m` | n x 1      | Emission-m due to indirect acyclic |
 |                        | (m arrays) | flows producing final goods        |
 +------------------------+------------+------------------------------------+
@@ -135,6 +144,9 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wc_dir``             | n x 1      | Total emissions due to direct      |
 |                        |            | cycling                            |
 +------------------------+------------+------------------------------------+
+| ``xc_dir``             | n x 1      | Total outputs due to direct        |
+|                        |            | cycling                            |
++------------------------+------------+------------------------------------+
 | ``wc_dir_``:sub:`m`    | n x 1      | Emission-m due to direct           |
 |                        | (m arrays) | cycling                            |
 +------------------------+------------+------------------------------------+
@@ -144,6 +156,9 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``fdir``               | n x 1      | Final goods produced directly      |
 +------------------------+------------+------------------------------------+
 | ``wa_dir``             | n x 1      | Total emissions due to direct      |
+|                        |            | production of final goods          |
++------------------------+------------+------------------------------------+
+| ``xa_dir``             | n x 1      | Total outputs due to direct        |
 |                        |            | production of final goods          |
 +------------------------+------------+------------------------------------+
 | ``wa_dir_``:sub:`m`    | n x 1      | Emission-m due to direct           |
