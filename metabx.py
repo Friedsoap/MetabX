@@ -527,12 +527,21 @@ actual_structure_dictionary['rc_dir'] = np.zeros(NBR_sectors)
 actual_structure_dictionary['ra_dir'] = np.zeros(NBR_sectors)
 # nx1 arrays
 actual_structure_dictionary['find'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['fdir'] = np.zeros((NBR_sectors,1))
+
 actual_structure_dictionary['wind_ac_a'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['wind_ac_c'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['wind_c'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['wc_dir'] = np.zeros((NBR_sectors,1))
-actual_structure_dictionary['fdir'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['wa_dir'] = np.zeros((NBR_sectors,1))
+
+actual_structure_dictionary['xind_ac_a'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['xind_ac_c'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['xind_c'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['xc_dir'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['xa_dir'] = np.zeros((NBR_sectors,1))
+
+
 # nx1 arrays for m emissions
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['wind_ac_a_'+str(waste_index)] = np.zeros((NBR_sectors,1))
@@ -737,6 +746,13 @@ for struct_index in range(NBR_sectors):
     actual_structure_dictionary['ra_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'] * actual_structure_dictionary['fd'][struct_index][0]
     actual_structure_dictionary['fdir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'] * actual_structure_dictionary['fd'][struct_index][0]
     actual_structure_dictionary['wa_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    # total outputs
+    actual_structure_dictionary['xind_ac_a'] += product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['xind_ac_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['xind_c'] += product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['xc_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    actual_structure_dictionary['xa_dir'] += product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir'] * actual_structure_dictionary['fd'][struct_index][0]
+    #  disaggregated waste types
     for waste_index in range(NBR_disposals):
         actual_structure_dictionary['wind_ac_a_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
         actual_structure_dictionary['wind_ac_c_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
@@ -1545,8 +1561,8 @@ out_sheet_all.write(row_section_start+5+row_index, 0, 'TOTALS', style_header_lal
 out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 1, 3, 'Cyclic flows within the inter-sectoral matrix', style_header_center)
 out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 1, 3, 'Cycling throughput', style_header_center)
 #cyclic flows disaggregated level headers
-out_sheet_all.write(row_section_start+3, 1, 'Direct (cdir)', style_header_center)
-out_sheet_all.write(row_section_start+3, 2, 'Indirect (cind)', style_header_center)
+out_sheet_all.write(row_section_start+3, 1, 'Direct (c_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 2, 'Indirect (c_ind)', style_header_center)
 out_sheet_all.write(row_section_start+3, 3, 'Total (cycling_throughput)', style_header_center)
 
 ## System inputs (primary resources)
@@ -1591,7 +1607,7 @@ out_sheet_all.write(row_section_start+3, 21, 'Total (w)', style_header_center)
 ## Total outputs
 # top level headers
 out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 23, 27, 'Total outputs', style_header_center)
-out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 23, 24, 'Cycling', style_header_center)
+out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 23, 24, 'Cyclic', style_header_center)
 out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 25, 26, 'Acyclic', style_header_center)
 out_sheet_all.write(row_section_start+2, 27, 'Total', style_header_center)
 
@@ -1602,78 +1618,81 @@ out_sheet_all.write(row_section_start+3, 25, 'Direct (xa_dir)', style_header_cen
 out_sheet_all.write(row_section_start+3, 26, 'Indirect (xind_ac_a)', style_header_center)
 out_sheet_all.write(row_section_start+3, 27, 'Total (x)', style_header_center)
 
-# ---- Indicators of cyclic component ----
-for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 1, self_cycling_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 2, inter_cycling_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 3, cycling_throughput_all[row_index], style_nbr_3dec)
-#totals
-out_sheet_all.write(row_section_start+4+row_index+1, 1, tot_self_cycling_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 2, tot_inter_cycling_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 3, tot_cycling_throughput_all, style_nbr_3dec)
+### Data for the whole section
 
-# ---- Indicators of feeding flows (inputs) to maintain the cyclic component ----
+# Cycling throughput
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 5, self_cycling_feeding_flows_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 6, inter_cycling_feeding_flows_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 7, feeding_flows_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 1, actual_structure_dictionary['c_dir'][row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 2, actual_structure_dictionary['c_ind'][row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 3, actual_structure_dictionary['cycling_throughput'][row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1, 5, tot_self_cycling_feeding_flows_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 6, tot_inter_cycling_feeding_flows_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 7, tot_feeding_flows_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 1, sum(actual_structure_dictionary['c_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 2, sum(actual_structure_dictionary['c_ind'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 3, sum(actual_structure_dictionary['cycling_throughput'].flatten()), style_nbr_3dec)
 
-# ---- Indicators on straight inputs that generate the acyclic component --------
+# Cyclic System inputs (primary resources)
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 8, raw_direct_straight_inputs_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 9, raw_indirect_straight_inputs_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 10, raw_straight_inputs_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 11, r_array.flatten()[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 5, actual_structure_dictionary['rc_dir'][row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 6, actual_structure_dictionary['rind_ac_c'][row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 7, actual_structure_dictionary['rc'][row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1, 8, tot_raw_direct_straight_inputs_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 9, tot_raw_indirect_straight_inputs_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 10, tot_raw_straight_inputs_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 11, np.sum(r_array), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 5, sum(actual_structure_dictionary['rc_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 6, sum(actual_structure_dictionary['rind_ac_c'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 7, sum(actual_structure_dictionary['rc'].flatten()), style_nbr_3dec)
 
-# ---- Indicators of cycling losses due to the cyclic component and corresponding cyclic inputs----
+# Acyclic System inputs (primary resources) AND total inputs
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 13, direct_fd_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 14, indirect_fd_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 15, self_cycling_losses_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 16, inter_cycling_losses_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 17, cycling_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 8, actual_structure_dictionary['ra_dir'][row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 9, actual_structure_dictionary['rind_ac_a'][row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 10, actual_structure_dictionary['ra'][row_index], style_nbr_3dec)
+    # total input
+    out_sheet_all.write(row_section_start+4+row_index, 11, actual_structure_dictionary['r'][row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1, 13, tot_direct_fd_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 14, tot_indirect_fd_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 15, tot_self_cycling_losses_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 16, tot_inter_cycling_losses_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 17, tot_cycling_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 8, sum(actual_structure_dictionary['ra_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 9, sum(actual_structure_dictionary['rind_ac_a'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 10, sum(actual_structure_dictionary['ra'].flatten()), style_nbr_3dec)
+# total input
+out_sheet_all.write(row_section_start+4+row_index+1, 11,sum(actual_structure_dictionary['r'].flatten()), style_nbr_3dec)
 
-# ---- Acyclic emissions related indicators----
-
+# System outputs: Final demand AND Cyclic emissions
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 18,  direct_acyclic_losses_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 19,  indirect_acyclic_losses_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 20, acyclic_losses_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 21, total_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 13, actual_structure_dictionary['fdir'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 14, actual_structure_dictionary['find'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 15, actual_structure_dictionary['wc_dir'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 16, actual_structure_dictionary['wind_c'][row_index][0] + actual_structure_dictionary['wind_ac_c'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 17, actual_structure_dictionary['wc'][row_index][0], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1, 18, tot_direct_acyclic_losses_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 19, tot_indirect_acyclic_losses_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 20, tot_straight_losses_all, style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 21, tot_total_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 13, sum(actual_structure_dictionary['fdir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 14, sum(actual_structure_dictionary['find'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 15, sum(actual_structure_dictionary['wc_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 16, sum(actual_structure_dictionary['wind_c'].flatten() + actual_structure_dictionary['wind_ac_c'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 17, sum(actual_structure_dictionary['wc'].flatten()), style_nbr_3dec)
 
-# ---- Indicators of the total outputs  ----
+# System outputs: Acyclic emissions AND Total Emissions
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 23, total_self_cycling_output_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 24, total_inter_cycling_output_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 25, total_direct_acyclic_output_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 26, total_indirect_acyclic_output_all[row_index], style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index, 27, total_outputs.flatten()[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 18,  actual_structure_dictionary['wa_dir'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 19,  actual_structure_dictionary['wind_ac_a'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 20, actual_structure_dictionary['wa'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 21, actual_structure_dictionary['w'][row_index][0], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1, 23, np.sum(total_self_cycling_output_all), style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 24, np.sum(total_inter_cycling_output_all), style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 25, np.sum(total_direct_acyclic_output_all), style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 26, np.sum(total_indirect_acyclic_output_all), style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1, 27, np.sum(total_outputs), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 18, sum(actual_structure_dictionary['wa_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 19, sum(actual_structure_dictionary['wind_ac_a'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 20, sum(actual_structure_dictionary['wa'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 21, sum(actual_structure_dictionary['w'].flatten()), style_nbr_3dec)
+
+# Total outputs: Cyclic, Acyclic	AND Total
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index, 23, actual_structure_dictionary['xc_dir'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 24, actual_structure_dictionary['xind_c'][row_index][0] + actual_structure_dictionary['xind_ac_c'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 25, actual_structure_dictionary['xa_dir'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 26, actual_structure_dictionary['xind_ac_a'][row_index][0], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 27, actual_structure_dictionary['x'][row_index][0], style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1, 23, np.sum(actual_structure_dictionary['xc_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 24, np.sum(actual_structure_dictionary['xind_c'].flatten() + actual_structure_dictionary['xind_ac_c'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 25, np.sum(actual_structure_dictionary['xa_dir'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 26, np.sum(actual_structure_dictionary['xind_ac_a'].flatten()), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 27, np.sum(actual_structure_dictionary['x'].flatten()), style_nbr_3dec)
 
 # this was an old hyperlink to the corresponding sankey diagram - now the sankey is not even saved
 #out_sheet_all.write(row_section_start+NBR_sectors+5, 0,  xlwt.Formula('HYPERLINK(\"./images/sankey.cycles.'+output_filename+'.all.png\";"Link to a generated sankey diagram representing the cycling structure - will be substituted by Circos diagrams")'), style_link)    ### THE PROBLEMS Is THAT LIBREOFFICE does not open the link
