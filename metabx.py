@@ -1528,166 +1528,165 @@ for row_index in range(NBR_sectors):
 #section starting row:
 row_section_start= row_section_start + NBR_sectors + 2  
 
-#SECTION TITLE  
+# SECTION TITLE  
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
-out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'Cyclic-acyclic / direct-indirect components', style_grey_bold)
+out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'Overlapped cyclic-acyclic / direct-indirect components', style_grey_bold)
 
 row_section_start = row_section_start+1
-#ROW HEADERS for sectors
+# row HEADERS representing the sectors for the whole section
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index, 0, Z_array_with_headers['row headings'][row_index], style_header_lalign)   
-#row header for totals
+    out_sheet_all.write(row_section_start+4+row_index, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)   
 out_sheet_all.write(row_section_start+5+row_index, 0, 'TOTALS', style_header_lalign)   
 
-## COLUMN HEADERS OF indicators
+### COLUMN HEADERS for the whole section (there are 2 levels of headers)
 
-##cyclic flows COLUMN HEADERS section
-#cyclic flows top level headers
+## Cycling throughput
+# top level
 out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 1, 3, 'Cyclic flows within the inter-sectoral matrix', style_header_center)
 out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 1, 3, 'Cycling throughput', style_header_center)
 #cyclic flows disaggregated level headers
-out_sheet_all.write(row_section_start+3, 1, 'Self-cycling', style_header_center)
-out_sheet_all.write(row_section_start+3, 2, 'Inter-cycling', style_header_center)
-out_sheet_all.write(row_section_start+3, 3, 'Total', style_header_center)
+out_sheet_all.write(row_section_start+3, 1, 'Direct (cdir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 2, 'Indirect (cind)', style_header_center)
+out_sheet_all.write(row_section_start+3, 3, 'Total (cycling_throughput)', style_header_center)
 
-##System inputs COLUMN HEADERS section
-#System inputs top level headers
+## System inputs (primary resources)
+# top level headers
 out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 5, 11, 'System inputs (primary resources)', style_header_center)
 out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 5, 7, 'Cyclic', style_header_center)
 out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 8, 10, 'Acyclic', style_header_center)
 out_sheet_all.write(row_section_start+2, 11, 'Total inputs', style_header_center)
 
-#System inputs disaggregated level headers
-out_sheet_all.write(row_section_start+3, 5, 'Self-cycling', style_header_center)
-out_sheet_all.write(row_section_start+3, 6, 'Inter-cycling', style_header_center)
-out_sheet_all.write(row_section_start+3, 7, 'Total', style_header_center)
+# low_level  headers
+out_sheet_all.write(row_section_start+3, 5, 'Direct (rc_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 6, 'Indirect (rind_ac_c)', style_header_center)
+out_sheet_all.write(row_section_start+3, 7, 'Total cyclic inputs (rc)', style_header_center)
 
-out_sheet_all.write(row_section_start+3, 8, 'Direct', style_header_center)
-out_sheet_all.write(row_section_start+3, 9, 'Indirect', style_header_center)
-out_sheet_all.write(row_section_start+3, 10,'Total',style_header_center)
+out_sheet_all.write(row_section_start+3, 8, 'Direct (ra_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 9, 'Indirect (rind_ac_a)', style_header_center)
+out_sheet_all.write(row_section_start+3, 10,'Total acyclic inputs (ra)',style_header_center)
 
-out_sheet_all.write(row_section_start+3,11,'Cycling + Acyclic',style_header_center)
+out_sheet_all.write(row_section_start+3,11,'Total (r)',style_header_center)
 
-##System outputs COLUMN HEADERS section
-#System outputs top level headers
-out_sheet_all.write_merge(row_section_start+1,row_section_start+1,13,21,'System outputs (final goods and emissions)',style_header_center)
-out_sheet_all.write_merge(row_section_start+2,row_section_start+2,13,14,'Final demand',style_header_center)
-out_sheet_all.write_merge(row_section_start+2,row_section_start+2,15,17,'Cyclic emissions',style_header_center)
-out_sheet_all.write_merge(row_section_start+2,row_section_start+2,18,20,'Acyclic emissions',style_header_center)
-out_sheet_all.write(row_section_start+2,21,'Total Emissions',style_header_center)
+##  System outputs (final goods and emissions)
+#  top level headers
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 13, 21, 'System outputs (final goods and emissions)', style_header_center)
+out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 13, 14, 'Final demand', style_header_center)
+out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 15, 17, 'Cyclic emissions', style_header_center)
+out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 18, 20, 'Acyclic emissions', style_header_center)
+out_sheet_all.write(row_section_start+2, 21, 'Total Emissions', style_header_center)
 
-#System outputs disaggregated level headers
-out_sheet_all.write(row_section_start+3,13,'Direct',style_header_center)
-out_sheet_all.write(row_section_start+3,14,'Indirect',style_header_center)
-out_sheet_all.write(row_section_start+3,15,'Self-cycling',style_header_center)
-out_sheet_all.write(row_section_start+3,16,'Inter-cycling',style_header_center)
-out_sheet_all.write(row_section_start+3,17,'Total',style_header_center)
+# low level headers
+out_sheet_all.write(row_section_start+3, 13, 'Direct (fdir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 14, 'Indirect (find)', style_header_center)
+out_sheet_all.write(row_section_start+3, 15, 'Direct (wc_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 16, 'Indirect (wind_c + wind_ac_c)', style_header_center)
+out_sheet_all.write(row_section_start+3, 17, 'Total (wc)', style_header_center)
 
-out_sheet_all.write(row_section_start+3,18,'Direct',style_header_center)
-out_sheet_all.write(row_section_start+3,19,'Indirect',style_header_center)
-out_sheet_all.write(row_section_start+3,20,'Total',style_header_center)
+out_sheet_all.write(row_section_start+3, 18, 'Direct (wa_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 19, 'Indirect (wind_ac_a)', style_header_center)
+out_sheet_all.write(row_section_start+3, 20, 'Total (wa)', style_header_center)
 
-out_sheet_all.write(row_section_start+3,21,'Cycling + Acyclic',style_header_center)
+out_sheet_all.write(row_section_start+3, 21, 'Total (w)', style_header_center)
 
-##Total outputs COLUMN HEADERS section
-#Total outputs top level headers
-out_sheet_all.write_merge(row_section_start+1,row_section_start+1,23,27,'Total outputs',style_header_center)
-out_sheet_all.write_merge(row_section_start+2,row_section_start+2,23,24,'Cycling',style_header_center)
-out_sheet_all.write_merge(row_section_start+2,row_section_start+2,25,26,'Acyclic',style_header_center)
-out_sheet_all.write(row_section_start+2,27,'Total',style_header_center)
+## Total outputs
+# top level headers
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 23, 27, 'Total outputs', style_header_center)
+out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 23, 24, 'Cycling', style_header_center)
+out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 25, 26, 'Acyclic', style_header_center)
+out_sheet_all.write(row_section_start+2, 27, 'Total', style_header_center)
 
-#Total outputs disaggregated level headers
-out_sheet_all.write(row_section_start+3,23,'Self',style_header_center)
-out_sheet_all.write(row_section_start+3,24,'Inter',style_header_center)
-out_sheet_all.write(row_section_start+3,25,'Direct',style_header_center)
-out_sheet_all.write(row_section_start+3,26,'Indirect',style_header_center)
-out_sheet_all.write(row_section_start+3,27,'Cyclic + Acyclic',style_header_center)
+# low level headers
+out_sheet_all.write(row_section_start+3, 23, 'Direct (xc_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 24, 'Indirect (xind_c+xind_ac_c)', style_header_center)
+out_sheet_all.write(row_section_start+3, 25, 'Direct (xa_dir)', style_header_center)
+out_sheet_all.write(row_section_start+3, 26, 'Indirect (xind_ac_a)', style_header_center)
+out_sheet_all.write(row_section_start+3, 27, 'Total (x)', style_header_center)
 
 # ---- Indicators of cyclic component ----
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index,1,self_cycling_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,2,inter_cycling_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,3,cycling_throughput_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 1, self_cycling_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 2, inter_cycling_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 3, cycling_throughput_all[row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1,1,tot_self_cycling_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,2,tot_inter_cycling_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,3,tot_cycling_throughput_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 1, tot_self_cycling_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 2, tot_inter_cycling_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 3, tot_cycling_throughput_all, style_nbr_3dec)
 
 # ---- Indicators of feeding flows (inputs) to maintain the cyclic component ----
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index,5,self_cycling_feeding_flows_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,6,inter_cycling_feeding_flows_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,7,feeding_flows_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 5, self_cycling_feeding_flows_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 6, inter_cycling_feeding_flows_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 7, feeding_flows_all[row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1,5,tot_self_cycling_feeding_flows_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,6,tot_inter_cycling_feeding_flows_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,7,tot_feeding_flows_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 5, tot_self_cycling_feeding_flows_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 6, tot_inter_cycling_feeding_flows_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 7, tot_feeding_flows_all, style_nbr_3dec)
 
 # ---- Indicators on straight inputs that generate the acyclic component --------
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index,8,raw_direct_straight_inputs_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,9,raw_indirect_straight_inputs_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,10,raw_straight_inputs_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,11,r_array.flatten()[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 8, raw_direct_straight_inputs_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 9, raw_indirect_straight_inputs_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 10, raw_straight_inputs_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 11, r_array.flatten()[row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1,8,tot_raw_direct_straight_inputs_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,9,tot_raw_indirect_straight_inputs_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,10,tot_raw_straight_inputs_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,11,np.sum(r_array),style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 8, tot_raw_direct_straight_inputs_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 9, tot_raw_indirect_straight_inputs_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 10, tot_raw_straight_inputs_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 11, np.sum(r_array), style_nbr_3dec)
 
 # ---- Indicators of cycling losses due to the cyclic component and corresponding cyclic inputs----
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index,13,direct_fd_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,14,indirect_fd_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,15,self_cycling_losses_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,16,inter_cycling_losses_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,17,cycling_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 13, direct_fd_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 14, indirect_fd_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 15, self_cycling_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 16, inter_cycling_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 17, cycling_losses_all[row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1,13,tot_direct_fd_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,14,tot_indirect_fd_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,15,tot_self_cycling_losses_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,16,tot_inter_cycling_losses_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,17,tot_cycling_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 13, tot_direct_fd_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 14, tot_indirect_fd_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 15, tot_self_cycling_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 16, tot_inter_cycling_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 17, tot_cycling_losses_all, style_nbr_3dec)
 
 # ---- Acyclic emissions related indicators----
 
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index,18, direct_acyclic_losses_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,19, indirect_acyclic_losses_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,20,acyclic_losses_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,21,total_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 18,  direct_acyclic_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 19,  indirect_acyclic_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 20, acyclic_losses_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 21, total_losses_all[row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1,18,tot_direct_acyclic_losses_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,19,tot_indirect_acyclic_losses_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,20,tot_straight_losses_all,style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,21,tot_total_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 18, tot_direct_acyclic_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 19, tot_indirect_acyclic_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 20, tot_straight_losses_all, style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 21, tot_total_losses_all, style_nbr_3dec)
 
 # ---- Indicators of the total outputs  ----
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_section_start+4+row_index,23,total_self_cycling_output_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,24,total_inter_cycling_output_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,25,total_direct_acyclic_output_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,26,total_indirect_acyclic_output_all[row_index],style_nbr_3dec)
-    out_sheet_all.write(row_section_start+4+row_index,27,total_outputs.flatten()[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 23, total_self_cycling_output_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 24, total_inter_cycling_output_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 25, total_direct_acyclic_output_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 26, total_indirect_acyclic_output_all[row_index], style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index, 27, total_outputs.flatten()[row_index], style_nbr_3dec)
 #totals
-out_sheet_all.write(row_section_start+4+row_index+1,23,np.sum(total_self_cycling_output_all),style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,24,np.sum(total_inter_cycling_output_all),style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,25,np.sum(total_direct_acyclic_output_all),style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,26,np.sum(total_indirect_acyclic_output_all),style_nbr_3dec)
-out_sheet_all.write(row_section_start+4+row_index+1,27,np.sum(total_outputs),style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 23, np.sum(total_self_cycling_output_all), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 24, np.sum(total_inter_cycling_output_all), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 25, np.sum(total_direct_acyclic_output_all), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 26, np.sum(total_indirect_acyclic_output_all), style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1, 27, np.sum(total_outputs), style_nbr_3dec)
 
 # this was an old hyperlink to the corresponding sankey diagram - now the sankey is not even saved
-#out_sheet_all.write(row_section_start+NBR_sectors+5,0, xlwt.Formula('HYPERLINK(\"./images/sankey.cycles.'+output_filename+'.all.png\";"Link to a generated sankey diagram representing the cycling structure - will be substituted by Circos diagrams")'),style_link)    ### THE PROBLEMS Is THAT LIBREOFFICE does not open the link
+#out_sheet_all.write(row_section_start+NBR_sectors+5, 0,  xlwt.Formula('HYPERLINK(\"./images/sankey.cycles.'+output_filename+'.all.png\";"Link to a generated sankey diagram representing the cycling structure - will be substituted by Circos diagrams")'), style_link)    ### THE PROBLEMS Is THAT LIBREOFFICE does not open the link
 
 
 #### Cyclic and acyclic structures section:
 #section starting row:
-row_section_start = row_section_start + NBR_sectors + 10 
+row_section_start = row_section_start + NBR_sectors + 6 
 
-#write subsection header starting at colummn 0, row 6*NBR_sectors+20
+#write subsection header starting at colummn 0,  row 6*NBR_sectors+20
 
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
-out_sheet_all.write(row_section_start,0,'Cyclic and acyclic structures',style_grey_bold)
+out_sheet_all.write(row_section_start, 0, 'Cyclic and acyclic structures', style_grey_bold)
 
 
 ### Cyclic structure
