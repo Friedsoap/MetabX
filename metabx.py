@@ -248,7 +248,7 @@ label_dictionary['row_sector_labels']= [row[0] for row in Z_PRE_array[1:]]
 label_dictionary['column_sector_labels']= Z_PRE_array[0][1:]
 label_dictionary['waste_labels']= f_PRE_array[0][1:] # assumes only one final demand
 label_dictionary['fd_labels']= f_PRE_array[0][0] # assumes only one final demand
-
+label_dictionary['final_outputs_labels']=f_PRE_array[0][0:]
 
 # Actual structure dictionary
 actual_structure_dictionary=dict()
@@ -1332,6 +1332,596 @@ style_header_lalign_bold= xlwt.easyxf('border: left thin, right thin, top thin, 
 
 style_nbr_3dec= xlwt.easyxf('border: left thin, right thin, top thin, bottom thin;',num_format_str = "#,###0.000;-#,###0.000" )
 style_link = xlwt.easyxf('font: underline single')
+
+
+###############################################################################
+###### Saving the analyses for the whole economy in worksheet called 'All flows structure'
+##############################################################################
+
+## create sheet to add images
+#out_sheet_all_image = output_workbook.add_sheet('All flows structure Images')
+#out_sheet_all_image.insert_bitmap(Images_Path+'/'+'sankey.cycles.all.'+output_filename+'.png', 0, 0)#the insert_bitmap function does not accept pngs...
+
+
+## 'All flows structure' is called internally out_sheet_all
+out_sheet_all = output_workbook.add_sheet('Actual structure decomposition')
+
+# first row with title
+out_sheet_all.write(0,0,'Original PIOT',style_grey_bold)
+out_sheet_all.row(0).set_style(style_grey_bold)
+
+### intersectoral matrix Z
+# column headers - start at third row, second column
+i=1 #column index
+for column_headers in label_dictionary['column_sector_labels']:
+    out_sheet_all.write(2,i,column_headers,style_header_center)
+    i += 1
+
+# row headers - start at 1st column row, fourth row
+i=3 #row index
+for row_headers in label_dictionary['column_sector_labels']:
+    out_sheet_all.write(i,0,row_headers,style_header_lalign)
+    i += 1  
+
+# data -  starts at fourth row and second column
+for row_index in range(NBR_sectors):
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+3,col_index+1,actual_structure_dictionary['Z'][row_index][col_index],style_nbr_3dec)
+
+### primary resources (r)
+# headings
+out_sheet_all.write(NBR_sectors+3,0,label_dictionary['resource_labels'],style_header_lalign)
+# data
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(NBR_sectors+3,col_index+1,actual_structure_dictionary['r'][col_index],style_nbr_3dec)
+
+### total inputs (x)
+#  header 
+out_sheet_all.write(NBR_sectors+4,0,'Total inputs',style_header_center)
+# data 
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(NBR_sectors+4,col_index+1,actual_structure_dictionary['x'].flatten()[col_index],style_nbr_3dec)
+
+### final goods and wastes (fd) 
+# column headers for final goods AND wastes start at column NBR_sectors+1, fourth row
+i=NBR_sectors+1#row index 
+for column_headers in label_dictionary['final_outputs_labels']:
+    out_sheet_all.write(2,i,column_headers,style_header_center)
+    i+=1
+    
+#data for final goods starts at fourth row and NBR_sectors+1 column
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+3,NBR_sectors+1,actual_structure_dictionary['fd'].flatten()[row_index],style_nbr_3dec)
+#data for wastes starting at fourth row and 1+NBR_sectors+1+waste_index column
+for waste_index in range(NBR_disposals):
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+3,1+NBR_sectors+1+waste_index,actual_structure_dictionary['w'+str(waste_index)].flatten()[row_index],style_nbr_3dec)
+
+### total outputs
+# header - start at column 1+NBR_sectors+1+NBR_disposals, fourth row
+out_sheet_all.write(2,1+NBR_sectors+1+NBR_disposals,'Total outputs',style_header_lalign)
+# data
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+3, 1+NBR_sectors+1+NBR_disposals, actual_structure_dictionary['x'].flatten()[row_index], style_nbr_3dec)
+    
+# TODO: STOPPED here
+
+#### Meso- and macro-economic resource indicators (efficiencies and  intensities)
+
+#section starting row:
+row_section_start=NBR_sectors+5
+
+#section title
+out_sheet_all.row(row_section_start).set_style(style_grey_bold)
+out_sheet_all.write(row_section_start,0,'Meso- and macro-economic resource indicators (efficiencies and  intensities)',style_grey_bold)
+
+#meso economic efficiencies top headers
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,0,1,'Meso indicators',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,0,1,'Resource efficiencies',style_header_center)
+#meso economic efficiencies row headers and values
+for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+3,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)
+        out_sheet_all.write(row_index+row_section_start+3,1,list_sectoral_eff_vars[row_index],style_nbr_3dec)
+
+#write TOP-LEVEL MACRO INDICATORS
+#top header
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,3,4,'Top-level macro indicators',style_header_center)
+#row headers
+out_sheet_all.write(row_section_start+2,3,'Resource efficiency',style_header_lalign)
+out_sheet_all.write(row_section_start+4,3,'Resource intensity',style_header_lalign)
+out_sheet_all.write(row_section_start+5,3,'Emission intensity',style_header_lalign)
+#indicators
+out_sheet_all.write(row_section_start+2,4,tot_res_eff_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4,4,tot_res_int_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+5,4,tot_em_int_all,style_nbr_3dec)
+
+#write MACRO INDICATORS 
+#top header
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,6,7+NBR_disposals,'Macro indicators (intensities)',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,6,7,'Resource intensities',style_header_center)
+
+
+#macro economic Resource intensities row headers and values
+for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+3,6,Z_array_with_headers['row headings'][row_index],style_header_lalign)
+        out_sheet_all.write(row_index+row_section_start+3,7,res_int_all[row_index],style_nbr_3dec)
+#macro economic TOTAL Resource intensities row headers and values
+out_sheet_all.write(row_index+row_section_start+4,6,'Totals',style_header_lalign)
+out_sheet_all.write(row_index+row_section_start+4,7,tot_res_int_all,style_nbr_3dec)
+
+# Emission intensities column headers and values 
+for waste_index in range(NBR_disposals):
+    #column header
+    out_sheet_all.write(row_section_start+2,8+waste_index,f_array_with_headers['column headings'][1+waste_index]+' intensity',style_header_center)
+    #values
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index + row_section_start + 3, 8 + waste_index,eval('em_int_'+str(waste_index)+'_all_'+str(row_index)),style_nbr_3dec)# FIXME: need to solve this, for that I need to create the sectoral intensities which I believe I did not create previously.
+    exec 'out_sheet_all.write(row_index+row_section_start+4,8+'+str(waste_index)+',em_int_'+str(waste_index)+'_all,style_nbr_3dec)' 
+
+
+
+#### Leontief Inverse:
+#section starting row:
+row_section_start=2*NBR_sectors+9
+#section header
+out_sheet_all.row(row_section_start).set_style(style_grey_bold)
+out_sheet_all.write(row_section_start,0,'Leontief inverse with related outputs endogenised [L=(I-A-Etot)^-1] (Since it is a characteristic of the sector, it will be the same for all production structures, even  calculated with the specific production structure variables)',style_grey_bold)
+
+# write L starting at row_section_start+1
+for row_index in range(NBR_sectors):
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+1,col_index+1,L[row_index][col_index],style_nbr_3dec)
+
+#### Cycle decomposition:
+#write section header starting at colummn 0, row 3*NBR_sectors+10
+out_sheet_all.row(3*NBR_sectors+10).set_style(style_grey_bold)
+out_sheet_all.write(3*NBR_sectors+10,0,'Cyclic-acyclic decomposition of the inter-sectoral matrix based on Ulanowicz (1983)',style_grey_bold)
+
+#header for Cyclic component
+out_sheet_all.write(3*NBR_sectors+11,0,'Cyclic component',style_header_lalign)
+# write cycle_matrix starting at colummn 0, row 3*NBR_sectors+12
+for row_index in range(NBR_sectors):
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+3*NBR_sectors+12,col_index+1,Z_array_cyclic[row_index][col_index],style_nbr_3dec)
+
+#header for Acyclic component   
+out_sheet_all.write(4*NBR_sectors+13,0,'Acyclic component',style_header_lalign)
+# write acyclic_matrix starting at colummn 0, row 4*NBR_sectors+14
+for row_index in range(NBR_sectors):
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+4*NBR_sectors+14,col_index+1,Z_array_acyclic[row_index][col_index],style_nbr_3dec)    
+
+#### SECTION: Cyclic-acyclic indicators starting at colummn 0, row 5*NBR_sectors+14
+
+#section starting row:
+row_section_start=5*NBR_sectors+14  
+
+#SECTION TITLE  
+out_sheet_all.row(row_section_start).set_style(style_grey_bold)
+out_sheet_all.write(row_section_start,0,'Cyclic-acyclic indicators',style_grey_bold)
+
+#ROW HEADERS for sectors
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)   
+#row header for totals
+out_sheet_all.write(row_section_start+5+row_index,0,'TOTALS',style_header_lalign)   
+
+## COLUMN HEADERS OF indicators
+
+##cyclic flows COLUMN HEADERS section
+#cyclic flows top level headers
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,1,3,'Cyclic flows within the inter-sectoral matrix',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,1,3,'Cycling throughput',style_header_center)
+#cyclic flows disaggregated level headers
+out_sheet_all.write(row_section_start+3,1,'Self-cycling',style_header_center)
+out_sheet_all.write(row_section_start+3,2,'Inter-cycling',style_header_center)
+out_sheet_all.write(row_section_start+3,3,'Total',style_header_center)
+
+##System inputs COLUMN HEADERS section
+#System inputs top level headers
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,5,11,'System inputs (primary resources)',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,5,7,'Cyclic',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,8,10,'Acyclic',style_header_center)
+out_sheet_all.write(row_section_start+2,11,'Total inputs',style_header_center)
+
+#System inputs disaggregated level headers
+out_sheet_all.write(row_section_start+3,5,'Self-cycling',style_header_center)
+out_sheet_all.write(row_section_start+3,6,'Inter-cycling',style_header_center)
+out_sheet_all.write(row_section_start+3,7,'Total',style_header_center)
+
+out_sheet_all.write(row_section_start+3,8,'Direct',style_header_center)
+out_sheet_all.write(row_section_start+3,9,'Indirect',style_header_center)
+out_sheet_all.write(row_section_start+3,10,'Total',style_header_center)
+
+out_sheet_all.write(row_section_start+3,11,'Cycling + Acyclic',style_header_center)
+
+##System outputs COLUMN HEADERS section
+#System outputs top level headers
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,13,21,'System outputs (final goods and emissions)',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,13,14,'Final demand',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,15,17,'Cyclic emissions',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,18,20,'Acyclic emissions',style_header_center)
+out_sheet_all.write(row_section_start+2,21,'Total Emissions',style_header_center)
+
+#System outputs disaggregated level headers
+out_sheet_all.write(row_section_start+3,13,'Direct',style_header_center)
+out_sheet_all.write(row_section_start+3,14,'Indirect',style_header_center)
+out_sheet_all.write(row_section_start+3,15,'Self-cycling',style_header_center)
+out_sheet_all.write(row_section_start+3,16,'Inter-cycling',style_header_center)
+out_sheet_all.write(row_section_start+3,17,'Total',style_header_center)
+
+out_sheet_all.write(row_section_start+3,18,'Direct',style_header_center)
+out_sheet_all.write(row_section_start+3,19,'Indirect',style_header_center)
+out_sheet_all.write(row_section_start+3,20,'Total',style_header_center)
+
+out_sheet_all.write(row_section_start+3,21,'Cycling + Acyclic',style_header_center)
+
+##Total outputs COLUMN HEADERS section
+#Total outputs top level headers
+out_sheet_all.write_merge(row_section_start+1,row_section_start+1,23,27,'Total outputs',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,23,24,'Cycling',style_header_center)
+out_sheet_all.write_merge(row_section_start+2,row_section_start+2,25,26,'Acyclic',style_header_center)
+out_sheet_all.write(row_section_start+2,27,'Total',style_header_center)
+
+#Total outputs disaggregated level headers
+out_sheet_all.write(row_section_start+3,23,'Self',style_header_center)
+out_sheet_all.write(row_section_start+3,24,'Inter',style_header_center)
+out_sheet_all.write(row_section_start+3,25,'Direct',style_header_center)
+out_sheet_all.write(row_section_start+3,26,'Indirect',style_header_center)
+out_sheet_all.write(row_section_start+3,27,'Cyclic + Acyclic',style_header_center)
+
+# ---- Indicators of cyclic component ----
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,1,self_cycling_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,2,inter_cycling_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,3,cycling_throughput_all[row_index],style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1,1,tot_self_cycling_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,2,tot_inter_cycling_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,3,tot_cycling_throughput_all,style_nbr_3dec)
+
+# ---- Indicators of feeding flows (inputs) to maintain the cyclic component ----
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,5,self_cycling_feeding_flows_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,6,inter_cycling_feeding_flows_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,7,feeding_flows_all[row_index],style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1,5,tot_self_cycling_feeding_flows_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,6,tot_inter_cycling_feeding_flows_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,7,tot_feeding_flows_all,style_nbr_3dec)
+
+# ---- Indicators on straight inputs that generate the acyclic component --------
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,8,raw_direct_straight_inputs_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,9,raw_indirect_straight_inputs_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,10,raw_straight_inputs_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,11,r_array.flatten()[row_index],style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1,8,tot_raw_direct_straight_inputs_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,9,tot_raw_indirect_straight_inputs_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,10,tot_raw_straight_inputs_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,11,np.sum(r_array),style_nbr_3dec)
+
+# ---- Indicators of cycling losses due to the cyclic component and corresponding cyclic inputs----
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,13,direct_fd_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,14,indirect_fd_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,15,self_cycling_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,16,inter_cycling_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,17,cycling_losses_all[row_index],style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1,13,tot_direct_fd_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,14,tot_indirect_fd_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,15,tot_self_cycling_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,16,tot_inter_cycling_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,17,tot_cycling_losses_all,style_nbr_3dec)
+
+# ---- Acyclic emissions related indicators----
+
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,18, direct_acyclic_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,19, indirect_acyclic_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,20,acyclic_losses_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,21,total_losses_all[row_index],style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1,18,tot_direct_acyclic_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,19,tot_indirect_acyclic_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,20,tot_straight_losses_all,style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,21,tot_total_losses_all,style_nbr_3dec)
+
+# ---- Indicators of the total outputs  ----
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_section_start+4+row_index,23,total_self_cycling_output_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,24,total_inter_cycling_output_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,25,total_direct_acyclic_output_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,26,total_indirect_acyclic_output_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_section_start+4+row_index,27,total_outputs.flatten()[row_index],style_nbr_3dec)
+#totals
+out_sheet_all.write(row_section_start+4+row_index+1,23,np.sum(total_self_cycling_output_all),style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,24,np.sum(total_inter_cycling_output_all),style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,25,np.sum(total_direct_acyclic_output_all),style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,26,np.sum(total_indirect_acyclic_output_all),style_nbr_3dec)
+out_sheet_all.write(row_section_start+4+row_index+1,27,np.sum(total_outputs),style_nbr_3dec)
+
+# this was an old hyperlink to the corresponding sankey diagram - now the sankey is not even saved
+#out_sheet_all.write(row_section_start+NBR_sectors+5,0, xlwt.Formula('HYPERLINK(\"./images/sankey.cycles.'+output_filename+'.all.png\";"Link to a generated sankey diagram representing the cycling structure - will be substituted by Circos diagrams")'),style_link)    ### THE PROBLEMS Is THAT LIBREOFFICE does not open the link
+
+
+#### Cyclic and acyclic structures section:
+#section starting row:
+row_section_start=6*NBR_sectors+20 
+
+#write subsection header starting at colummn 0, row 6*NBR_sectors+20
+
+out_sheet_all.row(row_section_start).set_style(style_grey_bold)
+out_sheet_all.write(row_section_start,0,'Cyclic and acyclic structures',style_grey_bold)
+
+
+### Cyclic structure
+out_sheet_all.write(row_section_start+1,0,'Cyclic structure',style_header_lalign_bold)
+
+# write cycle_matrix starting at colummn 0, row 3*NBR_sectors+12
+for row_index in range(NBR_sectors):
+    #row headers intersectoral matrix
+    out_sheet_all.write(row_index+row_section_start+3,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)       
+    #column headers  intersectoral matrix
+    out_sheet_all.write(row_section_start+2,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)    
+    for col_index in range(NBR_sectors):              
+        #intersectoral flows        
+        out_sheet_all.write(row_index+row_section_start+3,col_index+1,Z_array_cyclic[row_index][col_index],style_nbr_3dec)
+#INPUTS
+#Feeding flows header
+out_sheet_all.write(row_index+row_section_start+4,0,'Resources',style_header_lalign)
+#Feeding flows values
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4,1+col_index,feeding_flows_all[col_index],style_nbr_3dec)
+#total_cycling_output_all flows header (ACTUALLY = INPUTS)
+out_sheet_all.write(row_index+row_section_start+5,0,'Total inputs',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+5,1+col_index,total_cycling_output_all[col_index],style_nbr_3dec)
+
+#OUTPUTS
+#final demand = 0
+out_sheet_all.write(row_section_start+2,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors,0,style_nbr_3dec)
+#cycling losses flows 
+out_sheet_all.write(row_section_start+2,2+NBR_sectors,'Emissions',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,2+NBR_sectors,feeding_flows_all[row_index],style_nbr_3dec)
+#total_cycling_output_all
+out_sheet_all.write(row_section_start+2,3+NBR_sectors,'Total outputs',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,3+NBR_sectors,total_cycling_output_all[row_index],style_nbr_3dec)
+
+
+
+### Acyclic structure         
+row_section_start=7*NBR_sectors+26         
+out_sheet_all.write(row_section_start,0,'Acyclic structure',style_header_lalign_bold)
+# write acyclic_matrix starting at colummn 0, row 4*NBR_sectors+14
+for row_index in range(NBR_sectors):
+    #row headers  intersectoral matrix
+    out_sheet_all.write(row_index+row_section_start+2,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)
+    #column headers  intersectoral matrix
+    out_sheet_all.write(row_section_start+1,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+2,col_index+1,Z_array_acyclic[row_index][col_index],style_nbr_3dec)      
+
+#INPUTS
+#straight raw input flows header
+out_sheet_all.write(row_index+row_section_start+3,0,'Resources',style_header_lalign)
+#straight raw input flows  values
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+col_index,raw_straight_inputs_all.flatten()[col_index],style_nbr_3dec)
+#total_straight_output_all (ACTUALLY = INPUTS) flows header
+out_sheet_all.write(row_index+row_section_start+4,0,'Total inputs',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4,1+col_index,total_straight_output_all.flatten()[col_index],style_nbr_3dec)
+
+#OUTPUTS
+#Final goods
+out_sheet_all.write(row_section_start+1,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_center)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors,fd_all.flatten()[row_index],style_nbr_3dec)
+#Straight losses
+out_sheet_all.write(row_section_start+1,2+NBR_sectors,'Emissions',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,2+NBR_sectors,acyclic_losses_all.flatten()[row_index],style_nbr_3dec)
+#	total straight output
+out_sheet_all.write(row_section_start+1,3+NBR_sectors,'Total outputs',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,3+NBR_sectors,total_straight_output_all[row_index],style_nbr_3dec)
+
+
+#### DISAGGREGATED cyclic structures section:
+#section starting row:
+row_section_start=8*NBR_sectors+32 
+
+#write subsection header starting at colummn 0, row 6*NBR_sectors+20
+
+out_sheet_all.row(row_section_start).set_style(style_grey_bold)
+out_sheet_all.write(row_section_start,0,'Disaggregated Cyclic structures (self and inter-cycling)',style_grey_bold)
+
+
+### SELF-Cyclic structure
+out_sheet_all.write(row_section_start+1,0,'Self-cycling structure',style_header_lalign_bold)
+
+# write cycle_matrix starting at colummn 0, row 3*NBR_sectors+12
+for row_index in range(NBR_sectors):
+    #row headers intersectoral matrix
+    out_sheet_all.write(row_index+row_section_start+3,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)       
+    #column headers  intersectoral matrix
+    out_sheet_all.write(row_section_start+2,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)    
+    for col_index in range(NBR_sectors):              
+        #intersectoral flows        
+        out_sheet_all.write(row_index+row_section_start+3,col_index+1,Z_array_self_cycling[row_index][col_index],style_nbr_3dec)
+
+#INPUTS
+#Feeding flows header
+out_sheet_all.write(row_index+row_section_start+4,0,'Resources',style_header_lalign)
+#Feeding flows values
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4,1+col_index,self_cycling_feeding_flows_all[col_index],style_nbr_3dec)
+#total_cycling_output_all flows header (ACTUALLY = INPUTS)
+out_sheet_all.write(row_index+row_section_start+5,0,'Total inputs',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+5,1+col_index,total_self_cycling_output_all[col_index],style_nbr_3dec)
+
+## OUTPUTS
+# fd: final demand = 0
+out_sheet_all.write(row_section_start+2,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors,0,style_nbr_3dec)
+# Emissions
+for i in range(NBR_disposals):
+    # write header
+    out_sheet_all.write(row_section_start+2,1+NBR_sectors+1+i,f_array_with_headers['column headings'][i+1],style_header_lalign)
+
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors+1+i,eval('w_'+str(i)+'_SC_all')[row_index][0],style_nbr_3dec)
+
+#total_cycling_output_all
+out_sheet_all.write(row_section_start+2,1+NBR_sectors+1+NBR_disposals,'Total outputs',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors+1+NBR_disposals,total_self_cycling_output_all[row_index],style_nbr_3dec)
+
+
+
+### INTER-CYCLIC structure         
+row_section_start=9*NBR_sectors+38         
+out_sheet_all.write(row_section_start,0,'Inter-cycling structure',style_header_lalign_bold)
+
+for row_index in range(NBR_sectors):
+    #row headers  intersectoral matrix
+    out_sheet_all.write(row_index+row_section_start+2,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)
+    #column headers  intersectoral matrix
+    out_sheet_all.write(row_section_start+1,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+2,col_index+1,Z_array_inter_cycling[row_index][col_index],style_nbr_3dec)      
+
+#INPUTS
+#resources header
+out_sheet_all.write(row_index+row_section_start+3,0,'Resources',style_header_lalign)
+#straight raw input flows  values
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+col_index,inter_cycling_feeding_flows_all.flatten()[col_index],style_nbr_3dec)
+#total_straight_output_all (ACTUALLY = INPUTS) flows header
+out_sheet_all.write(row_index+row_section_start+4,0,'Total inputs',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4,1+col_index,total_inter_cycling_output_all.flatten()[col_index],style_nbr_3dec)
+
+## OUTPUTS
+# Final goods
+out_sheet_all.write(row_section_start+1,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_center)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors,0,style_nbr_3dec)
+# Emissions 
+for i in range(NBR_disposals):
+    out_sheet_all.write(row_section_start+1,1+NBR_sectors+1+i,f_array_with_headers['column headings'][1+i],style_header_lalign)
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors+1+i,eval('w_'+str(i)+'_IC_all')[row_index][0],style_nbr_3dec)
+#	total straight output
+out_sheet_all.write(row_section_start+1,1+NBR_sectors+1+NBR_disposals,'Total outputs',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors+1+NBR_disposals,total_inter_cycling_output_all[row_index],style_nbr_3dec)
+
+
+#### DISAGGREGATED acyclic structures section:
+#section starting row:
+row_section_start=10*NBR_sectors+44 
+
+#write subsection header starting at colummn 0, row row_section_start
+
+out_sheet_all.row(row_section_start).set_style(style_grey_bold)
+out_sheet_all.write(row_section_start,0,'Disaggregated acyclic structures (direct and indirect)',style_grey_bold)
+
+
+### Direct acyclic structure
+out_sheet_all.write(row_section_start+1,0,'Direct acyclic structure',style_header_lalign_bold)
+
+# write cycle_matrix starting at colummn 0, row 3*NBR_sectors+12
+for row_index in range(NBR_sectors):
+    #row headers intersectoral matrix
+    out_sheet_all.write(row_index+row_section_start+3,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)       
+    #column headers  intersectoral matrix
+    out_sheet_all.write(row_section_start+2,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)    
+    for col_index in range(NBR_sectors):              
+        #intersectoral flows        
+        out_sheet_all.write(row_index+row_section_start+3,col_index+1,0,style_nbr_3dec)
+
+#INPUTS
+#Resources 
+out_sheet_all.write(row_index+row_section_start+4,0,'Resources',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4,1+col_index,raw_direct_straight_inputs_all[col_index],style_nbr_3dec)
+#total inputs
+out_sheet_all.write(row_index+row_section_start+5,0,'Total inputs',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+5,1+col_index,total_direct_acyclic_output_all[col_index],style_nbr_3dec)
+
+#OUTPUTS
+# final demand 
+out_sheet_all.write(row_section_start+2,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors,direct_fd_all[row_index],style_nbr_3dec)
+# emissions
+for i in range(NBR_disposals):
+    out_sheet_all.write(row_section_start+2,1+NBR_sectors+1+i,f_array_with_headers['column headings'][1+i],style_header_lalign)
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors+1+i,eval('w_'+str(i)+'_DA_all')[row_index][0],style_nbr_3dec)
+#total_direct_acyclic_output_all
+out_sheet_all.write(row_section_start+2,1+NBR_sectors+1+NBR_disposals,'Total outputs',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors+1+NBR_disposals,total_direct_acyclic_output_all[row_index],style_nbr_3dec)
+
+
+
+### Indirect acyclic structure         
+row_section_start=11*NBR_sectors+50         
+out_sheet_all.write(row_section_start,0,'Indirect acyclic structure',style_header_lalign_bold)
+
+#Intersectoral matrix
+for row_index in range(NBR_sectors):
+    #row headers  intersectoral matrix
+    out_sheet_all.write(row_index+row_section_start+2,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)
+    #column headers  intersectoral matrix
+    out_sheet_all.write(row_section_start+1,1+row_index,Z_array_with_headers['column headings'][row_index], style_header_lalign)
+    #values
+    for col_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+2,col_index+1,Z_array_acyclic[row_index][col_index],style_nbr_3dec)      
+
+#INPUTS
+#resources header
+out_sheet_all.write(row_index+row_section_start+3,0,'Resources',style_header_lalign)
+#straight raw input flows  values
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3,1+col_index,raw_indirect_straight_inputs_all[col_index],style_nbr_3dec)
+#total inputs
+out_sheet_all.write(row_index+row_section_start+4,0,'Total inputs',style_header_lalign)
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4,1+col_index,total_indirect_acyclic_output_all[col_index],style_nbr_3dec)
+
+#OUTPUTS
+#Final goods
+out_sheet_all.write(row_section_start+1,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_center)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors,indirect_fd_all[row_index],style_nbr_3dec)
+#Emissions
+for i in range(NBR_disposals):
+    out_sheet_all.write(row_section_start+1,1+NBR_sectors+1+i,f_array_with_headers['column headings'][i+1],style_header_lalign)
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors+1+i,eval('w_'+str(i)+'_IA_all')[row_index][0],style_nbr_3dec)
+#total outputs
+out_sheet_all.write(row_section_start+1,1+NBR_sectors+1+NBR_disposals,'Total outputs',style_header_lalign)
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors+1+NBR_disposals,total_indirect_acyclic_output_all[row_index],style_nbr_3dec)
+
+
+
+
+
+
 
 
 ###############################################################################
