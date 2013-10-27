@@ -99,7 +99,8 @@ circos_draw = False
 circos_execute = True
 circos_open_images = True
 
-
+zero_threshold = 1.0e-10 # threshold under which an absolute value is considered 0 to clean the arrays, also used to check negativity below its negative
+max_difference=0.00001 # max_difference represents a percentage (so 1 is 100%)
 
 ###### intialise and check the workbook     ##################################
 print('... Starting Phymetec version {0} at {1} (yyyymmdd_hhmm) '.format(__version__,time_at_start))
@@ -284,10 +285,9 @@ total_outputs=np.sum(actual_structure_dictionary['Z'],axis=1).reshape(NBR_sector
 for waste_index in range(NBR_disposals):
     total_outputs=total_outputs+actual_structure_dictionary['w'+str(waste_index)]
 actual_structure_dictionary['x']=total_outputs
-# raise error if total_inputs are different from total_outputs for more than 'acceptable value'
-max_balancing_difference=0.00001 # max_balancing_difference represents a percentage (so 1 is 100%)
+# raise error if total_inputs are different from total_outputs for more than acceptable value: max_difference
 for i_index in range(NBR_sectors):
-    if total_inputs[i_index]-total_outputs[i_index][0] > max_balancing_difference*(total_inputs[i_index]+total_outputs[i_index][0])/2 :
+    if total_inputs[i_index]-total_outputs[i_index][0] > max_difference*(total_inputs[i_index]+total_outputs[i_index][0])/2 :
         sys.exit('''Error: Total outputs different from total inputs for sector {0}, i.e, the IOT is not balanced, exiting.'''.format(i_index))
         
 ##############################################################################
@@ -643,34 +643,41 @@ for struct_index in range(NBR_sectors):
     # error check with the two ways to find fdir
     for i in range(NBR_sectors):
         # clean ra_dir array
-        if product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'][i] < 1.0e-10:
+        if product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'][i] < zero_threshold:
             product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'][i] = 0
-        # raise error if difference with other method is greater than 0.001%
-        if (product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > 0.000001:
-            sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
+        # raise error if difference with other method is greater than max_difference (defined at top)
+        # but only for fdir diferent than 0!
+        if product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] != 0:
+            if (product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > max_difference:
+                sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
 
     print('\n + Finding wdir +')
     # as aggregate emissions
     product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'] = product_based_structures['prod_based_struct_'+str(struct_index)]['w'] - product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir']-product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c'] -product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] - product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c']
-    # clean wa_dir_
+    # clean wa_dir
     for i in range(NBR_sectors):
-        if np.abs(product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0]) < 1.0e-10:
+        if np.abs(product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0]) < zero_threshold:
             product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0] = 0
-        elif product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0] < -1.0e-10:
+        elif product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'][i][0] < -zero_threshold:
             sys.exit('Error: wa_dir from product_based structure_{0} is significantly negative'.format(str(struct_index)))
     
+    # find xa_dir 
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir'] = np.dot(LA.inv(actual_structure_dictionary['Etot']), product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir'])
+        
     # for each emission type
     for waste_index in range(NBR_disposals):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)] = product_based_structures['prod_based_struct_'+str(struct_index)]['w'+str(waste_index)] - product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)]-product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)] -product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] - product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)]
         # clean wa_dir_
         for i in range(NBR_sectors):
-            if np.abs(product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0]) < 1.0e-10:
+            if np.abs(product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0]) < zero_threshold:
                 product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] = 0
-            elif product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] < -1.0e-10:
+            elif product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] < -zero_threshold:
                 sys.exit('Error: wa_dir_{1} from product_based structure_{0} is significantly negative'.format(str(struct_index),str(waste_index)))
             # raise error if difference with other method is greater than 0.001%
-            if (product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(np.ones(NBR_sectors)-meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > 0.000001:
-                sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
+            # but only for wa_dir_ diferent than 0!
+            if product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] != 0:
+                if (product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)][i][0] - np.dot(product_based_structures['prod_based_struct_'+str(struct_index)]['ra_dir'],np.diag(np.ones(NBR_sectors)-meso_efficiencies))[i])/product_based_structures['prod_based_struct_'+str(struct_index)]['fdir'][i][0] > max_difference:
+                    sys.exit('Error: fdir as fd - find does not equal ra_dir*meso_efficiencies for product_based structure_{0}'.format(str(struct_index)))
                 
     print('\n +++ Aggregating the overlaped structures into the cyclic-acyclic meta-structure +++')  
     # intermediate structures
