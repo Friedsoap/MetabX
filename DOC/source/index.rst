@@ -13,8 +13,8 @@ Contents:
 
    intro
    data_input
-   internal_data_structure
    calculations
+   internal_data_structure
 
 
 Indices and tables
