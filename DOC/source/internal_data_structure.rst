@@ -167,7 +167,9 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | **Cyclic-acyclic\  Structure**                                           |
 | See :ref:`meta_str`                                                      |
 +------------------------+------------+------------------------------------+
-| ``Zc``                 | n x n      | Same as above                      |
+| ``Zcyc``               | n x n      | Matrix containing all intersectoral|
+|                        |            | flows induced by cycling           |
+|                        |            | (``Zc``+``Zind_c``+``Zind_ac_c``)  |
 +------------------------+------------+------------------------------------+
 | ``Za``                 | n x n      | Matrix containing the intersectoral|
 |                        |            | flows to produce final goods       |
@@ -193,6 +195,12 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``wa_``:sub:`m`        | n x 1      | Emission-m due to                  |
 |                        | (m arrays) | producing final goods              |
++------------------------+------------+------------------------------------+
+| ``xc``                 | n x 1      | Total outputs due to               |
+|                        |            | maintaining cycling                |
++------------------------+------------+------------------------------------+
+| ``xa``                 | n x 1      | Total outputs due to               |
+|                        |            | producing final goods              |
 +------------------------+------------+------------------------------------+
 | **Direct-Indirect Structure**                                            |
 | See :ref:`meta_str`                                                      |
@@ -224,6 +232,12 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``wi_``:sub:`m`        | n x 1      | Emission-m due to                  |
 |                        | (m arrays) | indirect flows                     |
++------------------------+------------+------------------------------------+
+| ``xd``                 | n x 1      | Total outputs due to               |
+|                        |            | direct flows                       |
++------------------------+------------+------------------------------------+
+| ``xi``                 | n x 1      | Total outputs due to               |
+|                        |            | indirect flows                     |
 +------------------------+------------+------------------------------------+
 
 .. note::
