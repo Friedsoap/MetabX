@@ -541,6 +541,8 @@ actual_structure_dictionary['xind_c'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['xc_dir'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['xa_dir'] = np.zeros((NBR_sectors,1))
 
+actual_structure_dictionary['xc'] = np.zeros((NBR_sectors,1))
+actual_structure_dictionary['xa'] = np.zeros((NBR_sectors,1))
 
 # nx1 arrays for m emissions
 for waste_index in range(NBR_disposals):
@@ -689,7 +691,7 @@ for struct_index in range(NBR_sectors):
                 
     print('\n +++ Aggregating the overlaped structures into the cyclic-acyclic meta-structure +++')  
     # intermediate structures
-    # Zc is the same as previously calculated         
+    product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc'] = product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'] + product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_c']     
     product_based_structures['prod_based_struct_'+str(struct_index)]['Za'] = product_based_structures['prod_based_struct_'+str(struct_index)]['Zind_ac_a']
     # final goods
     product_based_structures['prod_based_struct_'+str(struct_index)]['fa'] = product_based_structures['prod_based_struct_'+str(struct_index)]['fd']
@@ -699,6 +701,10 @@ for struct_index in range(NBR_sectors):
     # emissions
     product_based_structures['prod_based_struct_'+str(struct_index)]['wa'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir']
     product_based_structures['prod_based_struct_'+str(struct_index)]['wc'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c']
+    # total outputs
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xa'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir']
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xc'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c']
+    
     # for each emission type
     for waste_index in range(NBR_disposals):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wa_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)]
@@ -763,7 +769,7 @@ for struct_index in range(NBR_sectors):
 
 print('\n +++ Aggregating the overlaped structures of the aggregated structure into the cyclic-acyclic meta-structure +++')  
 # intermediate structures
-# Zc is the same as previously calculated         
+actual_structure_dictionary['Zcyc'] = actual_structure_dictionary['Zc'] + actual_structure_dictionary['Zind_c'] + actual_structure_dictionary['Zind_ac_c']        
 actual_structure_dictionary['Za'] = actual_structure_dictionary['Zind_ac_a']
 # final goods
 actual_structure_dictionary['fa'] = actual_structure_dictionary['fd']
@@ -777,7 +783,10 @@ actual_structure_dictionary['wc'] = actual_structure_dictionary['wind_ac_c'] + a
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['wa_'+str(waste_index)] = actual_structure_dictionary['wind_ac_a_'+str(waste_index)] + actual_structure_dictionary['wa_dir_'+str(waste_index)]
     actual_structure_dictionary['wc_'+str(waste_index)] = actual_structure_dictionary['wind_ac_c_'+str(waste_index)] + actual_structure_dictionary['wc_dir_'+str(waste_index)] + actual_structure_dictionary['wind_c_'+str(waste_index)]
-
+# total outputs
+# emissions
+actual_structure_dictionary['xa'] = actual_structure_dictionary['xind_ac_a'] + actual_structure_dictionary['xa_dir']
+actual_structure_dictionary['xc'] = actual_structure_dictionary['xind_ac_c'] + actual_structure_dictionary['xc_dir'] + actual_structure_dictionary['xind_c']
 
 print('\n +++ Aggregating the overlaped structures of the aggregated structure into the direct-indirect meta-structure +++')  
 # intermediate structures
@@ -1399,16 +1408,16 @@ for col_index in range(NBR_sectors):
     out_sheet_all.write(NBR_sectors+4, col_index+1, actual_structure_dictionary['x'].flatten()[col_index], style_nbr_3dec)
 
 ### final goods and wastes (fd) 
-# column headers for final goods AND wastes start at column NBR_sectors+1,  fourth row
+# column headers for final goods AND wastes start
 i=NBR_sectors+1#row index 
 for column_headers in label_dictionary['final_outputs_labels']:
     out_sheet_all.write(2, i, column_headers, style_header_center)
     i+=1
     
-#data for final goods starts at fourth row and NBR_sectors+1 column
+# data for final goods ONLY
 for row_index in range(NBR_sectors):
     out_sheet_all.write(row_index+3, NBR_sectors+1, actual_structure_dictionary['fd'].flatten()[row_index], style_nbr_3dec)
-#data for wastes starting at fourth row and 1+NBR_sectors+1+waste_index column
+# data for wastes ONLY
 for waste_index in range(NBR_disposals):
     for row_index in range(NBR_sectors):
         out_sheet_all.write(row_index+3, 1+NBR_sectors+1+waste_index, actual_structure_dictionary['w'+str(waste_index)].flatten()[row_index], style_nbr_3dec)
@@ -1698,107 +1707,117 @@ out_sheet_all.write(row_section_start+4+row_index+1, 27, np.sum(actual_structure
 #out_sheet_all.write(row_section_start+NBR_sectors+5, 0,  xlwt.Formula('HYPERLINK(\"./images/sankey.cycles.'+output_filename+'.all.png\";"Link to a generated sankey diagram representing the cycling structure - will be substituted by Circos diagrams")'), style_link)    ### THE PROBLEMS Is THAT LIBREOFFICE does not open the link
 
 
-#### Cyclic and acyclic structures section:
-#section starting row:
+### Section: Cyclic and acyclic meta-structures
+# starting row:
 row_section_start = row_section_start + NBR_sectors + 6 
 
-#write subsection header starting at colummn 0,  row 6*NBR_sectors+20
-
+# section header
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
-out_sheet_all.write(row_section_start, 0, 'Cyclic and acyclic structures', style_grey_bold)
+out_sheet_all.write(row_section_start, 0,  'The cyclic-acyclic meta-structure',  style_grey_bold)
+row_section_start += 1
 
+# section header for the Cyclic structure
+out_sheet_all.write(row_section_start+1, 0, 'Cyclic structure', style_header_lalign_bold)
 
-### Cyclic structure
-out_sheet_all.write(row_section_start+1,0,'Cyclic structure',style_header_lalign_bold)
-
-# write cycle_matrix starting at colummn 0, row 3*NBR_sectors+12
+## Zc only
 for row_index in range(NBR_sectors):
-    #row headers intersectoral matrix
-    out_sheet_all.write(row_index+row_section_start+3,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)       
-    #column headers  intersectoral matrix
-    out_sheet_all.write(row_section_start+2,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)    
+    # row headers 
+    out_sheet_all.write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)       
+    # column headers 
+    out_sheet_all.write(row_section_start+2, 1+row_index, label_dictionary['column_sector_labels'][row_index], style_header_lalign)    
     for col_index in range(NBR_sectors):              
-        #intersectoral flows        
-        out_sheet_all.write(row_index+row_section_start+3,col_index+1,Z_array_cyclic[row_index][col_index],style_nbr_3dec)
-#INPUTS
-#Feeding flows header
-out_sheet_all.write(row_index+row_section_start+4,0,'Resources',style_header_lalign)
-#Feeding flows values
-for col_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+4,1+col_index,feeding_flows_all[col_index],style_nbr_3dec)
-#total_cycling_output_all flows header (ACTUALLY = INPUTS)
-out_sheet_all.write(row_index+row_section_start+5,0,'Total inputs',style_header_lalign)
-for col_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+5,1+col_index,total_cycling_output_all[col_index],style_nbr_3dec)
+        # data    
+        out_sheet_all.write(row_index+row_section_start+3, col_index+1, actual_structure_dictionary['Zcyc'][row_index][col_index], style_nbr_3dec)
 
-#OUTPUTS
-#final demand = 0
-out_sheet_all.write(row_section_start+2,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_lalign)
-for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+3,1+NBR_sectors,0,style_nbr_3dec)
-#cycling losses flows 
-out_sheet_all.write(row_section_start+2,2+NBR_sectors,'Emissions',style_header_lalign)
-for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+3,2+NBR_sectors,feeding_flows_all[row_index],style_nbr_3dec)
-#total_cycling_output_all
-out_sheet_all.write(row_section_start+2,3+NBR_sectors,'Total outputs',style_header_lalign)
-for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+3,3+NBR_sectors,total_cycling_output_all[row_index],style_nbr_3dec)
+## Primary resources
+# header
+out_sheet_all.write(row_index+row_section_start+4, 0, label_dictionary['resource_labels'][0], style_header_lalign)
+# data
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+4, 1+col_index, actual_structure_dictionary['rc'][col_index], style_nbr_3dec)
 
+## total inputs (actually = total outputs) 
+# header
+out_sheet_all.write(row_index+row_section_start+5, 0, 'Total inputs', style_header_lalign)
+# data
+for col_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+5, 1+col_index, actual_structure_dictionary['xc'].flatten()[col_index], style_nbr_3dec)
+
+## final demand
+# header
+out_sheet_all.write(row_section_start+2, 1+NBR_sectors, str(label_dictionary['fd_labels']), style_header_lalign)
+# data = 0 here
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3, 1+NBR_sectors, 0, style_nbr_3dec)
+    
+## emissions
+for waste_index in range(NBR_disposals):
+    # header
+    out_sheet_all.write(row_section_start+2, 2+NBR_sectors+waste_index, label_dictionary['waste_labels'][waste_index], style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        out_sheet_all.write(row_index+row_section_start+3, 2+NBR_sectors+waste_index, actual_structure_dictionary['wc_'+str(waste_index)][row_index][0], style_nbr_3dec)
+
+## total outputs
+# header
+out_sheet_all.write(row_section_start+2, 3+NBR_sectors, 'Total outputs', style_header_lalign)
+# data
+for row_index in range(NBR_sectors):
+    out_sheet_all.write(row_index+row_section_start+3, 3+NBR_sectors, actual_structure_dictionary['xc'].flatten()[row_index], style_nbr_3dec)
 
 
 ### Acyclic structure         
-row_section_start=row_section_start + NBR_sectors + 10         
-out_sheet_all.write(row_section_start,0,'Acyclic structure',style_header_lalign_bold)
-# write acyclic_matrix starting at colummn 0, row 4*NBR_sectors+14
+row_section_start=row_section_start + NBR_sectors + 7        
+out_sheet_all.write(row_section_start, 0, 'Acyclic structure', style_header_lalign_bold)
+# write acyclic_matrix starting at colummn 0,  row 4*NBR_sectors+14
 for row_index in range(NBR_sectors):
     #row headers  intersectoral matrix
-    out_sheet_all.write(row_index+row_section_start+2,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)
+    out_sheet_all.write(row_index+row_section_start+2, 0, Z_array_with_headers['row headings'][row_index], style_header_lalign)
     #column headers  intersectoral matrix
-    out_sheet_all.write(row_section_start+1,1+row_index,Z_array_with_headers['column headings'][row_index],style_header_lalign)
+    out_sheet_all.write(row_section_start+1, 1+row_index, Z_array_with_headers['column headings'][row_index], style_header_lalign)
     for col_index in range(NBR_sectors):
-        out_sheet_all.write(row_index+row_section_start+2,col_index+1,Z_array_acyclic[row_index][col_index],style_nbr_3dec)      
+        out_sheet_all.write(row_index+row_section_start+2, col_index+1, Z_array_acyclic[row_index][col_index], style_nbr_3dec)      
 
 #INPUTS
 #straight raw input flows header
-out_sheet_all.write(row_index+row_section_start+3,0,'Resources',style_header_lalign)
+out_sheet_all.write(row_index+row_section_start+3, 0, 'Resources', style_header_lalign)
 #straight raw input flows  values
 for col_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+3,1+col_index,raw_straight_inputs_all.flatten()[col_index],style_nbr_3dec)
+    out_sheet_all.write(row_index+row_section_start+3, 1+col_index, raw_straight_inputs_all.flatten()[col_index], style_nbr_3dec)
 #total_straight_output_all (ACTUALLY = INPUTS) flows header
-out_sheet_all.write(row_index+row_section_start+4,0,'Total inputs',style_header_lalign)
+out_sheet_all.write(row_index+row_section_start+4, 0, 'Total inputs', style_header_lalign)
 for col_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+4,1+col_index,total_straight_output_all.flatten()[col_index],style_nbr_3dec)
+    out_sheet_all.write(row_index+row_section_start+4, 1+col_index, total_straight_output_all.flatten()[col_index], style_nbr_3dec)
 
 #OUTPUTS
 #Final goods
-out_sheet_all.write(row_section_start+1,1+NBR_sectors,f_array_with_headers['column headings'][0],style_header_center)
+out_sheet_all.write(row_section_start+1, 1+NBR_sectors, f_array_with_headers['column headings'][0], style_header_center)
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+2,1+NBR_sectors,fd_all.flatten()[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_index+row_section_start+2, 1+NBR_sectors, fd_all.flatten()[row_index], style_nbr_3dec)
 #Straight losses
-out_sheet_all.write(row_section_start+1,2+NBR_sectors,'Emissions',style_header_lalign)
+out_sheet_all.write(row_section_start+1, 2+NBR_sectors, 'Emissions', style_header_lalign)
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+2,2+NBR_sectors,acyclic_losses_all.flatten()[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_index+row_section_start+2, 2+NBR_sectors, acyclic_losses_all.flatten()[row_index], style_nbr_3dec)
 #	total straight output
-out_sheet_all.write(row_section_start+1,3+NBR_sectors,'Total outputs',style_header_lalign)
+out_sheet_all.write(row_section_start+1, 3+NBR_sectors, 'Total outputs', style_header_lalign)
 for row_index in range(NBR_sectors):
-    out_sheet_all.write(row_index+row_section_start+2,3+NBR_sectors,total_straight_output_all[row_index],style_nbr_3dec)
+    out_sheet_all.write(row_index+row_section_start+2, 3+NBR_sectors, total_straight_output_all[row_index], style_nbr_3dec)
 
 
 #### DISAGGREGATED cyclic structures section:
 #section starting row:
 row_section_start = row_section_start + NBR_sectors + 10 
 
-#write subsection header starting at colummn 0, row 6*NBR_sectors+20
+#write subsection header starting at colummn 0,  row 6*NBR_sectors+20
 
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
-out_sheet_all.write(row_section_start,0,'Disaggregated Cyclic structures (self and inter-cycling)',style_grey_bold)
+out_sheet_all.write(row_section_start, 0, 'Disaggregated Cyclic structures (self and inter-cycling)', style_grey_bold)
 
 
 ### SELF-Cyclic structure
-out_sheet_all.write(row_section_start+1,0,'Self-cycling structure',style_header_lalign_bold)
+out_sheet_all.write(row_section_start+1, 0, 'Self-cycling structure', style_header_lalign_bold)
 
-# write cycle_matrix starting at colummn 0, row 3*NBR_sectors+12
+# write cycle_matrix starting at colummn 0,  row 3*NBR_sectors+12
 for row_index in range(NBR_sectors):
     #row headers intersectoral matrix
     out_sheet_all.write(row_index+row_section_start+3,0,Z_array_with_headers['row headings'][row_index],style_header_lalign)       
