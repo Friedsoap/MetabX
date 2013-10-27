@@ -1370,6 +1370,8 @@ style_link = xlwt.easyxf('font: underline single')
 #out_sheet_all_image = output_workbook.add_sheet('All flows structure Images')
 #out_sheet_all_image.insert_bitmap(Images_Path+'/'+'sankey.cycles.all.'+output_filename+'.png', 0, 0)#the insert_bitmap function does not accept pngs...
 
+print('\n +++++ Starting writing the xls for the actual structure +++++')
+
 
 ## 'All flows structure' is called internally out_sheet_all
 out_sheet_all = output_workbook.add_sheet('Actual structure decomposition')
@@ -1928,8 +1930,572 @@ out_sheet_all.write(row_section_start+2, 3+NBR_sectors, 'Total outputs', style_h
 for row_index in range(NBR_sectors):
     out_sheet_all.write(row_index+row_section_start+3, 3+NBR_sectors, actual_structure_dictionary['xi'].flatten()[row_index], style_nbr_3dec)
 
+print('\n +++++ Starting writing the xls for each product-based structure +++++')
+sheets_dictionary=dict()
+for prod_struct in range(NBR_sectors):
+    # create a sheet for each product-based structure
+    sheets_dictionary['out_sheet_'+str(prod_struct)]=output_workbook.add_sheet(str(label_dictionary['row_sector_labels'][prod_struct])+'-based structure')
+
+    print('\n +++ Writing structural decomposition for product-based structure '+str(prod_struct)+' +++')
+
+    ### SECTION: Product-based structure
+    # starting row = 0
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(0,0, str(label_dictionary['row_sector_labels'][prod_struct])+'-based structure', style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(0).set_style(style_grey_bold)
+
+    ### intersectoral matrix Z
+    # column headers - start at third row, second column
+    i=1 #column index
+    for column_headers in label_dictionary['column_sector_labels']:
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(2, i, column_headers, style_header_center)
+        i += 1
+
+    # row headers - start at 1st column row, fourth row
+    i=3 #row index
+    for row_headers in label_dictionary['column_sector_labels']:
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(i, 0, row_headers, style_header_lalign)
+        i += 1  
+
+    # data -  starts at fourth row and second column
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+3, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['Z'][row_index][col_index], style_nbr_3dec)
+
+    ### primary resources (r)
+    # headings
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(NBR_sectors+3, 0, label_dictionary['resource_labels'], style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(NBR_sectors+3, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['r'][col_index], style_nbr_3dec)
+
+    ### total inputs (x)
+    #  header 
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(NBR_sectors+4, 0, 'Total inputs', style_header_center)
+    # data 
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(NBR_sectors+4, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['x'].flatten()[col_index], style_nbr_3dec)
+
+    ### final goods and wastes (fd) 
+    # column headers for final goods AND wastes start
+    i=NBR_sectors+1#row index 
+    for column_headers in label_dictionary['final_outputs_labels']:
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(2, i, column_headers, style_header_center)
+        i+=1
+        
+    # data for final goods ONLY
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+3, NBR_sectors+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['fd'].flatten()[row_index], style_nbr_3dec)
+    # data for wastes ONLY
+    for waste_index in range(NBR_disposals):
+        for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+3, 1+NBR_sectors+1+waste_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['w'+str(waste_index)].flatten()[row_index], style_nbr_3dec)
+
+    ### total outputs
+    # header - start at column 1+NBR_sectors+1+NBR_disposals, fourth row
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(2, 1+NBR_sectors+1+NBR_disposals, 'Total outputs', style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+3,  1+NBR_sectors+1+NBR_disposals,  product_based_structures['prod_based_struct_'+str(prod_struct)]['x'].flatten()[row_index],  style_nbr_3dec)
+        
+    ### SECTION: Meso- and macro-economic resource indicators (efficiencies and  intensities)
+    # starting row for the section:
+    row_section_start = NBR_sectors + 6
+
+    # section title
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Meso- and macro-economic resource indicators (efficiencies and  intensities)', style_grey_bold)
+
+    row_section_start = row_section_start + 1
+    ### meso economic efficiencies
+    # top headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 0, 1, 'Meso indicators', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 0, 1, 'Resource efficiencies', style_header_center)
+    # row headers AND values
+    for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 1, meso_efficiencies[row_index], style_nbr_3dec)
+
+    ### TOP-LEVEL MACRO INDICATORS
+    # top header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 3, 4, 'Top-level macro indicators', style_header_center)
+    # row headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 3, 'Resource efficiency', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4, 3, 'Resource intensity', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, 3, 'Emission intensity', style_header_lalign)
+    #indicators
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 4, product_based_structures['prod_based_struct_'+str(prod_struct)]['tot_res_eff'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4, 4, product_based_structures['prod_based_struct_'+str(prod_struct)]['tot_res_int'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, 4, product_based_structures['prod_based_struct_'+str(prod_struct)]['tot_em_int'], style_nbr_3dec)
+
+    # MACRO INDICATORS 
+    # top header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 6, 7+NBR_disposals, 'Macro indicators (intensities)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 6, 7, 'Resource intensities', style_header_center)
+
+    # macro economic Resource intensities row headers and values
+    for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 6, label_dictionary['row_sector_labels'][row_index], style_header_lalign)
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 7, product_based_structures['prod_based_struct_'+str(prod_struct)]['r'][row_index], style_nbr_3dec)
+    # macro economic TOTAL Resource intensities row headers and values
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 6, 'Totals', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 7, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['r'].flatten()), style_nbr_3dec)
+
+    # Emission intensities column headers and values 
+    for waste_index in range(NBR_disposals):
+        #column header
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 8+waste_index, label_dictionary['final_outputs_labels'][1+waste_index]+' intensity', style_header_center)
+        #values
+        for row_index in range(NBR_sectors):
+            #sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index + row_section_start + 3,  8 + waste_index, eval('em_int_'+str(waste_index)+'_all_'+str(row_index)), style_nbr_3dec)# FIXME: need to solve this,  for that I need to create the sectoral intensities which I believe I did not create previously. # TODO: erase
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index + row_section_start + 3,  8 + waste_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['w'+str(waste_index)][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 8+waste_index, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['w'+str(waste_index)][row_index].flatten()), style_nbr_3dec)
+        #exec 'sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 8+'+str(waste_index)+', em_int_'+str(waste_index)+'_all, style_nbr_3dec)'  # TODO: erase
+
+    ### SECTION: Leontief Inverse section :
+    # section starting row:
+    row_section_start = row_section_start + NBR_sectors + 5
+    # section header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Leontief inverse with emissions endogenised [L=(I-A-Etot)^-1]', style_grey_bold)
+
+    # matrix header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 0, 'Leontief matrix (L)', style_header_lalign)
+
+    # write L matrix
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, col_index+1, actual_structure_dictionary['L'][row_index][col_index], style_nbr_3dec)
+
+    ### SECTION: Intersectoral cyclic and indirect matrices
+    # section starting row:
+    row_section_start = row_section_start + NBR_sectors + 4     
+        
+    # section header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Intersectoral cyclic and indirect matrices', style_grey_bold)
+
+    # header for Cyclic intersectoral flows (Zc)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 0, 'Cyclic intersectoral flows (Zc)', style_header_lalign)
+    # data for Cyclic intersectoral flows (Zc)
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['Zc'][row_index][col_index], style_nbr_3dec)
+
+    # rebase the starting point
+    row_section_start = row_section_start + NBR_sectors + 4 
+    # header for Indirect intersectoral flows (Zind)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start, 0, 'Indirect intersectoral flows (Zind)', style_header_lalign)
+    # data for Indirect intersectoral flows (Zind)
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index + row_section_start + 1,  col_index+1,  product_based_structures['prod_based_struct_'+str(prod_struct)]['Zind'][row_index][col_index],  style_nbr_3dec) 
+
+    # rebase the starting point
+    row_section_start = row_section_start + NBR_sectors + 2
+    # header for Acyclic indirect intersectoral flows (Zind_ac_a)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start, 0, 'Acyclic Indirect intersectoral flows (Zind_ac_a)', style_header_lalign)
+    # data for Acyclic indirect intersectoral flows (Zind_ac_a)
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+1, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['Zind_ac_a'][row_index][col_index], style_nbr_3dec)
+
+    # rebase the starting point
+    row_section_start = row_section_start + NBR_sectors + 2
+    # header for indirect intersectoral flows to maintain cycling (Zind_ac_c)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start, 0, 'Indirect intersectoral flows to maintain cycling (Zind_ac_c)', style_header_lalign)
+    # data for indirect intersectoral flows to maintain cycling (Zind_ac_a)
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+1,  col_index+1,  product_based_structures['prod_based_struct_'+str(prod_struct)]['Zind_ac_c'][row_index][col_index],  style_nbr_3dec)         
+
+    # rebase the starting point
+    row_section_start = row_section_start + NBR_sectors + 2
+    # header for indirect intersectoral consumed for cycling (Zind_c)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start, 0, 'Indirect intersectoral flows consumed for cycling (Zind_c)', style_header_lalign)
+    # data for indirect intersectoral consumed for cycling (Zind_c)
+    for row_index in range(NBR_sectors):
+        for col_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+1,  col_index+1,  product_based_structures['prod_based_struct_'+str(prod_struct)]['Zind_c'][row_index][col_index],  style_nbr_3dec) 
+
+    ### SECTION: Overlapped cyclic-acyclic/direct-indirect structural components
+    #section starting row:
+    row_section_start= row_section_start + NBR_sectors + 2  
+
+    # SECTION TITLE  
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Overlapped cyclic-acyclic / direct-indirect components', style_grey_bold)
+
+    row_section_start = row_section_start+1
+    # row HEADERS representing the sectors for the whole section
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)   
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5+row_index, 0, 'TOTALS', style_header_lalign)   
+
+    ### COLUMN HEADERS for the whole section (there are 2 levels of headers)
+
+    ## Cycling throughput
+    # top level
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 1, 3, 'Cyclic flows within the inter-sectoral matrix', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 1, 3, 'Cycling throughput', style_header_center)
+    #cyclic flows disaggregated level headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 1, 'Direct (c_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 2, 'Indirect (c_ind)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 3, 'Total (cycling_throughput)', style_header_center)
+
+    ## System inputs (primary resources)
+    # top level headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 5, 11, 'System inputs (primary resources)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 5, 7, 'Cyclic', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 8, 10, 'Acyclic', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 11, 'Total inputs', style_header_center)
+
+    # low_level  headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 5, 'Direct (rc_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 6, 'Indirect (rind_ac_c)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 7, 'Total cyclic inputs (rc)', style_header_center)
+
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 8, 'Direct (ra_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 9, 'Indirect (rind_ac_a)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 10,'Total acyclic inputs (ra)',style_header_center)
+
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3,11,'Total (r)',style_header_center)
+
+    ##  System outputs (final goods and emissions)
+    #  top level headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 13, 21, 'System outputs (final goods and emissions)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 13, 14, 'Final demand', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 15, 17, 'Cyclic emissions', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 18, 20, 'Acyclic emissions', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 21, 'Total Emissions', style_header_center)
+
+    # low level headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 13, 'Direct (fdir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 14, 'Indirect (find)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 15, 'Direct (wc_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 16, 'Indirect (wind_c + wind_ac_c)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 17, 'Total (wc)', style_header_center)
+
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 18, 'Direct (wa_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 19, 'Indirect (wind_ac_a)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 20, 'Total (wa)', style_header_center)
+
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 21, 'Total (w)', style_header_center)
+
+    ## Total outputs
+    # top level headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 23, 27, 'Total outputs', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 23, 24, 'Cyclic', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+2, row_section_start+2, 25, 26, 'Acyclic', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 27, 'Total', style_header_center)
+
+    # low level headers
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 23, 'Direct (xc_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 24, 'Indirect (xind_c+xind_ac_c)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 25, 'Direct (xa_dir)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 26, 'Indirect (xind_ac_a)', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, 27, 'Total (x)', style_header_center)
+
+    ### Data for the whole section
+
+    # Cycling throughput
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 1, product_based_structures['prod_based_struct_'+str(prod_struct)]['c_dir'][row_index], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 2, product_based_structures['prod_based_struct_'+str(prod_struct)]['c_ind'][row_index], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 3, product_based_structures['prod_based_struct_'+str(prod_struct)]['cycling_throughput'][row_index], style_nbr_3dec)
+    #totals
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 1, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['c_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 2, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['c_ind'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 3, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['cycling_throughput'].flatten()), style_nbr_3dec)
+
+    # Cyclic System inputs (primary resources)
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 5, product_based_structures['prod_based_struct_'+str(prod_struct)]['rc_dir'][row_index], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 6, product_based_structures['prod_based_struct_'+str(prod_struct)]['rind_ac_c'][row_index], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 7, product_based_structures['prod_based_struct_'+str(prod_struct)]['rc'][row_index], style_nbr_3dec)
+    #totals
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 5, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['rc_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 6, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['rind_ac_c'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 7, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['rc'].flatten()), style_nbr_3dec)
+
+    # Acyclic System inputs (primary resources) AND total inputs
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 8, product_based_structures['prod_based_struct_'+str(prod_struct)]['ra_dir'][row_index], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 9, product_based_structures['prod_based_struct_'+str(prod_struct)]['rind_ac_a'][row_index], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 10, product_based_structures['prod_based_struct_'+str(prod_struct)]['ra'][row_index], style_nbr_3dec)
+        # total input
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 11, product_based_structures['prod_based_struct_'+str(prod_struct)]['r'][row_index], style_nbr_3dec)
+    #totals
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 8, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['ra_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 9, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['rind_ac_a'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 10, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['ra'].flatten()), style_nbr_3dec)
+    # total input
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 11,sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['r'].flatten()), style_nbr_3dec)
+
+    # System outputs: Final demand AND Cyclic emissions
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 13, product_based_structures['prod_based_struct_'+str(prod_struct)]['fdir'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 14, product_based_structures['prod_based_struct_'+str(prod_struct)]['find'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 15, product_based_structures['prod_based_struct_'+str(prod_struct)]['wc_dir'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 16, product_based_structures['prod_based_struct_'+str(prod_struct)]['wind_c'][row_index][0] + product_based_structures['prod_based_struct_'+str(prod_struct)]['wind_ac_c'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 17, product_based_structures['prod_based_struct_'+str(prod_struct)]['wc'][row_index][0], style_nbr_3dec)
+    #totals
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 13, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['fdir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 14, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['find'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 15, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['wc_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 16, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['wind_c'].flatten() + product_based_structures['prod_based_struct_'+str(prod_struct)]['wind_ac_c'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 17, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['wc'].flatten()), style_nbr_3dec)
+
+    # System outputs: Acyclic emissions AND Total Emissions
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 18,  product_based_structures['prod_based_struct_'+str(prod_struct)]['wa_dir'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 19,  product_based_structures['prod_based_struct_'+str(prod_struct)]['wind_ac_a'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 20, product_based_structures['prod_based_struct_'+str(prod_struct)]['wa'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 21, product_based_structures['prod_based_struct_'+str(prod_struct)]['w'][row_index][0], style_nbr_3dec)
+    #totals
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 18, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['wa_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 19, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['wind_ac_a'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 20, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['wa'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 21, sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['w'].flatten()), style_nbr_3dec)
+
+    # Total outputs: Cyclic, Acyclic    AND Total
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 23, product_based_structures['prod_based_struct_'+str(prod_struct)]['xc_dir'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 24, product_based_structures['prod_based_struct_'+str(prod_struct)]['xind_c'][row_index][0] + product_based_structures['prod_based_struct_'+str(prod_struct)]['xind_ac_c'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 25, product_based_structures['prod_based_struct_'+str(prod_struct)]['xa_dir'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 26, product_based_structures['prod_based_struct_'+str(prod_struct)]['xind_ac_a'][row_index][0], style_nbr_3dec)
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index, 27, product_based_structures['prod_based_struct_'+str(prod_struct)]['x'][row_index][0], style_nbr_3dec)
+    #totals
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 23, np.sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['xc_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 24, np.sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['xind_c'].flatten() + product_based_structures['prod_based_struct_'+str(prod_struct)]['xind_ac_c'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 25, np.sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['xa_dir'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 26, np.sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['xind_ac_a'].flatten()), style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4+row_index+1, 27, np.sum(product_based_structures['prod_based_struct_'+str(prod_struct)]['x'].flatten()), style_nbr_3dec)
+
+    # this was an old hyperlink to the corresponding sankey diagram - now the sankey is not even saved
+    #sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+NBR_sectors+5, 0,  xlwt.Formula('HYPERLINK(\"./images/sankey.cycles.'+output_filename+'.all.png\";"Link to a generated sankey diagram representing the cycling structure - will be substituted by Circos diagrams")'), style_link)    ### THE PROBLEMS Is THAT LIBREOFFICE does not open the link
 
 
+    ### Section: Cyclic and acyclic meta-structures
+    # starting row:
+    row_section_start = row_section_start + NBR_sectors + 6 
+
+    # section header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'The cyclic-acyclic meta-structure', style_grey_bold)
+    row_section_start += 1
+
+    # section header for the Cyclic structure
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Cyclic structure', style_header_lalign_bold)
+
+    ## Zcyc only
+    for row_index in range(NBR_sectors):
+        # row headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)       
+        # column headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+row_index, label_dictionary['column_sector_labels'][row_index], style_header_lalign)    
+        for col_index in range(NBR_sectors):              
+            # data    
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['Zcyc'][row_index][col_index], style_nbr_3dec)
+
+    ## Primary resources
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 0, label_dictionary['resource_labels'][0], style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['rc'][col_index], style_nbr_3dec)
+
+    ## total inputs (actually = total outputs) 
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 0, 'Total inputs', style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['xc'].flatten()[col_index], style_nbr_3dec)
+
+    ## final demand
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+NBR_sectors, str(label_dictionary['fd_labels']), style_header_lalign)
+    # data = 0 here
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 1+NBR_sectors, 0, style_nbr_3dec)
+        
+    ## emissions
+    for waste_index in range(NBR_disposals):
+        # header
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 2+NBR_sectors+waste_index, label_dictionary['waste_labels'][waste_index], style_header_lalign)
+        # data
+        for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 2+NBR_sectors+waste_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['wc_'+str(waste_index)][row_index][0], style_nbr_3dec)
+
+    ## total outputs
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 3+NBR_sectors, 'Total outputs', style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 3+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['xc'].flatten()[row_index], style_nbr_3dec)
+
+
+    ### Acyclic structure         
+    row_section_start = row_section_start + NBR_sectors + 5        
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Acyclic structure', style_header_lalign_bold)
+
+    ## Za only
+    for row_index in range(NBR_sectors):
+        # row headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)       
+        # column headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+row_index, label_dictionary['column_sector_labels'][row_index], style_header_lalign)    
+        for col_index in range(NBR_sectors):              
+            # data    
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, col_index+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['Za'][row_index][col_index], style_nbr_3dec)
+
+    ## Primary resources
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 0, label_dictionary['resource_labels'][0], style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['ra'][col_index], style_nbr_3dec)
+
+    ## total inputs (actually = total outputs) 
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 0, 'Total inputs', style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['xa'].flatten()[col_index], style_nbr_3dec)
+
+    ## final demand
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+NBR_sectors, str(label_dictionary['fd_labels']), style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 1+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['fd'].flatten()[row_index], style_nbr_3dec)
+        
+    ## emissions
+    for waste_index in range(NBR_disposals):
+        # header
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 2+NBR_sectors+waste_index, label_dictionary['waste_labels'][waste_index], style_header_lalign)
+        # data
+        for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 2+NBR_sectors+waste_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['wa_'+str(waste_index)][row_index][0], style_nbr_3dec)
+
+    ## total outputs
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 3+NBR_sectors, 'Total outputs', style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 3+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['xa'].flatten()[row_index], style_nbr_3dec)
+
+    ### Section The direct-indirect meta-structure
+    #section starting row:
+    row_section_start = row_section_start + NBR_sectors + 6
+
+    # subsection header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'The direct-indirect meta-structure', style_grey_bold)
+
+    ### Direct structure         
+    row_section_start += 1
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Direct structure', style_header_lalign_bold)
+
+    ## Zd only
+    for row_index in range(NBR_sectors):
+        # row headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)       
+        # column headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+row_index, label_dictionary['column_sector_labels'][row_index], style_header_lalign)    
+        for col_index in range(NBR_sectors):              
+            # data    
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, col_index+1, 'unknown', style_nbr_3dec)
+
+    ## Primary resources
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 0, label_dictionary['resource_labels'][0], style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['rd'][col_index], style_nbr_3dec)
+
+    ## total inputs (actually = total outputs) 
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 0, 'Total inputs', style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['xd'].flatten()[col_index], style_nbr_3dec)
+
+    ## final demand
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+NBR_sectors, str(label_dictionary['fd_labels']), style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 1+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['fdir'].flatten()[row_index], style_nbr_3dec)
+        
+    ## emissions
+    for waste_index in range(NBR_disposals):
+        # header
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 2+NBR_sectors+waste_index, label_dictionary['waste_labels'][waste_index], style_header_lalign)
+        # data
+        for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 2+NBR_sectors+waste_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['wd_'+str(waste_index)][row_index][0], style_nbr_3dec)
+
+    ## total outputs
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 3+NBR_sectors, 'Total outputs', style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 3+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['xd'].flatten()[row_index], style_nbr_3dec)
+
+    ### Indirect structure         
+    row_section_start = row_section_start + NBR_sectors + 5        
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Indirect structure', style_header_lalign_bold)
+
+    ## Zi
+    for row_index in range(NBR_sectors):
+        # row headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)       
+        # column headers 
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+row_index, label_dictionary['column_sector_labels'][row_index], style_header_lalign)    
+        for col_index in range(NBR_sectors):              
+            # data    
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, col_index+1, 'unknown', style_nbr_3dec)
+
+    ## Primary resources
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 0, label_dictionary['resource_labels'][0], style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+4, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['ri'][col_index], style_nbr_3dec)
+
+    ## total inputs (actually = total outputs) 
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 0, 'Total inputs', style_header_lalign)
+    # data
+    for col_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+5, 1+col_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['xi'].flatten()[col_index], style_nbr_3dec)
+
+    ## final demand
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 1+NBR_sectors, str(label_dictionary['fd_labels']), style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 1+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['find'].flatten()[row_index], style_nbr_3dec)
+        
+    ## emissions
+    for waste_index in range(NBR_disposals):
+        # header
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 2+NBR_sectors+waste_index, label_dictionary['waste_labels'][waste_index], style_header_lalign)
+        # data
+        for row_index in range(NBR_sectors):
+            sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 2+NBR_sectors+waste_index, product_based_structures['prod_based_struct_'+str(prod_struct)]['wi_'+str(waste_index)][row_index][0], style_nbr_3dec)
+
+    ## total outputs
+    # header
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 3+NBR_sectors, 'Total outputs', style_header_lalign)
+    # data
+    for row_index in range(NBR_sectors):
+        sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+row_section_start+3, 3+NBR_sectors, product_based_structures['prod_based_struct_'+str(prod_struct)]['xi'].flatten()[row_index], style_nbr_3dec)
+
+
+
+    
+    
 
 ##############################################################################
 ##############################################################################
