@@ -727,7 +727,9 @@ for struct_index in range(NBR_sectors):
     for waste_index in range(NBR_disposals):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wd_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)]
         product_based_structures['prod_based_struct_'+str(struct_index)]['wi_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)]
-
+    # total outputs
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xd'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir']
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xi'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c']
 
     print('\n +++ Using the product-based components to build the structural components of aggregated structure +++++')
     # building the arrays  for the aggregate structure
@@ -804,7 +806,9 @@ actual_structure_dictionary['wi'] = actual_structure_dictionary['wind_ac_c'] + a
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['wd_'+str(waste_index)] = actual_structure_dictionary['wc_dir_'+str(waste_index)] + actual_structure_dictionary['wa_dir_'+str(waste_index)]
     actual_structure_dictionary['wi_'+str(waste_index)] = actual_structure_dictionary['wind_ac_c_'+str(waste_index)] + actual_structure_dictionary['wind_ac_a_'+str(waste_index)] + actual_structure_dictionary['wind_c_'+str(waste_index)]
-
+# total outputs
+actual_structure_dictionary['xd'] = actual_structure_dictionary['xc_dir'] + actual_structure_dictionary['xa_dir']
+actual_structure_dictionary['xi'] = actual_structure_dictionary['xind_ac_c'] + actual_structure_dictionary['xind_ac_a'] + actual_structure_dictionary['xind_c']
 
 
 
