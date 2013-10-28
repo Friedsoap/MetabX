@@ -119,8 +119,6 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
             
     ### Write the config and data files in the corresponding subfolders
     print('\n+++ Writing Circos config and data files in {0}+++'.format(os.path.join(directory,specific_circos_dir)))
-#    check = check_if_can_draw_merged(diagram_type,  nbr_sectors, nbr_emissions, sector_names, arrays)    
-#    if check == True: # write the conf and data files
     create_attribute_colors_conf(nbr_emissions,sector_names,working_dir)
     create_kariotype_txt(diagram_type,flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
     create_ticks_conf(working_dir)
@@ -145,44 +143,6 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
 The graph was to be drawn in {0} but the program continues...
 +++++++++++++++++++++++++++++++++++'''.format(working_dir))
     return()
-
-#####################
-
-def check_if_can_draw_merged(diagram_type, nbr_sectors, nbr_emissions, sector_names, arrays):
-    ''' Checks if the IOT can be drawn in the 'merged' version. Returns False if not.'''
-    
-    if diagram_type == 'merged':
-        #calculate total inputs
-        sum_intersectoral_matrices=np.zeros((nbr_sectors,nbr_sectors))
-        sum_resource_vectors=np.zeros((1,nbr_sectors))
-        sum_fd_vectors=np.zeros((nbr_sectors,1))
-        sum_emission_array=np.zeros((nbr_sectors,nbr_emissions))
-        
-        for i in range(len(arrays)/4):
-            sum_intersectoral_matrices=arrays[4*i] + sum_intersectoral_matrices
-            sum_resource_vectors=arrays[4*i+1] + sum_resource_vectors
-            sum_fd_vectors=arrays[4*i+2] + sum_fd_vectors
-            sum_emission_array=arrays[4*i+3] + sum_emission_array
-        total_inputs= np.sum(sum_intersectoral_matrices,axis=0) + sum_resource_vectors    
-        
-        #calculate sum of intersectoral outputs + intesectoral inputs
-        # careful with slicing arrays: a[row_start:row_end][:,column_start:column_end]
-        check = True
-        for i in range(nbr_sectors):
-            intersectoral_output_sum= np.sum(sum_intersectoral_matrices[i]) + np.sum(sum_intersectoral_matrices[:][:,i:i+1])
-            if total_inputs.flatten()[i] < intersectoral_output_sum:
-                check = False
-                print('''\n++++ Error: the total output are inferior than the intersectoral sum of outputs and inputs of sector {0} ({1}) ++++'''.format(i, sector_names[i]))
-                break
-            else:
-                continue
-    elif diagram_type == 'symmetrical':
-        check = True
-    
-    return(check)
-
-######################
-
 
 ###################### /etc/attribute_colors.conf START ######################## 
 
