@@ -282,15 +282,11 @@ for sector_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(sector_index)]=tmp_structure
 
 ##############################################################################
-#############################################################################
-######  Structural analyses ##########################################
+######      Structural analyses    ##########################################
+##############################################################################
 
 #### Meso-economic efficiencies (same for all prod struct) ####
-print('\n')
-print(
-'+++++++  FINDING SECTORAL EFFICIENCIES (Meso-economic efficiencies)  ++++++++'
-)
-
+print('\n +++++++  Finding meso-efficiencies and other indicators  ++++++++')
 meso_efficiencies=np.zeros(NBR_sectors)
 for i in range(NBR_sectors):
     meso_efficiencies[i] = (sum(actual_structure_dictionary['Z'][i,:]) + actual_structure_dictionary['fd'].flatten()[i])/(sum(actual_structure_dictionary['Z'][:,i]) + actual_structure_dictionary['r'][i])
@@ -299,21 +295,16 @@ for i in range(NBR_sectors):
 #### TOP-LEVEL MACRO INDICATORS ####
 
 ## resource efficiencies, intensities and emission intensity for the whole economy
-#
-
-
 actual_structure_dictionary['tot_res_eff']=sum(actual_structure_dictionary['fd'].flatten())/sum(actual_structure_dictionary['r'])
 actual_structure_dictionary['tot_res_int']=1/actual_structure_dictionary['tot_res_eff']
 
 ## TOP-LEVEL Emission intensities 
-#for the whole economy
+# for the whole economy
 actual_structure_dictionary['tot_em_int']=0
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['tot_em_int']=actual_structure_dictionary['tot_em_int']+sum(actual_structure_dictionary['w'+str(waste_index)].flatten())/sum(actual_structure_dictionary['r'])
 
-
 # and for each prod struct
-
 for sector_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']=sum(product_based_structures['prod_based_struct_'+str(sector_index)]['fd'].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'])
     product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_int']=1/product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']
