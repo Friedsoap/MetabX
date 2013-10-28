@@ -9,7 +9,9 @@ MetabX does two separate things: decomposes an IOT between its cyclic and acycli
 Additionally, it can draw the data in a circular graph of the results parsing the IOT data in a specific format and for which Circos [MIK09]_ is required, a program originally thought to represent the human genome.
 For a rationale why to use circular graphs to view IOTs, see [AAM13]_.
 
-The program is compatible in either Linux and windows machines.
+The program is compatible in either Linux and windows machines (I believe Mac (i.e. BSD) also works but did not have the chance to test it).
+
+.. _python_req:
 
 Python requirements
 -------------------
@@ -21,17 +23,20 @@ Installing Spyderlib will also automatically install almost all python component
 
 In addition to Spyder, you need the module NetworkX.
 
+Finally, you need to download this program and copy it in your preferred working directory.
+
 Reference sites:
 
 * `Python <http://www.python.org/>`_
 * `Spyder <https://code.google.com/p/spyderlib/>`_
 * `NetworkX <http://networkx.github.io/>`_
+* MetabX (TODO: ADD SITE)
 
 .. note::
 
     In major Linux distributions, you can find them all through your package manager.
 
-
+.. _circos_req:
 
 Circos requirements
 -------------------
@@ -45,9 +50,6 @@ Once you installed perl, you need the following packages:
 * populate list from circos manual + the one in the book.
 
 Then, you need to install circos. It is recommended to get the latest version their `site <http://circos.ca>`_.
-
-
-
 
 
 

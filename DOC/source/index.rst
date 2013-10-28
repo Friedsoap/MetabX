@@ -13,6 +13,7 @@ Contents:
 
    intro
    installation_requirements
+   using_metabx
    data_input
    calculations
    internal_data_structure
