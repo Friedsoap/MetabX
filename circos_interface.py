@@ -112,25 +112,25 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
         os.mkdir('img')
         
     # apply the unit change   
-    arrays=list(arrays)       
+    arrays = list(arrays)       
     if unit !=1:
         for i in range(len(arrays)):
             arrays[i] = arrays[i] * unit
             
     ### Write the config and data files in the corresponding subfolders
     print('\n+++ Writing Circos config and data files in {0}+++'.format(os.path.join(directory,specific_circos_dir)))
-    create_attribute_colors_conf(nbr_emissions,sector_names,working_dir)
-    create_kariotype_txt(diagram_type,flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
+    create_attribute_colors_conf(nbr_emissions, sector_names, working_dir)
+    create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
     create_ticks_conf(working_dir)
     (histogram_end) = create_histograms_conf(diagram_type, flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
     # correction of the histogram end to draw the sectoral labels    
     if diagram_type == 'merged':
         histogram_end=histogram_end+'+50p'
-    create_ideogram_conf(working_dir,histogram_end)
+    create_ideogram_conf(working_dir, histogram_end)
     create_links_conf(working_dir)
     parent_name=os.path.split(directory)[1]
     create_image_conf(parent_name, specific_circos_dir, working_dir)
-    create_normalisation_conf(diagram_type,scale_type, working_dir, nbr_sectors,sector_names, arrays)
+    create_normalisation_conf(diagram_type, scale_type, working_dir, nbr_sectors, sector_names, arrays)
     create_circos_conf(unit, working_dir)
     create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, data_filename, nbr_sectors, nbr_emissions, sector_names, arrays)
         
@@ -551,7 +551,7 @@ def create_histograms_conf(diagram_type, flow_type, working_dir, nbr_sectors, nb
     '''
     os.chdir(working_dir)
     os.chdir('etc')
-    nbr_arrays=len(arrays)
+    nbr_arrays = len(arrays)
 
 ##### CREATING THE CONFIG FILES #######
     histograms_conf_file = open('histograms.conf', 'w')
