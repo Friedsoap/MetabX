@@ -172,7 +172,8 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``Zcyc``               | n x n      | Matrix containing all intersectoral|
 |                        |            | flows induced by cycling           |
-|                        |            | (``Zc``+``Zind_c``+``Zind_ac_c``)  |
+|                        |            | (``Zc`` + ``Zind_c`` +             |
+|                        |            | ``Zind_ac_c``)                     |
 +------------------------+------------+------------------------------------+
 | ``Za``                 | n x n      | Matrix containing the intersectoral|
 |                        |            | flows to produce final goods       |

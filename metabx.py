@@ -258,13 +258,7 @@ actual_structure_dictionary['L']=LA.inv(L_tmp)
 
 actual_structure_dictionary['r_coefs']=np.dot(actual_structure_dictionary['r'],LA.inv(np.diag(actual_structure_dictionary['x'].flatten())))
 
-
-
-
-
-
-# now all product-based structures will be stored within product_based_structures
-# each product-based structure entails: r, Z, f, wi, x
+# store each product-based structure component in the corresponing key within the product_based_structures dictionary
 product_based_structures=dict()
 for sector_index in range(NBR_sectors):
     tmp_structure=dict()
@@ -280,6 +274,11 @@ for sector_index in range(NBR_sectors):
         tmp_structure['tot_final_outputs'] += tmp_structure['w'+str(waste_index)]
         tmp_structure['w'] += tmp_structure['w'+str(waste_index)]
     tmp_structure['Z']=np.dot(actual_structure_dictionary['A'],np.diag(tmp_structure['x'].flatten()))
+    # create an array with all emissions stacked emissions
+    tmp_structure['w_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+    for sector_index_2 in range(NBR_sectors):
+        for waste_index in range(NBR_disposals):
+            tmp_structure['w_stacked'][sector_index_2][waste_index] =  tmp_structure['w'+str(waste_index)][sector_index_2][0]
     product_based_structures['prod_based_struct_'+str(sector_index)]=tmp_structure
 
 ##############################################################################
