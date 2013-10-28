@@ -71,7 +71,8 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | See :ref:`overl_str`                                                     |
 +------------------------+------------+------------------------------------+
 | ``Zc``                 | n x n      | Matrix containing intersectoral    |
-|                        |            | cycling                            |
+|                        |            | cycling, not to be confused with   |
+|                        |            | ``Zcyc`` calculated below          |
 +------------------------+------------+------------------------------------+
 | ``Zind``               | n x n      | Matrix containing the remaining    |
 |                        |            | intersectoral indirect flows       |
@@ -200,6 +201,13 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``wa_``:sub:`m`        | n x 1      | Emission-m due to                  |
 |                        | (m arrays) | producing final goods              |
 +------------------------+------------+------------------------------------+
+| ``wc_stacked``         | n x m      | Matrix with the m emission vectors |
+|                        |            | due to cycling stacked together    |
++------------------------+------------+------------------------------------+
+| ``wa_stacked``         | n x m      | Matrix with the m emission vectors |
+|                        |            | due to producing final goods       |
+|                        |            | stacked together                   |
++------------------------+------------+------------------------------------+
 | ``xc``                 | n x 1      | Total outputs due to               |
 |                        |            | maintaining cycling                |
 +------------------------+------------+------------------------------------+
@@ -236,6 +244,14 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``wi_``:sub:`m`        | n x 1      | Emission-m due to                  |
 |                        | (m arrays) | indirect flows                     |
++------------------------+------------+------------------------------------+
+| ``wd_stacked``         | n x m      | Matrix with the m emission vectors |
+|                        |            | due to direct flows stacked        |
+|                        |            | together                           |
++------------------------+------------+------------------------------------+
+| ``wi_stacked``         | n x m      | Matrix with the m emission vectors |
+|                        |            | due to indirect flows stacked      |
+|                        |            | together                           |
 +------------------------+------------+------------------------------------+
 | ``xd``                 | n x 1      | Total outputs due to               |
 |                        |            | direct flows                       |
