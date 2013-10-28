@@ -1559,7 +1559,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],j,arrays[0][i][j],'col_' + sector_names[i].lower()))
+                    table_intersectoral_flows.append((j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[i].lower()))
         
         if diagram_type =='symmetrical':
             # number of sectors represented = 2*(number of sectors)
@@ -1571,7 +1571,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],2*nbr_sectors-1-j,arrays[0][i][j],'col_' + sector_names[i].lower()))
+                    table_intersectoral_flows.append((2*nbr_sectors-1-j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[i].lower()))
             
     elif flow_type == 'sector_inputs':
 
@@ -1583,7 +1583,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],j,arrays[0][i][j],'col_' + sector_names[j].lower()))
+                    table_intersectoral_flows.append((j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[j].lower()))
         
         if diagram_type =='symmetrical':
             # number of sectors represented = 2*(number of sectors)
@@ -1595,7 +1595,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],2*nbr_sectors-1-j,arrays[0][i][j],'col_' + sector_names[j].lower()))
+                    table_intersectoral_flows.append((2*nbr_sectors-1-j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[j].lower()))
                     
 
     elif flow_type == 'cyclic_acyclic':
@@ -1609,7 +1609,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                         #do not append if the flow is 0
                         if arrays[4*flow_type_nbr][i][j] == 0:
                             continue
-                        table_intersectoral_flows.append((i,arrays[4*flow_type_nbr][i][j],j,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
+                        table_intersectoral_flows.append((j,arrays[4*flow_type_nbr][i][j],i,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
 
         if diagram_type =='symmetrical':
             # number of sectors represented = 2*(number of sectors)
@@ -1622,7 +1622,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                         #do not append if the flow is 0
                         if arrays[4*flow_type_nbr][i][j] == 0:
                             continue
-                        table_intersectoral_flows.append((i,arrays[4*flow_type_nbr][i][j],2*nbr_sectors-1-j,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
+                        table_intersectoral_flows.append((2*nbr_sectors-1-j,arrays[4*flow_type_nbr][i][j],i,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
     else:
        sys.exit('''Error: the flow_type argument passed to create_links_data_txt function is not one expected''') 
 
@@ -1733,11 +1733,11 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
 
     if diagram_type == 'merged':
         #calculating total outputs
-        sum_intersectoral_matrices=np.zeros((nbr_sectors,nbr_sectors))
-        sum_resource_vectors=np.zeros((1,nbr_sectors))
+        sum_intersectoral_matrices = np.zeros((nbr_sectors,nbr_sectors))
+        sum_resource_vectors = np.zeros((1,nbr_sectors))
         for i in range(len(arrays)/4):
-            sum_intersectoral_matrices=arrays[4*i] + sum_intersectoral_matrices
-            sum_resource_vectors=arrays[4*i+1] + sum_resource_vectors
+            sum_intersectoral_matrices = arrays[4*i] + sum_intersectoral_matrices
+            sum_resource_vectors = arrays[4*i+1] + sum_resource_vectors
 
         # the outputs start after the primary resources 
         # the inputs start after the primary resources + TOTAL sum of sectoral outputs.
@@ -1745,7 +1745,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
         #pdb.set_trace()
         outputs_start = sum_resource_vectors.flatten()
         last_output_position = outputs_start
-        inputs_start= sum_resource_vectors.flatten() + np.sum(sum_intersectoral_matrices,axis=1)
+        inputs_start= sum_resource_vectors.flatten() + np.sum(sum_intersectoral_matrices,axis=0)
         last_input_position = inputs_start
         
         for i in range(len(final_table)):
@@ -1756,7 +1756,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
             input_flow_end = input_flow_start + final_table[i][5]
             last_output_position[final_table[i][0]] = output_flow_end
             last_input_position[final_table[i][3]] = input_flow_end
-            final_table[i]=(represented_sector_names[final_table[i][0]],output_flow_start, output_flow_end,represented_sector_names[final_table[i][3]],input_flow_start,input_flow_end,final_table[i][6])
+            final_table[i] = (represented_sector_names[final_table[i][0]], output_flow_start, output_flow_end, represented_sector_names[final_table[i][3]], input_flow_start, input_flow_end, final_table[i][6])
 
     if diagram_type == 'symmetrical':
         # the outputs start at the beginning of the (output) segment
