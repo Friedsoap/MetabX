@@ -515,13 +515,18 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['wc'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c']
     # total outputs
     product_based_structures['prod_based_struct_'+str(struct_index)]['xa'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir']
-    product_based_structures['prod_based_struct_'+str(struct_index)]['xc'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c']
-    
+    product_based_structures['prod_based_struct_'+str(struct_index)]['xc'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c']    
     # for each emission type
     for waste_index in range(NBR_disposals):
         product_based_structures['prod_based_struct_'+str(struct_index)]['wa_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_a_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)]
         product_based_structures['prod_based_struct_'+str(struct_index)]['wc_'+str(waste_index)] =   product_based_structures['prod_based_struct_'+str(struct_index)]['wind_ac_c_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] + product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)]
-    
+    # stacking the emissions together
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wc_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wa_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+    for sector_index in range(NBR_sectors):
+        for waste_index in range(NBR_disposals):
+            product_based_structures['prod_based_struct_'+str(struct_index)]['wc_stacked'][sector_index][waste_index] =  product_based_structures['prod_based_struct_'+str(struct_index)]['wc_'+str(waste_index)][sector_index][0]
+            product_based_structures['prod_based_struct_'+str(struct_index)]['wa_stacked'][sector_index][waste_index] =  product_based_structures['prod_based_struct_'+str(struct_index)]['wa_'+str(waste_index)][sector_index][0]
 
     print('\n +++ Aggregating the overlaped structures into the direct-indirect meta-structure +++')  
     # intermediate structures
@@ -542,22 +547,13 @@ for struct_index in range(NBR_sectors):
     # total outputs
     product_based_structures['prod_based_struct_'+str(struct_index)]['xd'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir']
     product_based_structures['prod_based_struct_'+str(struct_index)]['xi'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c']
-
-    if circos_draw:
-    #### CircosFolder: where you want to put the circos drawings
-        CircosFolder = os.path.join(dirPath,'circos_graphs_' + time_at_start + '_' + data_filename + '_prod_structure_'+str(struct_index))
-        os.chdir(dirPath)
-        if os.path.split(CircosFolder)[1] not in os.listdir('./'):
-            #CHECK IF DIRECTORY EXISTS. IF not, create it.
-            os.mkdir(CircosFolder)    
-        
-        unit = circos_prod_based_unit
-    
-        #circos interface for flow_by_sector: sector_outputs or sector inputs
-        circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Z'], product_based_structures['prod_based_struct_'+str(struct_index)]['r'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['w_stacked'])
-        
-        circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Z'], product_based_structures['prod_based_struct_'+str(struct_index)]['r'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['w_stacked'])
-
+    # stacking the emissions together
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wd_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['wi_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+    for sector_index in range(NBR_sectors):
+        for waste_index in range(NBR_disposals):
+            product_based_structures['prod_based_struct_'+str(struct_index)]['wd_stacked'][sector_index][waste_index] =  product_based_structures['prod_based_struct_'+str(struct_index)]['wd_'+str(waste_index)][sector_index][0]
+            product_based_structures['prod_based_struct_'+str(struct_index)]['wi_stacked'][sector_index][waste_index] =  product_based_structures['prod_based_struct_'+str(struct_index)]['wi_'+str(waste_index)][sector_index][0]
 
     print('\n +++ Using the product-based components to build the structural components of aggregated structure +++++')
     # building the arrays  for the aggregate structure
@@ -596,6 +592,25 @@ for struct_index in range(NBR_sectors):
         actual_structure_dictionary['wc_dir_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
         actual_structure_dictionary['wa_dir_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
 
+    ###########################################################################
+    ###### DRAWING THE CIRCULAR DIAGRAM FOR EACH PROD-BASED STRUCTURE #########
+    ###########################################################################
+    if circos_draw:
+        CircosFolder = os.path.join(dirPath,'circos_graphs_' + time_at_start + '_' + data_filename + '_prod_structure_'+str(struct_index))
+        os.chdir(dirPath)
+        if os.path.split(CircosFolder)[1] not in os.listdir('./'):
+            #CHECK IF DIRECTORY EXISTS. IF not, create it.
+            os.mkdir(CircosFolder)            
+        unit = circos_prod_based_unit
+    
+        # draw flow_by_sector: sector_outputs or sector inputs
+        circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Z'], product_based_structures['prod_based_struct_'+str(struct_index)]['r'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['w_stacked'])        
+        circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Z'], product_based_structures['prod_based_struct_'+str(struct_index)]['r'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['w_stacked'])
+
+        # draw flow_by_type, specifically the cyclic and acyclic structures
+        circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc'], product_based_structures['prod_based_struct_'+str(struct_index)]['rc'].reshape((1,3)), np.zeros((NBR_sectors,1)), product_based_structures['prod_based_struct_'+str(struct_index)]['wc_stacked'], product_based_structures['prod_based_struct_'+str(struct_index)]['Za'], product_based_structures['prod_based_struct_'+str(struct_index)]['ra'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['wa_stacked'])
+        circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc'], product_based_structures['prod_based_struct_'+str(struct_index)]['rc'].reshape((1,3)), np.zeros((NBR_sectors,1)), product_based_structures['prod_based_struct_'+str(struct_index)]['wc_stacked'], product_based_structures['prod_based_struct_'+str(struct_index)]['Za'], product_based_structures['prod_based_struct_'+str(struct_index)]['ra'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['wa_stacked'])  
+
 
 print('\n +++ Aggregating the overlaped structures of the aggregated structure into the cyclic-acyclic meta-structure +++')  
 # intermediate structures
@@ -613,10 +628,18 @@ actual_structure_dictionary['wc'] = actual_structure_dictionary['wind_ac_c'] + a
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['wa_'+str(waste_index)] = actual_structure_dictionary['wind_ac_a_'+str(waste_index)] + actual_structure_dictionary['wa_dir_'+str(waste_index)]
     actual_structure_dictionary['wc_'+str(waste_index)] = actual_structure_dictionary['wind_ac_c_'+str(waste_index)] + actual_structure_dictionary['wc_dir_'+str(waste_index)] + actual_structure_dictionary['wind_c_'+str(waste_index)]
+# stacking the emissions together
+actual_structure_dictionary['wc_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+actual_structure_dictionary['wa_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+for sector_index in range(NBR_sectors):
+    for waste_index in range(NBR_disposals):
+        actual_structure_dictionary['wc_stacked'][sector_index][waste_index] =  actual_structure_dictionary['wc_'+str(waste_index)][sector_index][0]
+        actual_structure_dictionary['wa_stacked'][sector_index][waste_index] =  actual_structure_dictionary['wa_'+str(waste_index)][sector_index][0]
 # total outputs
-# emissions
 actual_structure_dictionary['xa'] = actual_structure_dictionary['xind_ac_a'] + actual_structure_dictionary['xa_dir']
 actual_structure_dictionary['xc'] = actual_structure_dictionary['xind_ac_c'] + actual_structure_dictionary['xc_dir'] + actual_structure_dictionary['xind_c']
+
+
 
 print('\n +++ Aggregating the overlaped structures of the aggregated structure into the direct-indirect meta-structure +++')  
 # intermediate structures
@@ -634,6 +657,13 @@ actual_structure_dictionary['wi'] = actual_structure_dictionary['wind_ac_c'] + a
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['wd_'+str(waste_index)] = actual_structure_dictionary['wc_dir_'+str(waste_index)] + actual_structure_dictionary['wa_dir_'+str(waste_index)]
     actual_structure_dictionary['wi_'+str(waste_index)] = actual_structure_dictionary['wind_ac_c_'+str(waste_index)] + actual_structure_dictionary['wind_ac_a_'+str(waste_index)] + actual_structure_dictionary['wind_c_'+str(waste_index)]
+# stacking the emissions together
+actual_structure_dictionary['wd_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+actual_structure_dictionary['wi_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+for sector_index in range(NBR_sectors):
+    for waste_index in range(NBR_disposals):
+        actual_structure_dictionary['wd_stacked'][sector_index][waste_index] =  actual_structure_dictionary['wd_'+str(waste_index)][sector_index][0]
+        actual_structure_dictionary['wi_stacked'][sector_index][waste_index] =  actual_structure_dictionary['wi_'+str(waste_index)][sector_index][0]
 # total outputs
 actual_structure_dictionary['xd'] = actual_structure_dictionary['xc_dir'] + actual_structure_dictionary['xa_dir']
 actual_structure_dictionary['xi'] = actual_structure_dictionary['xind_ac_c'] + actual_structure_dictionary['xind_ac_a'] + actual_structure_dictionary['xind_c']
@@ -657,7 +687,12 @@ actual_structure_dictionary['xi'] = actual_structure_dictionary['xind_ac_c'] + a
 #     - nbr_sectors [integer]
 #     - nbr_emissions [integer]
 #     - sector_names [array containing sector names in the same order as in the other arrays]
-#     - arrays: always in blocks of 4 with strict order: intersectoral_matrix [nbr_sectors x nbr_sectors],  primary_inputs[1 x nbr_sectors], final_goods [nbr_sectors x 1], emission_matrix [nbr_sectors x nbr_emissions]. By doing that the subroutine is flexible to calculate any kind of flow-type decomposition.
+#     - arrays: always in blocks of 4 with strict order: 
+#            1. intersectoral_matrix [nbr_sectors x nbr_sectors]
+#            2. primary_inputs[1 x nbr_sectors]
+#            3. final_goods [nbr_sectors x 1]
+#            4. emission_matrix [nbr_sectors x nbr_emissions].
+#            By doing that the subroutine is flexible to calculate any kind of flow-type decomposition (not yet implemented)
 #    '''
 #==============================================================================
 #===========arrays to pass for SC, IC, IA and DA structures====================
@@ -683,26 +718,24 @@ actual_structure_dictionary['xi'] = actual_structure_dictionary['xind_ac_c'] + a
 # w_array_DA_all # emissions for direct acyclic
 #==============================================================================
 
-
+###########################################################################
+###### DRAWING THE CIRCULAR DIAGRAM FOR THE ACTUAL STRUCTURE     #########
+###########################################################################
 if circos_draw:
-    #### CircosFolder: where you want to put the circos drawings
     CircosFolder=os.path.join(dirPath,'circos_graphs_' + time_at_start + '_' + data_filename + '_full_structure')
     os.chdir(dirPath)
     if os.path.split(CircosFolder)[1] not in os.listdir('./'):
         #CHECK IF DIRECTORY EXISTS. IF not, create it.
-        os.mkdir(CircosFolder)    
-    
+        os.mkdir(CircosFolder)        
     unit = 1
 
-    #circos interface for flow_by_sector: sector_outputs or sector inputs
-    circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['w_stacked'])
-    
+    # draw flow_by_sector: sector_outputs or sector inputs
+    circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['w_stacked'])   
     circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['w_stacked'])
     
-    # circos interface for flow_by_type: cyclic_acyclic
-    #circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array_self_cycling, self_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_SC_all, Z_array_inter_cycling, inter_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_IC_all, Z_array_acyclic, raw_indirect_straight_inputs_all.reshape((1,NBR_sectors)), indirect_fd_all.reshape((NBR_sectors,1)) , w_array_IA_all, np.zeros((NBR_sectors,NBR_sectors)), raw_direct_straight_inputs_all.reshape((1,NBR_sectors)), direct_fd_all.reshape((NBR_sectors,1)), w_array_DA_all)
-    
-    #circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array_self_cycling, self_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_SC_all, Z_array_inter_cycling, inter_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_IC_all, Z_array_acyclic, raw_indirect_straight_inputs_all.reshape((1,NBR_sectors)), indirect_fd_all.reshape((NBR_sectors,1)) , w_array_IA_all, np.zeros((NBR_sectors,NBR_sectors)), raw_direct_straight_inputs_all.reshape((1,NBR_sectors)), direct_fd_all.reshape((NBR_sectors,1)), w_array_DA_all)
+    # draw flow_by_type, specifically the cyclic and acyclic structures
+    circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Zcyc'], actual_structure_dictionary['rc'].reshape((1,3)), np.zeros((NBR_sectors,1)), actual_structure_dictionary['wc_stacked'], actual_structure_dictionary['Za'], actual_structure_dictionary['ra'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['wa_stacked'])   
+    circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Zcyc'], actual_structure_dictionary['rc'].reshape((1,3)), np.zeros((NBR_sectors,1)), actual_structure_dictionary['wc_stacked'], actual_structure_dictionary['Za'], actual_structure_dictionary['ra'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['wa_stacked'])
 
 
 #### Draw the sankey diagram for each piot #####################################
