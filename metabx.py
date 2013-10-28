@@ -97,6 +97,7 @@ sys.stdout = Tee(sys.stdout, logfile)
 circos_draw = True
 circos_execute = True
 circos_open_images = True
+circos_prod_based_unit = 1000
 
 zero_threshold = 1.0e-10 # threshold under which an absolute value is considered 0 to clean the arrays, also used to check negativity below its negative
 max_difference=0.00001 # max_difference represents a percentage (so 1 is 100%)
@@ -542,6 +543,22 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['xd'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xc_dir'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xa_dir']
     product_based_structures['prod_based_struct_'+str(struct_index)]['xi'] =   product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_c'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_ac_a'] + product_based_structures['prod_based_struct_'+str(struct_index)]['xind_c']
 
+    if circos_draw:
+    #### CircosFolder: where you want to put the circos drawings
+        CircosFolder = os.path.join(dirPath,'circos_graphs_' + time_at_start + '_' + data_filename + '_prod_structure_'+str(struct_index))
+        os.chdir(dirPath)
+        if os.path.split(CircosFolder)[1] not in os.listdir('./'):
+            #CHECK IF DIRECTORY EXISTS. IF not, create it.
+            os.mkdir(CircosFolder)    
+        
+        unit = circos_prod_based_unit
+    
+        #circos interface for flow_by_sector: sector_outputs or sector inputs
+        circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Z'], product_based_structures['prod_based_struct_'+str(struct_index)]['r'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['w_stacked'])
+        
+        circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], product_based_structures['prod_based_struct_'+str(struct_index)]['Z'], product_based_structures['prod_based_struct_'+str(struct_index)]['r'].reshape((1,3)), product_based_structures['prod_based_struct_'+str(struct_index)]['fd'], product_based_structures['prod_based_struct_'+str(struct_index)]['w_stacked'])
+
+
     print('\n +++ Using the product-based components to build the structural components of aggregated structure +++++')
     # building the arrays  for the aggregate structure
     actual_structure_dictionary['Zc'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'] * actual_structure_dictionary['fd'][struct_index][0]
@@ -675,7 +692,7 @@ if circos_draw:
         #CHECK IF DIRECTORY EXISTS. IF not, create it.
         os.mkdir(CircosFolder)    
     
-    unit=1
+    unit = 1
 
     #circos interface for flow_by_sector: sector_outputs or sector inputs
     circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['w_stacked'])
