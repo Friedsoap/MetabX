@@ -206,19 +206,15 @@ col_final_goods = blues-9-seq-8
 
     attribute_colors_conf_file_content='''\n	
 ###### COLORS DEFINED FOR FLOW-BY-TYPE SCHEMES ##############		
-# flow types: self-cycling, inter-cycling, indirect acyclic and direct acyclic:	
-# To mark the separation between cyclic and acyclic flows (each having 2 components), I chose a 4-div color scheme	
-# However the div schemes either start with red or end in green, so I mix the brown side of brbg-4 and the purple side of puor-4	
-#the cyclic flows being the	
-#col_sc=	brbg-4-div-1
-#col_ic=	brbg-4-div-2
-#col_ia=	puor-4-div-3
-#col_da=	puor-4-div-4
+# flow types: cyclic or acyclic:	
+# To mark the separation between cyclic and acyclic flows, I chose a 3-div color scheme	from http://colorbrewer2.org/
+# colour for  acyclic =	 brbg-3-div-1
+# colour brbg-4-div-2 not allocated
+#colour for cyclic =	brbg-3-div-3
 
-col_flowtype_0=	brbg-4-div-1
-col_flowtype_1=	brbg-4-div-2
-col_flowtype_2=	brbg-4-div-3
-col_flowtype_3=	brbg-4-div-4'''
+col_flowtype_0=	brbg-3-div-1
+col_flowtype_1=	brbg-3-div-3
+'''
 
     attribute_colors_conf_file.write(attribute_colors_conf_file_content)
     attribute_colors_conf_file.close()
@@ -233,13 +229,13 @@ col_flowtype_3=	brbg-4-div-4'''
 def create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays):
     '''Creates the kariotype.txt file in data directory.
     
-    if flow_type=sector_outputs or sector_inputs, only chromosomes are defined 
-    if diagram_type=cylic-acyclic, chromosomes and cytogenetic bands are defined
+    if flow_type = sector_outputs or sector_inputs, only chromosomes are defined 
+    if diagram_type = cylic-acyclic, chromosomes and cytogenetic bands are defined
     '''
     os.chdir(working_dir)
     os.chdir('data')
     kariotype_txt_file = open('kariotype.txt', 'w')
-    #creating the intial config comments
+    # creating the intial config comments
     # the content of the file should start at the beginning of the line, i.e. not respecting the indentation, otherwise that indentation is used in the file.
     kariotype_txt_file_content='''\
 ####### SECTOR DEFINITION ####################
@@ -256,21 +252,20 @@ def create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_
     '''
     kariotype_txt_file.write(kariotype_txt_file_content)
 
-#calculating total outputs
-    sum_intersectoral_matrices=np.zeros((nbr_sectors,nbr_sectors))
-    sum_resource_vectors=np.zeros((1,nbr_sectors))
-    sum_fd_vectors=np.zeros((nbr_sectors,1))
-    sum_emission_array=np.zeros((nbr_sectors,nbr_emissions))
+    # calculating total outputs
+    sum_intersectoral_matrices = np.zeros((nbr_sectors,nbr_sectors))
+    sum_resource_vectors = np.zeros((1,nbr_sectors))
+    sum_fd_vectors = np.zeros((nbr_sectors,1))
+    sum_emission_array = np.zeros((nbr_sectors,nbr_emissions))
     
     for i in range(len(arrays)/4):
-        sum_intersectoral_matrices=arrays[4*i] + sum_intersectoral_matrices
-        sum_resource_vectors=arrays[4*i+1] + sum_resource_vectors
-        sum_fd_vectors=arrays[4*i+2] + sum_fd_vectors
-        sum_emission_array=arrays[4*i+3] + sum_emission_array
+        sum_intersectoral_matrices = arrays[4*i] + sum_intersectoral_matrices
+        sum_resource_vectors = arrays[4*i+1] + sum_resource_vectors
+        sum_fd_vectors = arrays[4*i+2] + sum_fd_vectors
+        sum_emission_array = arrays[4*i+3] + sum_emission_array
     total_inputs= np.sum(sum_intersectoral_matrices,axis=0) + sum_resource_vectors
 
-#create the chr- lines for merged and symmetrical cases
-        
+    ### create the chr- lines for merged and symmetrical cases        
     # in merged case, the sectors are listed as they appear
     if diagram_type == 'merged':
         for i in range(len(sector_names)):
@@ -294,15 +289,15 @@ def create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_
 # COLOR	I have predefined the colors in the attribute_colors.conf file. I have only managed to apply color names as col_flowtype_X where X is a number. The flowtype to which it refers depends on the ordering of the arrays passed to the main circos function. So, col_flowtype_0 will be the color to the first flow type.
     '''
             kariotype_txt_file.write(kariotype_txt_file_content)
-            band_counter=0
-            band_start=np.zeros((1,nbr_sectors))
-            band_end=np.zeros((1,nbr_sectors))
+            band_counter = 0
+            band_start = np.zeros((1,nbr_sectors))
+            band_end = np.zeros((1,nbr_sectors))
             for i in range(len(arrays)/4):
-                intersectoral_matrix=arrays[4*i]
-                resource_vector=arrays[4*i+1]
-                fd_column=arrays[4*i+2]
-                emissions_columns=arrays[4*i+3]
-                total_inputs= np.sum(intersectoral_matrix,axis=0) + resource_vector.flatten()
+                intersectoral_matrix = arrays[4*i]
+                resource_vector = arrays[4*i+1]
+                fd_column = arrays[4*i+2]
+                emissions_columns = arrays[4*i+3]
+                total_inputs = np.sum(intersectoral_matrix,axis=0) + resource_vector.flatten()
                 total_outputs = np.sum(intersectoral_matrix,axis=1) + fd_column.flatten() + np.sum(emissions_columns,axis=1)
                 band_end = total_inputs + total_outputs + band_end
                 #pdb.set_trace()
