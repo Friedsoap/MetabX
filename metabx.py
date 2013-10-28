@@ -200,7 +200,12 @@ for waste_index in range(NBR_disposals):
     actual_structure_dictionary['w'+str(waste_index)]=np.array([[c for c in row[0:]] for row in f_PRE_array[1:]])[:][:,str(waste_index+1)].reshape((NBR_sectors,1))
     actual_structure_dictionary['tot_final_outputs'] += actual_structure_dictionary['w'+str(waste_index)]
     actual_structure_dictionary['w'] += actual_structure_dictionary['w'+str(waste_index)]
-    
+# create an array with all emissions stacked emissions
+actual_structure_dictionary['w_stacked'] = np.zeros((NBR_sectors, NBR_disposals))
+for sector_index in range(NBR_sectors):
+    for waste_index in range(NBR_disposals):
+        actual_structure_dictionary['w_stacked'][sector_index][waste_index] =  actual_structure_dictionary['w'+str(waste_index)][sector_index][0]
+        
 # label dictionary
 label_dictionary=dict()
 label_dictionary['title']=str(title_worksheet.row_values(0)[0])

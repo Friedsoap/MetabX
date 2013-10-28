@@ -34,6 +34,9 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``w``:sub:`m`          | n x 1      | Emission vectors (one for each     |
 |                        | (m arrays) | of the *m* different emissions)    |
 +------------------------+------------+------------------------------------+
+| ``w_stacked``          | n x m      | Matrix with the m emission vectors |
+|                        |            | stacked horizontally               |
++------------------------+------------+------------------------------------+
 | ``x``                  | n x 1      | total outputs vector               |
 +------------------------+------------+------------------------------------+
 | ``tot_final_outputs``  | n x 1      | total final outputs vector         |
