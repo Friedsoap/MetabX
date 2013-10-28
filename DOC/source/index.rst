@@ -17,6 +17,8 @@ Contents:
    data_input
    calculations
    internal_data_structure
+   data_output
+   circos_output
 
 
 Indices and tables

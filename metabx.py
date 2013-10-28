@@ -94,7 +94,7 @@ sys.stdout = Tee(sys.stdout, logfile)
 # Other configuration options
 
 # Config for the circos_interface module
-circos_draw = False
+circos_draw = True
 circos_execute = True
 circos_open_images = True
 
@@ -622,15 +622,6 @@ actual_structure_dictionary['xd'] = actual_structure_dictionary['xc_dir'] + actu
 actual_structure_dictionary['xi'] = actual_structure_dictionary['xind_ac_c'] + actual_structure_dictionary['xind_ac_a'] + actual_structure_dictionary['xind_c']
 
 
-
-
-
-
-
-
-
-
-
 ###############################################################################
 ################ DRAWING CIRCOS DIAGRAM #####################################
 #==============================================================================
@@ -686,17 +677,15 @@ if circos_draw:
     
     unit=1
 
-# STOPPED: check whether I included circos_execute,circos_open_images in the production structures and make the corresponding amendments in the draw_circos_diagram function
-
     #circos interface for flow_by_sector: sector_outputs or sector inputs
-    circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'], actual_structure_dictionary['fd'], w_all)
+    circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['w_stacked'])
     
-    circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array, r_array, fd_all, w_all)
+    circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'non_normalised', 'sector_outputs', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, label_dictionary['column_sector_labels'], actual_structure_dictionary['Z'], actual_structure_dictionary['r'].reshape((1,3)), actual_structure_dictionary['fd'], actual_structure_dictionary['w_stacked'])
     
     # circos interface for flow_by_type: cyclic_acyclic
-    circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array_self_cycling, self_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_SC_all, Z_array_inter_cycling, inter_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_IC_all, Z_array_acyclic, raw_indirect_straight_inputs_all.reshape((1,NBR_sectors)), indirect_fd_all.reshape((NBR_sectors,1)) , w_array_IA_all, np.zeros((NBR_sectors,NBR_sectors)), raw_direct_straight_inputs_all.reshape((1,NBR_sectors)), direct_fd_all.reshape((NBR_sectors,1)), w_array_DA_all)
+    #circos_interface.draw_circos_diagram(circos_execute, circos_open_images, unit,'merged', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array_self_cycling, self_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_SC_all, Z_array_inter_cycling, inter_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_IC_all, Z_array_acyclic, raw_indirect_straight_inputs_all.reshape((1,NBR_sectors)), indirect_fd_all.reshape((NBR_sectors,1)) , w_array_IA_all, np.zeros((NBR_sectors,NBR_sectors)), raw_direct_straight_inputs_all.reshape((1,NBR_sectors)), direct_fd_all.reshape((NBR_sectors,1)), w_array_DA_all)
     
-    circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array_self_cycling, self_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_SC_all, Z_array_inter_cycling, inter_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_IC_all, Z_array_acyclic, raw_indirect_straight_inputs_all.reshape((1,NBR_sectors)), indirect_fd_all.reshape((NBR_sectors,1)) , w_array_IA_all, np.zeros((NBR_sectors,NBR_sectors)), raw_direct_straight_inputs_all.reshape((1,NBR_sectors)), direct_fd_all.reshape((NBR_sectors,1)), w_array_DA_all)
+    #circos_interface.draw_circos_diagram(circos_execute,circos_open_images, unit,'symmetrical', 'normalised', 'cyclic_acyclic', 'size_desc',  CircosFolder, data_filename, NBR_sectors, NBR_disposals, Z_array_with_headers['column headings'], Z_array_self_cycling, self_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_SC_all, Z_array_inter_cycling, inter_cycling_feeding_flows_all.reshape((1,NBR_sectors)), np.zeros((NBR_sectors,1)), w_array_IC_all, Z_array_acyclic, raw_indirect_straight_inputs_all.reshape((1,NBR_sectors)), indirect_fd_all.reshape((NBR_sectors,1)) , w_array_IA_all, np.zeros((NBR_sectors,NBR_sectors)), raw_direct_straight_inputs_all.reshape((1,NBR_sectors)), direct_fd_all.reshape((NBR_sectors,1)), w_array_DA_all)
 
 
 #### Draw the sankey diagram for each piot #####################################
