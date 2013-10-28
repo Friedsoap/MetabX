@@ -59,32 +59,35 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
     - *arrays: is a list called arrays containing different array which should always be passed in blocks of 4 with strict order: intersectoral_matrix [nbr_sectors x nbr_sectors],  primary_inputs[1 x nbr_sectors], final_goods [nbr_sectors x 1], emission_matrix [nbr_sectors x nbr_emissions]. By doing that this subroutine is flexible to calculate any kind of flow-type decomposition.
     '''  
 
-######  CHECK of the arguments names passed to the function.  ############
-    if nbr_sectors >12:
+    ### function checks
+    # check whether the amount of sectors/ emissions exceeds the default colour capacities
+    if nbr_sectors > 12:
          sys.exit('''Error: there are {0} sectors but there are only 12 predefined colors for sectors. You will need to comment out this error and modify the attribute_colors.conf file'''.format(nbr_sectors))
-    if nbr_emissions >6:
-         sys.exit('''Error: there are {0} emission types but there are only 5 predefined colors for emissions. You will need to comment out this error and modify the attribute_colors.conf file'''.format(nbr_emissions))         
+    if nbr_emissions > 6:
+         sys.exit('''Error: there are {0} emission types but there are only 5 predefined colors for emissions. You will need to comment out this error and modify the attribute_colors.conf file'''.format(nbr_emissions))
+
+    # check whether the options passed are not mispelled
     if diagram_type != 'merged' and diagram_type !='symmetrical':
          sys.exit('''Error: the diagram_type argument is not merged nor symmetrical''')
     if scale_type != 'normalised' and  scale_type !='non_normalised':
          sys.exit('''Error: the scale_type argument is not normalised nor non_normalised''')
     if flow_type != 'sector_outputs' and flow_type !='sector_inputs' and flow_type !='cyclic_acyclic':
-         sys.exit('''Error: the flow_type argument is not sector_outputs nor sector_inputs nor cyclic_acyclic ''')         
-    nbr_arrays=len(arrays)# number of arrays passed to the function
-    if nbr_arrays!=4 and (flow_type == 'sector_outputs' or flow_type =='sector_inputs'):
-         sys.exit('''Error: You want a sector_outputs or sector_inputs diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be four.'''.format(nbr_arrays))
-    if nbr_arrays!=16 and flow_type == 'cyclic_acyclic':
-         print('''Error: You want a cyclic_acyclic diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be sixteen. '''.format(nbr_arrays))
-         sys.exit('''Error: You want a sector_outputs or cyclic_acyclic diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be sixteen. '''.format(nbr_arrays))
+         sys.exit('''Error: the flow_type argument is not sector_outputs nor sector_inputs nor cyclic_acyclic ''')
     if ribbon_order != 'size_asc' and ribbon_order != 'size_desc' and ribbon_order != 'native':
          sys.exit('''Error: the ribbon_order argument is not size_asc nor size_desc nor native.''')
-    #this is a redundant check of the structure since the previous checks are strict on the number of arrays. But you never know...
-    nbr_flow_structures=nbr_arrays/4
+
+    # check consistency in the number of arrays passed
+    nbr_arrays=len(arrays)# number of arrays passed to the function
+    if nbr_arrays != 4 and (flow_type == 'sector_outputs' or flow_type =='sector_inputs'):
+         sys.exit('''Error: You want a sector_outputs or sector_inputs diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be four.'''.format(nbr_arrays))
+    if nbr_arrays != 8 and flow_type == 'cyclic_acyclic':
+         sys.exit('''Error: You want a sector_outputs or cyclic_acyclic diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be eight. '''.format(nbr_arrays))    
+    # the next is a redundant check of the structure at this point, but the idea is to enable drawing k components at the same time in future versions
+    nbr_flow_structures = nbr_arrays/4
     if not isinstance( nbr_flow_structures, int ):
          sys.exit('''Error: A structure is defined by 4 arrays, but you passed {0} arrays, which is not a multiple of 4... something is wrong. (The typical decompositions are either a full structure diagram (the 4 IOT components) or the disaggregated cyclic_acyclic which contains 4 structures and thus 16 arrays'''.format(nbr_arrays))
 
-
-###### CHECK array dimensions ##########
+    # check array dimensions
     for i in range(nbr_flow_structures):
         if np.shape(arrays[4*i]) != (nbr_sectors, nbr_sectors):
             sys.exit('''Error: The {0}th intersectoral matrix you passed to the circos interface (i.e. the {1}th array) does not seem to be of the required dimension   [{2}x{2}]'''.format(i+1,4*i+1,nbr_sectors))
@@ -96,8 +99,8 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
             sys.exit('''Error: The {0}th emissions array you passed to the circos interface (i.e. the {1}th array)  does not seem to be of the required dimension  [{2}x{3}]'''.format(i+1, 4*i+3+1, nbr_sectors, nbr_emissions))
 
 
-### create folder structure
-# create a circos directory for the specific graph inside the "directory" directory containing the required subfolders (etc, data and img)
+    # create folder structure required by circos
+    # create a circos directory for the specific graph inside the "directory" directory containing the required subfolders (etc, data and img)
     specific_circos_dir=diagram_type+'_'+scale_type+'_'+flow_type+'_'+ribbon_order
     os.chdir(directory)
     working_dir=os.path.join(directory,specific_circos_dir)
@@ -108,13 +111,13 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
         os.mkdir('data')
         os.mkdir('img')
         
-#### apply the unit change   
+    # apply the unit change   
     arrays=list(arrays)       
     if unit !=1:
         for i in range(len(arrays)):
-            arrays[i]=arrays[i]*unit
+            arrays[i] = arrays[i] * unit
             
-##### Write the config and data files in the corresponding subfolders
+    ### Write the config and data files in the corresponding subfolders
     print('\n+++ Writing Circos config and data files in {0}+++'.format(os.path.join(directory,specific_circos_dir)))
 #    check = check_if_can_draw_merged(diagram_type,  nbr_sectors, nbr_emissions, sector_names, arrays)    
 #    if check == True: # write the conf and data files
