@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    intro
+   installation_requirements
    data_input
    calculations
    internal_data_structure
