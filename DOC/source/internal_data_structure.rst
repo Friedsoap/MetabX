@@ -29,7 +29,7 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | ``fd``                 | n x 1      |  Final demand vector [#2]_         |
 +------------------------+------------+------------------------------------+
-| ``w``                  | n x 1      | Total emissions                    |
+| ``w``                  | n x 1      | Total emissions (aggregated)       |
 +------------------------+------------+------------------------------------+
 | ``w``:sub:`m`          | n x 1      | Emission vectors (one for each     |
 |                        | (m arrays) | of the *m* different emissions)    |
