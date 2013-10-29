@@ -94,7 +94,7 @@ sys.stdout = Tee(sys.stdout, logfile)
 # Other configuration options
 
 # Config for the circos_interface module
-circos_draw = True
+circos_draw = False
 circos_execute = True
 circos_open_images = True
 circos_prod_based_unit = 1000
@@ -303,7 +303,7 @@ actual_structure_dictionary['tot_res_int']=1/actual_structure_dictionary['tot_re
 # for the whole economy
 actual_structure_dictionary['tot_em_int']=0
 for waste_index in range(NBR_disposals):
-    actual_structure_dictionary['tot_em_int']=actual_structure_dictionary['tot_em_int']+sum(actual_structure_dictionary['w'+str(waste_index)].flatten())/sum(actual_structure_dictionary['r'])
+    actual_structure_dictionary['tot_em_int'] = actual_structure_dictionary['tot_em_int'] + np.sum(actual_structure_dictionary['w'+str(waste_index)].flatten())/np.sum(actual_structure_dictionary['fd'].flatten())
 
 # and for each prod struct
 for sector_index in range(NBR_sectors):
@@ -311,7 +311,7 @@ for sector_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_int']=1/product_based_structures['prod_based_struct_'+str(sector_index)]['tot_res_eff']
     product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=0
     for waste_index in range(NBR_disposals):
-        product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']+sum(product_based_structures['prod_based_struct_'+str(sector_index)]['w'+str(waste_index)].flatten())/sum(product_based_structures['prod_based_struct_'+str(sector_index)]['r'])
+        product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int']=product_based_structures['prod_based_struct_'+str(sector_index)]['tot_em_int'] + np.sum(product_based_structures['prod_based_struct_'+str(sector_index)]['w'+str(waste_index)].flatten())/np.sum(product_based_structures['prod_based_struct_'+str(sector_index)]['fd'].flatten())
 
 
 ##############################################################################
@@ -836,13 +836,13 @@ out_sheet_all.write(2, 1+NBR_sectors+1+NBR_disposals, 'Total outputs', style_hea
 for row_index in range(NBR_sectors):
     out_sheet_all.write(row_index+3,  1+NBR_sectors+1+NBR_disposals,  actual_structure_dictionary['x'].flatten()[row_index],  style_nbr_3dec)
     
-### SECTION: Meso- and macro-economic resource indicators (efficiencies and  intensities)
+### SECTION: Meso- and macro-Indicators on resource efficiency and the cyclic-acylic and direct-indirect structures
 # starting row for the section:
 row_section_start = NBR_sectors + 6
 
 # section title
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
-out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'Meso- and macro-economic resource indicators (efficiencies and  intensities)', style_grey_bold)
+out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'Meso- and macro-Indicators on resource efficiency and the cyclic-acylic and direct-indirect structures', style_grey_bold)
 
 row_section_start = row_section_start + 1
 ### meso economic efficiencies
@@ -854,11 +854,18 @@ for row_index in range(NBR_sectors):
         out_sheet_all.write(row_index+row_section_start+3, 0, label_dictionary['row_sector_labels'][row_index], style_header_lalign)
         out_sheet_all.write(row_index+row_section_start+3, 1, meso_efficiencies[row_index], style_nbr_3dec)
 
-### TOP-LEVEL MACRO INDICATORS
-# top header
-out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 3, 4, 'Top-level macro indicators', style_header_center)
-# row headers
+#####  Aggregated macro indicators
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 3, 8, ' Aggregated macro indicators', style_header_center)
+
+### about to system efficiency
+row_section_start = row_section_start + 1
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 3, 4, 'About the system efficiency', style_header_center)
+row_section_start = row_section_start + 1
+# headers
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 3, 4, 'Resource efficiency', style_header_center)
 out_sheet_all.write(row_section_start+2, 3, 'Resource efficiency', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+3, row_section_start+3, 3, 4, 'Intensities per unit of final good', style_header_center)
+
 out_sheet_all.write(row_section_start+4, 3, 'Resource intensity', style_header_lalign)
 out_sheet_all.write(row_section_start+5, 3, 'Emission intensity', style_header_lalign)
 #indicators
@@ -866,31 +873,73 @@ out_sheet_all.write(row_section_start+2, 4, actual_structure_dictionary['tot_res
 out_sheet_all.write(row_section_start+4, 4, actual_structure_dictionary['tot_res_int'], style_nbr_3dec)
 out_sheet_all.write(row_section_start+5, 4, actual_structure_dictionary['tot_em_int'], style_nbr_3dec)
 
-# MACRO INDICATORS 
+### about cyclic structure
+row_section_start = row_section_start - 1
+column_start = 5
+
+# headers
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'About the cyclic structure', style_header_center)
+row_section_start = row_section_start + 1
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'Amount of cycling', style_header_center)
+out_sheet_all.write(row_section_start+2, column_start, 'CIy', style_header_lalign)
+out_sheet_all.write(row_section_start+3, column_start, 'CIx', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Impact of cycling', style_header_center)
+out_sheet_all.write(row_section_start+5, column_start, 'CLIx', style_header_lalign)
+out_sheet_all.write(row_section_start+6, column_start, 'CCIx', style_header_lalign)
+
+# indicators
+out_sheet_all.write(row_section_start+2, column_start+1, 'CIy_value', style_header_lalign)
+out_sheet_all.write(row_section_start+3, column_start+1, 'CIx_value', style_header_lalign)
+out_sheet_all.write(row_section_start+5, column_start+1, 'CLIx_value', style_header_lalign)
+out_sheet_all.write(row_section_start+6, column_start+1, 'CCIx_value', style_header_lalign)
+
+### about indirect structure
+row_section_start = row_section_start -1
+column_start = 7
+
+# headers
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'About the indirect structure', style_header_center)
+row_section_start = row_section_start + 1
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'Amount of indirect flows', style_header_center)
+out_sheet_all.write(row_section_start+2, column_start, 'IIy', style_header_lalign)
+out_sheet_all.write(row_section_start+3, column_start, 'IIx', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Impact of indirect flows', style_header_center)
+out_sheet_all.write(row_section_start+5, column_start, 'RIy', style_header_lalign)
+out_sheet_all.write(row_section_start+6, column_start, 'RIx', style_header_lalign)
+
+# indicators
+out_sheet_all.write(row_section_start+2, column_start+1, 'CIy_value', style_header_lalign)
+out_sheet_all.write(row_section_start+3, column_start+1, 'CIx_value', style_header_lalign)
+out_sheet_all.write(row_section_start+5, column_start+1, 'CLIx_value', style_header_lalign)
+out_sheet_all.write(row_section_start+6, column_start+1, 'CCIx_value', style_header_lalign)
+
+### Disaggregated macro- indicators
 # top header
-out_sheet_all.write_merge(row_section_start+1, row_section_start+1, 6, 7+NBR_disposals, 'Macro indicators (intensities)', style_header_center)
-out_sheet_all.write_merge(row_section_start+2, row_section_start+2, 6, 7, 'Resource intensities', style_header_center)
+row_section_start = row_section_start-2
+column_start = 10
+out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1+NBR_disposals, ' Disaggregated macro indicators (intensities per unit of final good)', style_header_center)
+out_sheet_all.write(row_section_start+2,  column_start+1, 'Resource intensities', style_header_center)
 
 # macro economic Resource intensities row headers and values
 for row_index in range(NBR_sectors):
-        out_sheet_all.write(row_index+row_section_start+3, 6, label_dictionary['row_sector_labels'][row_index], style_header_lalign)
-        out_sheet_all.write(row_index+row_section_start+3, 7, 'only for product-based', style_nbr_3dec)
+        out_sheet_all.write(row_index+row_section_start+3, column_start, label_dictionary['row_sector_labels'][row_index], style_header_lalign)
+        out_sheet_all.write(row_index+row_section_start+3, column_start+1, 'only for product-based', style_nbr_3dec)
 # macro economic TOTAL Resource intensities row headers and values
-out_sheet_all.write(row_index+row_section_start+4, 6, 'Totals', style_header_lalign)
-out_sheet_all.write(row_index+row_section_start+4, 7, 'only for product-based', style_nbr_3dec)
+out_sheet_all.write(row_index+row_section_start+4, column_start, 'Totals', style_header_lalign)
+out_sheet_all.write(row_index+row_section_start+4, column_start+1, 'only for product-based', style_nbr_3dec)
 
 # Emission intensities column headers and values 
 for waste_index in range(NBR_disposals):
     #column header
-    out_sheet_all.write(row_section_start+2, 8+waste_index, label_dictionary['final_outputs_labels'][1+waste_index]+' intensity', style_header_center)
+    out_sheet_all.write(row_section_start+2, column_start + 2 + waste_index, label_dictionary['final_outputs_labels'][1+waste_index]+' intensity', style_header_center)
     #values
     for row_index in range(NBR_sectors):
-        out_sheet_all.write(row_index + row_section_start + 3,  8 + waste_index, 'only for product-based', style_nbr_3dec)
-    out_sheet_all.write(row_index+row_section_start+4, 8+waste_index, 'only for product-based', style_nbr_3dec)
+        out_sheet_all.write(row_index + row_section_start + 3,  column_start + 2 + waste_index, 'only for product-based', style_nbr_3dec)
+    out_sheet_all.write(row_index+row_section_start+4, column_start + 2 +waste_index, 'only for product-based', style_nbr_3dec)
 
 ### SECTION: Leontief Inverse section :
 # section starting row:
-row_section_start = row_section_start + NBR_sectors + 5
+row_section_start = row_section_start + NBR_sectors + 7
 # section header
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
 out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'Leontief inverse with emissions endogenised [L=(I-A-Etot)^-1]', style_grey_bold)
@@ -1402,13 +1451,13 @@ for prod_struct in range(NBR_sectors):
     for row_index in range(NBR_sectors):
         sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_index+3,  1+NBR_sectors+1+NBR_disposals,  product_based_structures['prod_based_struct_'+str(prod_struct)]['x'].flatten()[row_index],  style_nbr_3dec)
         
-    ### SECTION: Meso- and macro-economic resource indicators (efficiencies and  intensities)
+    ### SECTION: Meso- and macro-Indicators on resource efficiency and the cyclic-acylic and direct-indirect structures
     # starting row for the section:
     row_section_start = NBR_sectors + 6
 
     # section title
     sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Meso- and macro-economic resource indicators (efficiencies and  intensities)', style_grey_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Meso- and macro-Indicators on resource efficiency and the cyclic-acylic and direct-indirect structures', style_grey_bold)
 
     row_section_start = row_section_start + 1
     ### meso economic efficiencies
@@ -1422,9 +1471,10 @@ for prod_struct in range(NBR_sectors):
 
     ### TOP-LEVEL MACRO INDICATORS
     # top header
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 3, 4, 'Top-level macro indicators', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, 3, 4, 'Resource efficiency', style_header_center)
     # row headers
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, 3, 'Resource efficiency', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+3, row_section_start+3, 3, 4, 'Intensities per unit of final good', style_header_center)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+4, 3, 'Resource intensity', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, 3, 'Emission intensity', style_header_lalign)
     #indicators
@@ -1456,7 +1506,7 @@ for prod_struct in range(NBR_sectors):
 
     ### SECTION: Leontief Inverse section :
     # section starting row:
-    row_section_start = row_section_start + NBR_sectors + 5
+    row_section_start = row_section_start + NBR_sectors + 7
     # section header
     sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Leontief inverse with emissions endogenised [L=(I-A-Etot)^-1]', style_grey_bold)
