@@ -259,45 +259,59 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``xi``                 | n x 1      | Total outputs due to               |
 |                        |            | indirect flows                     |
 +------------------------+------------+------------------------------------+
-| **Structural\ Indicators\ of\ the\ cyclic\ structure**                   |
+| **Structural\  Indicators\  of\  the\  cyclic\  structure**              |
 | See :ref:`cyc_indic`                                                     |
 +------------------------+------------+------------------------------------+
 | *On\  the\  amount\  of\  cycling*                                       |
 +------------------------+------------+------------------------------------+
 | ``CIy``                | 1          | Amount of cycling per unit of      |
-|                        |            | final good (based on ``Zc``)       |
+|                        |            | final good (based on ``Zc``;       |
+|                        |            | between 0 and infinity )           |
 +------------------------+------------+------------------------------------+
 | ``CIx``                | 1          | Amount of cycling in relation to   |
-|                        |            | the total outputs (based on ``Zc``)|
+|                        |            | the total outputs (based on ``Zc`` |
+|                        |            | over ``x``;                        |
+|                        |            | between 0 and 1 )                  |
 +------------------------+------------+------------------------------------+
 | *On\  the\  impact  of\  cycling\  on\  the\  system*                    |
 +------------------------+------------+------------------------------------+
 | ``CLIx``               | 1          | Amount of emissions due to cycling |
 |                        |            | in relation to the total outputs   |
-|                        |            | of the system (based on ``wc``)    |
+|                        |            | of the system (based on ``wc``;    |
+|                        |            | between 0 and 1 )                  |
 +------------------------+------------+------------------------------------+
 | ``CCIx``               | 1          | Amount of intersectoral and final  |
 |                        |            | flows due to cycling in relation to|
 |                        |            | the total flows of the system      |
-|                        |            | (based on ``Zcyc`` and ``wc``)     |
+|                        |            | (based on ``Zcyc`` and ``wc``;     |
+|                        |            | between 0 and 1 )                  |
 +------------------------+------------+------------------------------------+
-| **Structural\ Indicators\ of\ the\ indirect structure**                  |
+| **Structural\  Indicators\  of\  the\  indirect\  structure**            |
 | See :ref:`ind_indic`                                                     |
 +------------------------+------------+------------------------------------+
 | *On\  the\  amount\  of\  indirect\  flows*                              |
 +------------------------+------------+------------------------------------+
+| ``IIy``                | 1          | Amount of indirect primary         |
+|                        |            | resources per unit of final good   |
+|                        |            | (based on ``ri``;                  |
+|                        |            | between 0 and infinity )           |
++------------------------+------------+------------------------------------+
 | ``IIx``                | 1          | Amount of indirect primary         |
 |                        |            | resources related to the total     |
-|                        |            | primary resources                  |
+|                        |            | primary resources (based on ``ri`` |
+|                        |            | over ``r``;                        |
+|                        |            | between 0 and 1 )                  |
 +------------------------+------------+------------------------------------+
 | *On\  the\  impact  of\  indirect\  flows\  on\  the\  system*           |
 +------------------------+------------+------------------------------------+
 | ``RIy``                | 1          | Amount of reallocated flows per    |
 |                        |            | unit of final good                 |
+|                        |            | (between 0 and infinity )          |
 +------------------------+------------+------------------------------------+
 | ``RIx``                | 1          | Amount of reallocated flows        |
 |                        |            | related to the indirect            |
 |                        |            | primary resources                  |
+|                        |            | (between 0 and 1 )                 |
 +------------------------+------------+------------------------------------+
 
 
