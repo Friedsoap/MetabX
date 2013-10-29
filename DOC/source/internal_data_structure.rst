@@ -259,6 +259,40 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 | ``xi``                 | n x 1      | Total outputs due to               |
 |                        |            | indirect flows                     |
 +------------------------+------------+------------------------------------+
+| **Structural\ Indicators\ of\ the\ cyclic\ structure**                   |
+| See :ref:`cyc_indic`                                                     |
++------------------------+------------+------------------------------------+
+| ``CIy``                | 1          | Amount of cycling per unit of      |
+|                        |            | final good (based on ``Zc``)       |
++------------------------+------------+------------------------------------+
+| ``CIx``                | 1          | Amount of cycling in relation to   |
+|                        |            | the total outputs (based on ``Zc``)|
++------------------------+------------+------------------------------------+
+| ``CLIx``               | 1          | Amount of emissions due to cycling |
+|                        |            | in relation to the total outputs   |
+|                        |            | of the system (based on ``wc``)    |
++------------------------+------------+------------------------------------+
+| ``CCIx``               | 1          | Amount of intersectoral and final  |
+|                        |            | flows due to cycling in relation to|
+|                        |            | the total flows of the system      |
+|                        |            | (based on ``Zcyc`` and ``wc``)     |
++------------------------+------------+------------------------------------+
+| **Structural\ Indicators\ of\ the\ indirect structure**                  |
+| See :ref:`ind_indic`                                                     |
++------------------------+------------+------------------------------------+
+| ``IIx``                | 1          | Amount of indirect primary         |
+|                        |            | resources related to the total     |
+|                        |            | primary resources                  |
++------------------------+------------+------------------------------------+
+| ``RIy``                | 1          | Amount of reallocated flows per    |
+|                        |            | unit of final good                 |
++------------------------+------------+------------------------------------+
+| ``RIx``                | 1          | Amount of reallocated flows        |
+|                        |            | related to the indirect            |
+|                        |            | primary resources                  |
++------------------------+------------+------------------------------------+
+
+
 
 .. note::
    

@@ -91,7 +91,31 @@ Since finding the cyclic-acyclic and direct-indirect meta-structures is a matter
 
 However, since all overlapped cyclic-acyclic and direct-indirect components of the aggregate structure must be calculated before they they can be aggregated, finding the cyclic-acyclic and direct-indirect meta-structures for the aggregate structure is only performed after the iteration calculating the product-based structures.
 
+.. _cyc_indic:
 
+Calculating structural indicators of the cyclic structure for the product-based structures
+------------------------------------------------------------------------------------------
+
+See [AAM13]_
+
+
+Calculating structural indicators of the cyclic structure for the aggregated structure
+------------------------------------------------------------------------------------------
+
+They are calculated as a weighted average of the former.
+
+.. _ind_indic:
+
+Calculating structural indicators of the indirect structure for the product-based structures
+------------------------------------------------------------------------------------------
+
+See [AAM13]_
+
+
+Calculating structural indicators of the indirect structure for the aggregated structure
+------------------------------------------------------------------------------------------
+
+They are calculated as a weighted average of the former.
 
 
 .. rubric:: Bibligraphy
