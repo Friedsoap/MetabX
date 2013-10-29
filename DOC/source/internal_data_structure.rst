@@ -273,12 +273,25 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 |                        |            | over ``x``;                        |
 |                        |            | between 0 and 1 )                  |
 +------------------------+------------+------------------------------------+
-| *On\  the\  impact  of\  cycling\  on\  the\  system*                    |
+| *On\  the\  amount\  of\  emissions\  due\  to\  cycling\*               |
++------------------------+------------+------------------------------------+
+| ``CLIy``               | 1          | Amount of emissions due to cycling |
+|                        |            | per unit of final good             |
+|                        |            | (based on ``wc``;                  |
+|                        |            | between 0 and infinity )           |
 +------------------------+------------+------------------------------------+
 | ``CLIx``               | 1          | Amount of emissions due to cycling |
 |                        |            | in relation to the total outputs   |
 |                        |            | of the system (based on ``wc``;    |
 |                        |            | between 0 and 1 )                  |
++------------------------+------------+------------------------------------+
+| *On\  the\ total\  amount\  of\  flows\  induced\  by\  cycling\*        |
++------------------------+------------+------------------------------------+
+| ``CCIy``               | 1          | Amount of intersectoral and final  |
+|                        |            | flows due to cycling per unit of   |
+|                        |            | final good                         |
+|                        |            | (based on ``Zcyc`` and ``wc``;     |
+|                        |            | between 0 and infinity )           |
 +------------------------+------------+------------------------------------+
 | ``CCIx``               | 1          | Amount of intersectoral and final  |
 |                        |            | flows due to cycling in relation to|
@@ -291,29 +304,37 @@ The structure of ``actual_structure_dictionary`` and of each entry in ``product_
 +------------------------+------------+------------------------------------+
 | *On\  the\  amount\  of\  indirect\  flows*                              |
 +------------------------+------------+------------------------------------+
-| ``IIy``                | 1          | Amount of indirect primary         |
-|                        |            | resources per unit of final good   |
-|                        |            | (based on ``ri``;                  |
+| ``IIy``                | 1          | Amount of reallocated flows per    |
+|                        |            | unit of final good                 |
+|                        |            | (based on ``Zind``;                |
 |                        |            | between 0 and infinity )           |
 +------------------------+------------+------------------------------------+
-| ``IIx``                | 1          | Amount of indirect primary         |
-|                        |            | resources related to the total     |
-|                        |            | primary resources (based on ``ri`` |
-|                        |            | over ``r``;                        |
+| ``IIx``                | 1          | Amount of reallocated flows        |
+|                        |            | in relation to the total outputs   |
+|                        |            | (based on ``Zind``;                |
 |                        |            | between 0 and 1 )                  |
 +------------------------+------------+------------------------------------+
-| *On\  the\  impact  of\  indirect\  flows\  on\  the\  system*           |
+| *On\  the\  amount\  of\  emissions\  due\  to\  indirect\  flows*       |
 +------------------------+------------+------------------------------------+
-| ``RIy``                | 1          | Amount of reallocated flows per    |
+| ``ILIy``               | 1          | Amount of reallocated flows per    |
 |                        |            | unit of final good                 |
 |                        |            | (between 0 and infinity )          |
 +------------------------+------------+------------------------------------+
-| ``RIx``                | 1          | Amount of reallocated flows        |
-|                        |            | related to the indirect            |
-|                        |            | primary resources                  |
+| ``ILIx``               | 1          | Amount of reallocated flows        |
+|                        |            | related to the total outputs       |
 |                        |            | (between 0 and 1 )                 |
 +------------------------+------------+------------------------------------+
-
+| *On\  the\  total\  flows\  induced\  by\ the\  indirect\  structure*    |
++------------------------+------------+------------------------------------+
+| ``CIIy``               | 1          | Total amount of flows induced      |
+|                        |            | indirecly per unit of final good   |
+|                        |            | (between 0 and infinity )          |
++------------------------+------------+------------------------------------+
+| ``CIIx``               | 1          | Total amount of flows induced      |
+|                        |            | indirecly related to the total     |
+|                        |            | outputs                            |
+|                        |            | (between 0 and 1 )                 |
++------------------------+------------+------------------------------------+
 
 
 .. note::

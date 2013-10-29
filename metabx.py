@@ -356,6 +356,20 @@ actual_structure_dictionary['xa_dir'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['xc'] = np.zeros((NBR_sectors,1))
 actual_structure_dictionary['xa'] = np.zeros((NBR_sectors,1))
 
+# indicators
+actual_structure_dictionary['CIy'] = 0
+actual_structure_dictionary['CIx'] = 0
+actual_structure_dictionary['CLIy'] = 0
+actual_structure_dictionary['CLIx'] = 0
+actual_structure_dictionary['CCIy'] = 0
+actual_structure_dictionary['CCIx'] = 0
+actual_structure_dictionary['IIy'] = 0
+actual_structure_dictionary['IIx'] = 0
+actual_structure_dictionary['ILIy'] = 0
+actual_structure_dictionary['ILIx'] = 0
+actual_structure_dictionary['CIIy'] = 0
+actual_structure_dictionary['CIIx'] = 0
+
 # nx1 arrays for m emissions
 for waste_index in range(NBR_disposals):
     actual_structure_dictionary['wind_ac_a_'+str(waste_index)] = np.zeros((NBR_sectors,1))
@@ -555,8 +569,25 @@ for struct_index in range(NBR_sectors):
             product_based_structures['prod_based_struct_'+str(struct_index)]['wd_stacked'][sector_index][waste_index] =  product_based_structures['prod_based_struct_'+str(struct_index)]['wd_'+str(waste_index)][sector_index][0]
             product_based_structures['prod_based_struct_'+str(struct_index)]['wi_stacked'][sector_index][waste_index] =  product_based_structures['prod_based_struct_'+str(struct_index)]['wi_'+str(waste_index)][sector_index][0]
 
+    ### Finding CIy, CIx, CLIx, CCIx,IIy, IIx, RIy and RIx indicators for each product-based structure
+    print('\n +++ Finding CIy, CIx, CLIx, CCIx,IIy, IIx, RIy and RIx indicators for each product-based structure +++')
+    # cycling
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CIx'] = product_based_structures['prod_based_struct_'+str(struct_index)]['CIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CLIx'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy']) / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] = ( np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc']) +  np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc']) )
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CCIx'] =     product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
+    # indirect
+    product_based_structures['prod_based_struct_'+str(struct_index)]['IIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['IIx'] = product_based_structures['prod_based_struct_'+str(struct_index)]['IIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['ILIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wi'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['ILIx'] = product_based_structures['prod_based_struct_'+str(struct_index)]['ILIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CIIy'] = (np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind']) + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['find']) + np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wi']))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CIIx'] = product_based_structures['prod_based_struct_'+str(struct_index)]['CIIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
+
+    ###  building the arrays  for the aggregate structure
     print('\n +++ Using the product-based components to build the structural components of aggregated structure +++++')
-    # building the arrays  for the aggregate structure
     actual_structure_dictionary['Zc'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'] * actual_structure_dictionary['fd'][struct_index][0]
     actual_structure_dictionary['Zind'] += product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'] * actual_structure_dictionary['fd'][struct_index][0]
     actual_structure_dictionary['cycling_throughput'] += product_based_structures['prod_based_struct_'+str(struct_index)]['cycling_throughput'] * actual_structure_dictionary['fd'][struct_index][0]
@@ -591,6 +622,20 @@ for struct_index in range(NBR_sectors):
         actual_structure_dictionary['wind_c_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wind_c_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
         actual_structure_dictionary['wc_dir_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wc_dir_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
         actual_structure_dictionary['wa_dir_'+str(waste_index)] += product_based_structures['prod_based_struct_'+str(struct_index)]['wa_dir_'+str(waste_index)] * actual_structure_dictionary['fd'][struct_index][0]
+    
+    # building the indicators for the aggregated structure
+    actual_structure_dictionary['CIy'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CIy']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['CIx'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CIx']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['CLIy'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd'])     
+    actual_structure_dictionary['CLIx'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CLIx']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd'])     
+    actual_structure_dictionary['CCIy'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['CCIx'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CCIx']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['IIy'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['IIy']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['IIx'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['IIx']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['ILIy'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['ILIy']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['ILIx'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['ILIx']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['CIIy'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CIIy']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
+    actual_structure_dictionary['CIIx'] +=  product_based_structures['prod_based_struct_'+str(struct_index)]['CIIx']* actual_structure_dictionary['fd'][struct_index][0] / np.sum(actual_structure_dictionary['fd']) 
 
     ###########################################################################
     ###### DRAWING THE CIRCULAR DIAGRAM FOR EACH PROD-BASED STRUCTURE #########
@@ -873,7 +918,7 @@ out_sheet_all.write(row_section_start+2, 4, actual_structure_dictionary['tot_res
 out_sheet_all.write(row_section_start+4, 4, actual_structure_dictionary['tot_res_int'], style_nbr_3dec)
 out_sheet_all.write(row_section_start+5, 4, actual_structure_dictionary['tot_em_int'], style_nbr_3dec)
 
-### about cyclic structure
+### about cyclic structure CIy, CIx, CLIx, CCIx
 row_section_start = row_section_start - 1
 column_start = 5
 
@@ -883,17 +928,22 @@ row_section_start = row_section_start + 1
 out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'Amount of cycling', style_header_center)
 out_sheet_all.write(row_section_start+2, column_start, 'CIy', style_header_lalign)
 out_sheet_all.write(row_section_start+3, column_start, 'CIx', style_header_lalign)
-out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Impact of cycling', style_header_center)
-out_sheet_all.write(row_section_start+5, column_start, 'CLIx', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Emissions due to cycling', style_header_center)
+out_sheet_all.write(row_section_start+5, column_start, 'CLIy', style_header_lalign)
 out_sheet_all.write(row_section_start+6, column_start, 'CCIx', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+7, row_section_start+7, column_start, column_start+1, 'Total flows due to cycling', style_header_center)
+out_sheet_all.write(row_section_start+8, column_start, 'CCIy', style_header_lalign)
+out_sheet_all.write(row_section_start+9, column_start, 'CCIx', style_header_lalign)
 
 # indicators
-out_sheet_all.write(row_section_start+2, column_start+1, 'CIy_value', style_header_lalign)
-out_sheet_all.write(row_section_start+3, column_start+1, 'CIx_value', style_header_lalign)
-out_sheet_all.write(row_section_start+5, column_start+1, 'CLIx_value', style_header_lalign)
-out_sheet_all.write(row_section_start+6, column_start+1, 'CCIx_value', style_header_lalign)
+out_sheet_all.write(row_section_start+2, column_start+1, actual_structure_dictionary['CIy'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+3, column_start+1, actual_structure_dictionary['CIx'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+5, column_start+1, actual_structure_dictionary['CLIy'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+6, column_start+1, actual_structure_dictionary['CCIx'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+8, column_start+1, actual_structure_dictionary['CCIy'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+9, column_start+1, actual_structure_dictionary['CCIx'], style_nbr_3dec)
 
-### about indirect structure
+### about indirect structure IIy, IIx, RIy and RIx
 row_section_start = row_section_start -1
 column_start = 7
 
@@ -903,15 +953,20 @@ row_section_start = row_section_start + 1
 out_sheet_all.write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'Amount of indirect flows', style_header_center)
 out_sheet_all.write(row_section_start+2, column_start, 'IIy', style_header_lalign)
 out_sheet_all.write(row_section_start+3, column_start, 'IIx', style_header_lalign)
-out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Impact of indirect flows', style_header_center)
-out_sheet_all.write(row_section_start+5, column_start, 'RIy', style_header_lalign)
-out_sheet_all.write(row_section_start+6, column_start, 'RIx', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Emissions due to indirect flows', style_header_center)
+out_sheet_all.write(row_section_start+5, column_start, 'ILIy', style_header_lalign)
+out_sheet_all.write(row_section_start+6, column_start, 'ILIx', style_header_lalign)
+out_sheet_all.write_merge(row_section_start+7, row_section_start+7, column_start, column_start+1, 'Total flows due to indirect flows', style_header_center)
+out_sheet_all.write(row_section_start+8, column_start, 'CIIy', style_header_lalign)
+out_sheet_all.write(row_section_start+9, column_start, 'CIIx', style_header_lalign)
 
 # indicators
-out_sheet_all.write(row_section_start+2, column_start+1, 'CIy_value', style_header_lalign)
-out_sheet_all.write(row_section_start+3, column_start+1, 'CIx_value', style_header_lalign)
-out_sheet_all.write(row_section_start+5, column_start+1, 'CLIx_value', style_header_lalign)
-out_sheet_all.write(row_section_start+6, column_start+1, 'CCIx_value', style_header_lalign)
+out_sheet_all.write(row_section_start+2, column_start+1, actual_structure_dictionary['IIy'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+3, column_start+1, actual_structure_dictionary['IIx'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+5, column_start+1, actual_structure_dictionary['ILIy'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+6, column_start+1, actual_structure_dictionary['ILIx'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+8, column_start+1, actual_structure_dictionary['CIIy'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+9, column_start+1, actual_structure_dictionary['CIIx'], style_nbr_3dec)
 
 ### Disaggregated macro- indicators
 # top header
@@ -939,7 +994,7 @@ for waste_index in range(NBR_disposals):
 
 ### SECTION: Leontief Inverse section :
 # section starting row:
-row_section_start = row_section_start + NBR_sectors + 7
+row_section_start = row_section_start + NBR_sectors + 10
 # section header
 out_sheet_all.row(row_section_start).set_style(style_grey_bold)
 out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'Leontief inverse with emissions endogenised [L=(I-A-Etot)^-1]', style_grey_bold)
@@ -1498,15 +1553,20 @@ for prod_struct in range(NBR_sectors):
     sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'Amount of cycling', style_header_center)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start, 'CIy', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start, 'CIx', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Impact of cycling', style_header_center)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start, 'CLIx', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Emissions due to cycling', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start, 'CLIy', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start, 'CCIx', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+7, row_section_start+7, column_start, column_start+1, 'Total flows due to cycling', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+8, column_start, 'CCIy', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+9, column_start, 'CCIx', style_header_lalign)
     
     # indicators
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start+1, 'CIy_value', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start+1, 'CIx_value', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start+1, 'CLIx_value', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start+1, 'CCIx_value', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CIy'] , style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CIx'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CLIy'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CCIx'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+8, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CCIy'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+9, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CCIx'], style_nbr_3dec)
     
     ### about indirect structure
     row_section_start = row_section_start -1
@@ -1518,15 +1578,20 @@ for prod_struct in range(NBR_sectors):
     sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+1, row_section_start+1, column_start, column_start+1, 'Amount of indirect flows', style_header_center)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start, 'IIy', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start, 'IIx', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Impact of indirect flows', style_header_center)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start, 'RIy', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start, 'RIx', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Emissions due indirect flows', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start, 'ILIy', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start, 'ILIx', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+7, row_section_start+7, column_start, column_start+1, 'Total flows due indirect flows', style_header_center)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+8, column_start, 'CIIy', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+9, column_start, 'CIIx', style_header_lalign)
     
     # indicators
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start+1, 'CIy_value', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start+1, 'CIx_value', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start+1, 'CLIx_value', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start+1, 'CCIx_value', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['IIy'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['IIx'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['ILIy'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['ILIx'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+8, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CIIy'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+9, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CIIx'], style_nbr_3dec)
     
     ### Disaggregated macro- indicators
     # top header
@@ -1554,7 +1619,7 @@ for prod_struct in range(NBR_sectors):
 
     ### SECTION: Leontief Inverse section :
     # section starting row:
-    row_section_start = row_section_start + NBR_sectors + 7
+    row_section_start = row_section_start + NBR_sectors + 10
     # section header
     sheets_dictionary['out_sheet_'+str(prod_struct)].row(row_section_start).set_style(style_grey_bold)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start, row_section_start, 0, 5, 'Leontief inverse with emissions endogenised [L=(I-A-Etot)^-1]', style_grey_bold)
