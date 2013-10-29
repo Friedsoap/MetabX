@@ -35,7 +35,7 @@ All IOT components are read from it and stored into the ``actual_structure_dicti
 IOA components (aggregate structure)
 ----------------------------------------------------------
 
-Then, the IOA components are calculated from the original structure and stored into ``actual_structure_dictionary` only:
+Then, the IOA components are calculated from the original structure and stored into ``actual_structure_dictionary`` only:
 
 #. the technical coefficient matrix  ``A``
 #. the Leontief matrix ``L``
@@ -94,7 +94,7 @@ However, since all overlapped cyclic-acyclic and direct-indirect components of t
 .. _cyc_indic:
 
 Calculating structural indicators of the cyclic structure for the product-based structures
-------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------
 
 See [AAM13]_
 
@@ -107,7 +107,7 @@ They are calculated as a weighted average of the former.
 .. _ind_indic:
 
 Calculating structural indicators of the indirect structure for the product-based structures
-------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 
 See [AAM13]_
 
