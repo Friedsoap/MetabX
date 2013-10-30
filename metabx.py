@@ -576,8 +576,7 @@ for struct_index in range(NBR_sectors):
     product_based_structures['prod_based_struct_'+str(struct_index)]['CIx'] = product_based_structures['prod_based_struct_'+str(struct_index)]['CIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
     product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc'])
     product_based_structures['prod_based_struct_'+str(struct_index)]['CLIx'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy']) / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
-    product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] = ( np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc']) +  np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc']) +
-np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['find']))
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] = ( np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc']) +  np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc']) )
     product_based_structures['prod_based_struct_'+str(struct_index)]['CCIx'] =     product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
     # indirect
     product_based_structures['prod_based_struct_'+str(struct_index)]['IIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'])
@@ -931,7 +930,7 @@ out_sheet_all.write(row_section_start+2, column_start, 'CIy', style_header_lalig
 out_sheet_all.write(row_section_start+3, column_start, 'CIx', style_header_lalign)
 out_sheet_all.write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Emissions due to cycling', style_header_center)
 out_sheet_all.write(row_section_start+5, column_start, 'CLIy', style_header_lalign)
-out_sheet_all.write(row_section_start+6, column_start, 'CCIx', style_header_lalign)
+out_sheet_all.write(row_section_start+6, column_start, 'CLIx', style_header_lalign)
 out_sheet_all.write_merge(row_section_start+7, row_section_start+7, column_start, column_start+1, 'Total flows due to cycling', style_header_center)
 out_sheet_all.write(row_section_start+8, column_start, 'CCIy', style_header_lalign)
 out_sheet_all.write(row_section_start+9, column_start, 'CCIx', style_header_lalign)
@@ -940,7 +939,7 @@ out_sheet_all.write(row_section_start+9, column_start, 'CCIx', style_header_lali
 out_sheet_all.write(row_section_start+2, column_start+1, actual_structure_dictionary['CIy'], style_nbr_3dec)
 out_sheet_all.write(row_section_start+3, column_start+1, actual_structure_dictionary['CIx'], style_nbr_3dec)
 out_sheet_all.write(row_section_start+5, column_start+1, actual_structure_dictionary['CLIy'], style_nbr_3dec)
-out_sheet_all.write(row_section_start+6, column_start+1, actual_structure_dictionary['CCIx'], style_nbr_3dec)
+out_sheet_all.write(row_section_start+6, column_start+1, actual_structure_dictionary['CLIx'], style_nbr_3dec)
 out_sheet_all.write(row_section_start+8, column_start+1, actual_structure_dictionary['CCIy'], style_nbr_3dec)
 out_sheet_all.write(row_section_start+9, column_start+1, actual_structure_dictionary['CCIx'], style_nbr_3dec)
 
@@ -1227,7 +1226,7 @@ out_sheet_all.write_merge(row_section_start, row_section_start, 0, 5, 'The cycli
 row_section_start += 1
 
 # section header for the Cyclic structure
-out_sheet_all.write(row_section_start+1, 0, 'Cyclic structure', style_header_lalign_bold)
+out_sheet_all.write(row_section_start+1, 0, 'Cyclic (maintenance) structure', style_header_lalign_bold)
 
 ## Zcyc only
 for row_index in range(NBR_sectors):
@@ -1278,7 +1277,7 @@ for row_index in range(NBR_sectors):
 
 ### Acyclic structure         
 row_section_start = row_section_start + NBR_sectors + 5        
-out_sheet_all.write(row_section_start+1, 0, 'Acyclic structure', style_header_lalign_bold)
+out_sheet_all.write(row_section_start+1, 0, 'Acyclic (productive) structure', style_header_lalign_bold)
 
 ## Za only
 for row_index in range(NBR_sectors):
@@ -1556,7 +1555,7 @@ for prod_struct in range(NBR_sectors):
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start, 'CIx', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+4, row_section_start+4, column_start, column_start+1, 'Emissions due to cycling', style_header_center)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start, 'CLIy', style_header_lalign)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start, 'CCIx', style_header_lalign)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start, 'CLIx', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write_merge(row_section_start+7, row_section_start+7, column_start, column_start+1, 'Total flows due to cycling', style_header_center)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+8, column_start, 'CCIy', style_header_lalign)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+9, column_start, 'CCIx', style_header_lalign)
@@ -1565,7 +1564,7 @@ for prod_struct in range(NBR_sectors):
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+2, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CIy'] , style_nbr_3dec)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+3, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CIx'], style_nbr_3dec)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+5, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CLIy'], style_nbr_3dec)
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CCIx'], style_nbr_3dec)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+6, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CLIx'], style_nbr_3dec)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+8, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CCIy'], style_nbr_3dec)
     sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+9, column_start+1, product_based_structures['prod_based_struct_'+str(prod_struct)]['CCIx'], style_nbr_3dec)
     
@@ -1852,7 +1851,7 @@ for prod_struct in range(NBR_sectors):
     row_section_start += 1
 
     # section header for the Cyclic structure
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Cyclic structure', style_header_lalign_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Cyclic (maintenance) structure', style_header_lalign_bold)
 
     ## Zcyc only
     for row_index in range(NBR_sectors):
@@ -1903,7 +1902,7 @@ for prod_struct in range(NBR_sectors):
 
     ### Acyclic structure         
     row_section_start = row_section_start + NBR_sectors + 5        
-    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Acyclic structure', style_header_lalign_bold)
+    sheets_dictionary['out_sheet_'+str(prod_struct)].write(row_section_start+1, 0, 'Acyclic (productive) structure', style_header_lalign_bold)
 
     ## Za only
     for row_index in range(NBR_sectors):
