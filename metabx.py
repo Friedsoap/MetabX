@@ -572,11 +572,12 @@ for struct_index in range(NBR_sectors):
     ### Finding CIy, CIx, CLIx, CCIx,IIy, IIx, RIy and RIx indicators for each product-based structure
     print('\n +++ Finding CIy, CIx, CLIx, CCIx,IIy, IIx, RIy and RIx indicators for each product-based structure +++')
     # cycling
-    product_based_structures['prod_based_struct_'+str(struct_index)]['CIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'])
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zc'] +
+np.sum(product_based_structures['prod_based_struct_' +str(struct_index)]['self_cycling']) )
     product_based_structures['prod_based_struct_'+str(struct_index)]['CIx'] = product_based_structures['prod_based_struct_'+str(struct_index)]['CIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
     product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc'])
     product_based_structures['prod_based_struct_'+str(struct_index)]['CLIx'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['CLIy']) / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
-    product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] = ( np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc']) +  np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc']) )
+    product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] = ( np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zcyc']) +  np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['wc']) + np.sum(product_based_structures['prod_based_struct_' +str(struct_index)]['self_cycling']) )
     product_based_structures['prod_based_struct_'+str(struct_index)]['CCIx'] =     product_based_structures['prod_based_struct_'+str(struct_index)]['CCIy'] / np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['x'])
     # indirect
     product_based_structures['prod_based_struct_'+str(struct_index)]['IIy'] = np.sum(product_based_structures['prod_based_struct_'+str(struct_index)]['Zind'])
