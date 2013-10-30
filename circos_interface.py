@@ -59,32 +59,35 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
     - *arrays: is a list called arrays containing different array which should always be passed in blocks of 4 with strict order: intersectoral_matrix [nbr_sectors x nbr_sectors],  primary_inputs[1 x nbr_sectors], final_goods [nbr_sectors x 1], emission_matrix [nbr_sectors x nbr_emissions]. By doing that this subroutine is flexible to calculate any kind of flow-type decomposition.
     '''  
 
-######  CHECK of the arguments names passed to the function.  ############
-    if nbr_sectors >12:
+    ### function checks
+    # check whether the amount of sectors/ emissions exceeds the default colour capacities
+    if nbr_sectors > 12:
          sys.exit('''Error: there are {0} sectors but there are only 12 predefined colors for sectors. You will need to comment out this error and modify the attribute_colors.conf file'''.format(nbr_sectors))
-    if nbr_emissions >6:
-         sys.exit('''Error: there are {0} emission types but there are only 5 predefined colors for emissions. You will need to comment out this error and modify the attribute_colors.conf file'''.format(nbr_emissions))         
+    if nbr_emissions > 6:
+         sys.exit('''Error: there are {0} emission types but there are only 5 predefined colors for emissions. You will need to comment out this error and modify the attribute_colors.conf file'''.format(nbr_emissions))
+
+    # check whether the options passed are not mispelled
     if diagram_type != 'merged' and diagram_type !='symmetrical':
          sys.exit('''Error: the diagram_type argument is not merged nor symmetrical''')
     if scale_type != 'normalised' and  scale_type !='non_normalised':
          sys.exit('''Error: the scale_type argument is not normalised nor non_normalised''')
     if flow_type != 'sector_outputs' and flow_type !='sector_inputs' and flow_type !='cyclic_acyclic':
-         sys.exit('''Error: the flow_type argument is not sector_outputs nor sector_inputs nor cyclic_acyclic ''')         
-    nbr_arrays=len(arrays)# number of arrays passed to the function
-    if nbr_arrays!=4 and (flow_type == 'sector_outputs' or flow_type =='sector_inputs'):
-         sys.exit('''Error: You want a sector_outputs or sector_inputs diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be four.'''.format(nbr_arrays))
-    if nbr_arrays!=16 and flow_type == 'cyclic_acyclic':
-         print('''Error: You want a cyclic_acyclic diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be sixteen. '''.format(nbr_arrays))
-         sys.exit('''Error: You want a sector_outputs or cyclic_acyclic diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be sixteen. '''.format(nbr_arrays))
+         sys.exit('''Error: the flow_type argument is not sector_outputs nor sector_inputs nor cyclic_acyclic ''')
     if ribbon_order != 'size_asc' and ribbon_order != 'size_desc' and ribbon_order != 'native':
          sys.exit('''Error: the ribbon_order argument is not size_asc nor size_desc nor native.''')
-    #this is a redundant check of the structure since the previous checks are strict on the number of arrays. But you never know...
-    nbr_flow_structures=nbr_arrays/4
+
+    # check consistency in the number of arrays passed
+    nbr_arrays=len(arrays)# number of arrays passed to the function
+    if nbr_arrays != 4 and (flow_type == 'sector_outputs' or flow_type =='sector_inputs'):
+         sys.exit('''Error: You want a sector_outputs or sector_inputs diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be four.'''.format(nbr_arrays))
+    if nbr_arrays != 8 and flow_type == 'cyclic_acyclic':
+         sys.exit('''Error: You want a sector_outputs or cyclic_acyclic diagram but the number of arrays passed to the draw_circos_diagram function is {0}, please check it out, it should be eight. '''.format(nbr_arrays))    
+    # the next is a redundant check of the structure at this point, but the idea is to enable drawing k components at the same time in future versions
+    nbr_flow_structures = nbr_arrays/4
     if not isinstance( nbr_flow_structures, int ):
          sys.exit('''Error: A structure is defined by 4 arrays, but you passed {0} arrays, which is not a multiple of 4... something is wrong. (The typical decompositions are either a full structure diagram (the 4 IOT components) or the disaggregated cyclic_acyclic which contains 4 structures and thus 16 arrays'''.format(nbr_arrays))
 
-
-###### CHECK array dimensions ##########
+    # check array dimensions
     for i in range(nbr_flow_structures):
         if np.shape(arrays[4*i]) != (nbr_sectors, nbr_sectors):
             sys.exit('''Error: The {0}th intersectoral matrix you passed to the circos interface (i.e. the {1}th array) does not seem to be of the required dimension   [{2}x{2}]'''.format(i+1,4*i+1,nbr_sectors))
@@ -96,8 +99,8 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
             sys.exit('''Error: The {0}th emissions array you passed to the circos interface (i.e. the {1}th array)  does not seem to be of the required dimension  [{2}x{3}]'''.format(i+1, 4*i+3+1, nbr_sectors, nbr_emissions))
 
 
-### create folder structure
-# create a circos directory for the specific graph inside the "directory" directory containing the required subfolders (etc, data and img)
+    # create folder structure required by circos
+    # create a circos directory for the specific graph inside the "directory" directory containing the required subfolders (etc, data and img)
     specific_circos_dir=diagram_type+'_'+scale_type+'_'+flow_type+'_'+ribbon_order
     os.chdir(directory)
     working_dir=os.path.join(directory,specific_circos_dir)
@@ -108,28 +111,26 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
         os.mkdir('data')
         os.mkdir('img')
         
-#### apply the unit change   
-    arrays=list(arrays)       
+    # apply the unit change   
+    arrays = list(arrays)       
     if unit !=1:
         for i in range(len(arrays)):
-            arrays[i]=arrays[i]*unit
+            arrays[i] = arrays[i] * unit
             
-##### Write the config and data files in the corresponding subfolders
+    ### Write the config and data files in the corresponding subfolders
     print('\n+++ Writing Circos config and data files in {0}+++'.format(os.path.join(directory,specific_circos_dir)))
-#    check = check_if_can_draw_merged(diagram_type,  nbr_sectors, nbr_emissions, sector_names, arrays)    
-#    if check == True: # write the conf and data files
-    create_attribute_colors_conf(nbr_emissions,sector_names,working_dir)
-    create_kariotype_txt(diagram_type,flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
+    create_attribute_colors_conf(nbr_emissions, sector_names, working_dir)
+    create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
     create_ticks_conf(working_dir)
     (histogram_end) = create_histograms_conf(diagram_type, flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays)
     # correction of the histogram end to draw the sectoral labels    
     if diagram_type == 'merged':
         histogram_end=histogram_end+'+50p'
-    create_ideogram_conf(working_dir,histogram_end)
+    create_ideogram_conf(working_dir, histogram_end)
     create_links_conf(working_dir)
     parent_name=os.path.split(directory)[1]
     create_image_conf(parent_name, specific_circos_dir, working_dir)
-    create_normalisation_conf(diagram_type,scale_type, working_dir, nbr_sectors,sector_names, arrays)
+    create_normalisation_conf(diagram_type, scale_type, working_dir, nbr_sectors, sector_names, arrays)
     create_circos_conf(unit, working_dir)
     create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, data_filename, nbr_sectors, nbr_emissions, sector_names, arrays)
         
@@ -142,44 +143,6 @@ def draw_circos_diagram(circos_execute, circos_open_images, unit, diagram_type, 
 The graph was to be drawn in {0} but the program continues...
 +++++++++++++++++++++++++++++++++++'''.format(working_dir))
     return()
-
-#####################
-
-def check_if_can_draw_merged(diagram_type, nbr_sectors, nbr_emissions, sector_names, arrays):
-    ''' Checks if the IOT can be drawn in the 'merged' version. Returns False if not.'''
-    
-    if diagram_type == 'merged':
-        #calculate total inputs
-        sum_intersectoral_matrices=np.zeros((nbr_sectors,nbr_sectors))
-        sum_resource_vectors=np.zeros((1,nbr_sectors))
-        sum_fd_vectors=np.zeros((nbr_sectors,1))
-        sum_emission_array=np.zeros((nbr_sectors,nbr_emissions))
-        
-        for i in range(len(arrays)/4):
-            sum_intersectoral_matrices=arrays[4*i] + sum_intersectoral_matrices
-            sum_resource_vectors=arrays[4*i+1] + sum_resource_vectors
-            sum_fd_vectors=arrays[4*i+2] + sum_fd_vectors
-            sum_emission_array=arrays[4*i+3] + sum_emission_array
-        total_inputs= np.sum(sum_intersectoral_matrices,axis=0) + sum_resource_vectors    
-        
-        #calculate sum of intersectoral outputs + intesectoral inputs
-        # careful with slicing arrays: a[row_start:row_end][:,column_start:column_end]
-        check = True
-        for i in range(nbr_sectors):
-            intersectoral_output_sum= np.sum(sum_intersectoral_matrices[i]) + np.sum(sum_intersectoral_matrices[:][:,i:i+1])
-            if total_inputs.flatten()[i] < intersectoral_output_sum:
-                check = False
-                print('''\n++++ Error: the total output are inferior than the intersectoral sum of outputs and inputs of sector {0} ({1}) ++++'''.format(i, sector_names[i]))
-                break
-            else:
-                continue
-    elif diagram_type == 'symmetrical':
-        check = True
-    
-    return(check)
-
-######################
-
 
 ###################### /etc/attribute_colors.conf START ######################## 
 
@@ -243,19 +206,15 @@ col_final_goods = blues-9-seq-8
 
     attribute_colors_conf_file_content='''\n	
 ###### COLORS DEFINED FOR FLOW-BY-TYPE SCHEMES ##############		
-# flow types: self-cycling, inter-cycling, indirect acyclic and direct acyclic:	
-# To mark the separation between cyclic and acyclic flows (each having 2 components), I chose a 4-div color scheme	
-# However the div schemes either start with red or end in green, so I mix the brown side of brbg-4 and the purple side of puor-4	
-#the cyclic flows being the	
-#col_sc=	brbg-4-div-1
-#col_ic=	brbg-4-div-2
-#col_ia=	puor-4-div-3
-#col_da=	puor-4-div-4
+# flow types: cyclic or acyclic:	
+# To mark the separation between cyclic and acyclic flows, I chose a 3-div color scheme	from http://colorbrewer2.org/
+# colour for  acyclic =	 brbg-3-div-1
+# colour brbg-4-div-2 not allocated
+#colour for cyclic =	brbg-3-div-3
 
-col_flowtype_0=	brbg-4-div-1
-col_flowtype_1=	brbg-4-div-2
-col_flowtype_2=	brbg-4-div-3
-col_flowtype_3=	brbg-4-div-4'''
+col_flowtype_0=	brbg-3-div-1
+col_flowtype_1=	brbg-3-div-3
+'''
 
     attribute_colors_conf_file.write(attribute_colors_conf_file_content)
     attribute_colors_conf_file.close()
@@ -270,13 +229,13 @@ col_flowtype_3=	brbg-4-div-4'''
 def create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_emissions, sector_names, arrays):
     '''Creates the kariotype.txt file in data directory.
     
-    if flow_type=sector_outputs or sector_inputs, only chromosomes are defined 
-    if diagram_type=cylic-acyclic, chromosomes and cytogenetic bands are defined
+    if flow_type = sector_outputs or sector_inputs, only chromosomes are defined 
+    if diagram_type = cylic-acyclic, chromosomes and cytogenetic bands are defined
     '''
     os.chdir(working_dir)
     os.chdir('data')
     kariotype_txt_file = open('kariotype.txt', 'w')
-    #creating the intial config comments
+    # creating the intial config comments
     # the content of the file should start at the beginning of the line, i.e. not respecting the indentation, otherwise that indentation is used in the file.
     kariotype_txt_file_content='''\
 ####### SECTOR DEFINITION ####################
@@ -293,21 +252,20 @@ def create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_
     '''
     kariotype_txt_file.write(kariotype_txt_file_content)
 
-#calculating total outputs
-    sum_intersectoral_matrices=np.zeros((nbr_sectors,nbr_sectors))
-    sum_resource_vectors=np.zeros((1,nbr_sectors))
-    sum_fd_vectors=np.zeros((nbr_sectors,1))
-    sum_emission_array=np.zeros((nbr_sectors,nbr_emissions))
+    # calculating total outputs
+    sum_intersectoral_matrices = np.zeros((nbr_sectors,nbr_sectors))
+    sum_resource_vectors = np.zeros((1,nbr_sectors))
+    sum_fd_vectors = np.zeros((nbr_sectors,1))
+    sum_emission_array = np.zeros((nbr_sectors,nbr_emissions))
     
     for i in range(len(arrays)/4):
-        sum_intersectoral_matrices=arrays[4*i] + sum_intersectoral_matrices
-        sum_resource_vectors=arrays[4*i+1] + sum_resource_vectors
-        sum_fd_vectors=arrays[4*i+2] + sum_fd_vectors
-        sum_emission_array=arrays[4*i+3] + sum_emission_array
+        sum_intersectoral_matrices = arrays[4*i] + sum_intersectoral_matrices
+        sum_resource_vectors = arrays[4*i+1] + sum_resource_vectors
+        sum_fd_vectors = arrays[4*i+2] + sum_fd_vectors
+        sum_emission_array = arrays[4*i+3] + sum_emission_array
     total_inputs= np.sum(sum_intersectoral_matrices,axis=0) + sum_resource_vectors
 
-#create the chr- lines for merged and symmetrical cases
-        
+    ### create the chr- lines for merged and symmetrical cases        
     # in merged case, the sectors are listed as they appear
     if diagram_type == 'merged':
         for i in range(len(sector_names)):
@@ -331,15 +289,15 @@ def create_kariotype_txt(diagram_type, flow_type, working_dir, nbr_sectors, nbr_
 # COLOR	I have predefined the colors in the attribute_colors.conf file. I have only managed to apply color names as col_flowtype_X where X is a number. The flowtype to which it refers depends on the ordering of the arrays passed to the main circos function. So, col_flowtype_0 will be the color to the first flow type.
     '''
             kariotype_txt_file.write(kariotype_txt_file_content)
-            band_counter=0
-            band_start=np.zeros((1,nbr_sectors))
-            band_end=np.zeros((1,nbr_sectors))
+            band_counter = 0
+            band_start = np.zeros((1,nbr_sectors))
+            band_end = np.zeros((1,nbr_sectors))
             for i in range(len(arrays)/4):
-                intersectoral_matrix=arrays[4*i]
-                resource_vector=arrays[4*i+1]
-                fd_column=arrays[4*i+2]
-                emissions_columns=arrays[4*i+3]
-                total_inputs= np.sum(intersectoral_matrix,axis=0) + resource_vector.flatten()
+                intersectoral_matrix = arrays[4*i]
+                resource_vector = arrays[4*i+1]
+                fd_column = arrays[4*i+2]
+                emissions_columns = arrays[4*i+3]
+                total_inputs = np.sum(intersectoral_matrix,axis=0) + resource_vector.flatten()
                 total_outputs = np.sum(intersectoral_matrix,axis=1) + fd_column.flatten() + np.sum(emissions_columns,axis=1)
                 band_end = total_inputs + total_outputs + band_end
                 #pdb.set_trace()
@@ -588,7 +546,7 @@ def create_histograms_conf(diagram_type, flow_type, working_dir, nbr_sectors, nb
     '''
     os.chdir(working_dir)
     os.chdir('etc')
-    nbr_arrays=len(arrays)
+    nbr_arrays = len(arrays)
 
 ##### CREATING THE CONFIG FILES #######
     histograms_conf_file = open('histograms.conf', 'w')
@@ -1601,7 +1559,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],j,arrays[0][i][j],'col_' + sector_names[i].lower()))
+                    table_intersectoral_flows.append((j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[i].lower()))
         
         if diagram_type =='symmetrical':
             # number of sectors represented = 2*(number of sectors)
@@ -1613,7 +1571,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],2*nbr_sectors-1-j,arrays[0][i][j],'col_' + sector_names[i].lower()))
+                    table_intersectoral_flows.append((2*nbr_sectors-1-j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[i].lower()))
             
     elif flow_type == 'sector_inputs':
 
@@ -1625,7 +1583,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],j,arrays[0][i][j],'col_' + sector_names[j].lower()))
+                    table_intersectoral_flows.append((j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[j].lower()))
         
         if diagram_type =='symmetrical':
             # number of sectors represented = 2*(number of sectors)
@@ -1637,7 +1595,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                     #do not append if the flow is 0
                     if arrays[0][i][j] == 0:
                         continue
-                    table_intersectoral_flows.append((i,arrays[0][i][j],2*nbr_sectors-1-j,arrays[0][i][j],'col_' + sector_names[j].lower()))
+                    table_intersectoral_flows.append((2*nbr_sectors-1-j,arrays[0][i][j],i,arrays[0][i][j],'col_' + sector_names[j].lower()))
                     
 
     elif flow_type == 'cyclic_acyclic':
@@ -1651,7 +1609,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                         #do not append if the flow is 0
                         if arrays[4*flow_type_nbr][i][j] == 0:
                             continue
-                        table_intersectoral_flows.append((i,arrays[4*flow_type_nbr][i][j],j,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
+                        table_intersectoral_flows.append((j,arrays[4*flow_type_nbr][i][j],i,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
 
         if diagram_type =='symmetrical':
             # number of sectors represented = 2*(number of sectors)
@@ -1664,7 +1622,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
                         #do not append if the flow is 0
                         if arrays[4*flow_type_nbr][i][j] == 0:
                             continue
-                        table_intersectoral_flows.append((i,arrays[4*flow_type_nbr][i][j],2*nbr_sectors-1-j,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
+                        table_intersectoral_flows.append((2*nbr_sectors-1-j,arrays[4*flow_type_nbr][i][j],i,arrays[4*flow_type_nbr][i][j],'col_flowtype_' + str(flow_type_nbr)))
     else:
        sys.exit('''Error: the flow_type argument passed to create_links_data_txt function is not one expected''') 
 
@@ -1775,11 +1733,11 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
 
     if diagram_type == 'merged':
         #calculating total outputs
-        sum_intersectoral_matrices=np.zeros((nbr_sectors,nbr_sectors))
-        sum_resource_vectors=np.zeros((1,nbr_sectors))
+        sum_intersectoral_matrices = np.zeros((nbr_sectors,nbr_sectors))
+        sum_resource_vectors = np.zeros((1,nbr_sectors))
         for i in range(len(arrays)/4):
-            sum_intersectoral_matrices=arrays[4*i] + sum_intersectoral_matrices
-            sum_resource_vectors=arrays[4*i+1] + sum_resource_vectors
+            sum_intersectoral_matrices = arrays[4*i] + sum_intersectoral_matrices
+            sum_resource_vectors = arrays[4*i+1] + sum_resource_vectors
 
         # the outputs start after the primary resources 
         # the inputs start after the primary resources + TOTAL sum of sectoral outputs.
@@ -1787,7 +1745,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
         #pdb.set_trace()
         outputs_start = sum_resource_vectors.flatten()
         last_output_position = outputs_start
-        inputs_start= sum_resource_vectors.flatten() + np.sum(sum_intersectoral_matrices,axis=1)
+        inputs_start= sum_resource_vectors.flatten() + np.sum(sum_intersectoral_matrices,axis=0)
         last_input_position = inputs_start
         
         for i in range(len(final_table)):
@@ -1798,7 +1756,7 @@ def create_links_data_txt(diagram_type, flow_type, ribbon_order, working_dir, da
             input_flow_end = input_flow_start + final_table[i][5]
             last_output_position[final_table[i][0]] = output_flow_end
             last_input_position[final_table[i][3]] = input_flow_end
-            final_table[i]=(represented_sector_names[final_table[i][0]],output_flow_start, output_flow_end,represented_sector_names[final_table[i][3]],input_flow_start,input_flow_end,final_table[i][6])
+            final_table[i] = (represented_sector_names[final_table[i][0]], output_flow_start, output_flow_end, represented_sector_names[final_table[i][3]], input_flow_start, input_flow_end, final_table[i][6])
 
     if diagram_type == 'symmetrical':
         # the outputs start at the beginning of the (output) segment
