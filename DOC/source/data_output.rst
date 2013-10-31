@@ -12,4 +12,4 @@ The output file name is specified by the user when running MetabX, the file is s
 
 All spreadsheets contain:
 
-* list all sections within the spreadsheets.
+* TODO: list all sections within the spreadsheets.

@@ -11,8 +11,9 @@ To decompose IOTs
 You need to install some software before it works (see :ref:`python_req`).
 With that software, it should work out of the box to decompose IOTs. 
 
-2 ways to run it: either directly from shell or through Spyder
-Explain both
+You can run MetabX in 2 ways: either from the shell or through Spyder
+
+TODO: Explain both
 
 
 
