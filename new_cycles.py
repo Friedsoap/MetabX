@@ -13,11 +13,12 @@ Cycle finding algorithms
 #    BSD license.
 
 
-#   This file has been customised by Aleix Altimiras Martin.
+#   This file has been customised by Aleix Altimiras Martin from Networkx v1.6
 #   In particular the simple_cycles routine has been transformed in a 
 #   generator function. Apparently a similar implementation will be included 
-#   in next releases of networkx (this cycles.py corresponds to networkx v1.6)
-#   The pull request corresponding to this changes is 
+#   in next releases of NetworkX
+#   This file corresponds to cycles.py in networkx v1.6.
+#   The pull request corresponding to similar changes is 
 #   https://github.com/networkx/networkx/pull/890
 
 
