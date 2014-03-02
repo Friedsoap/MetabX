@@ -1,0 +1,7 @@
+If you use Metabx for your work (I am very glad!), please cite it as:
+
+Altimiras-Martin, A., 2014. The Regenerative Economy: Inducing and quantifying a socio-techno-structural transition to harmonise the Human and Earth System ecologies by managing  human-induced material flows. PhD, thesis. University of Cambridge.
+
+Also, if you include images generated, please cite Circos (the program generating the image), as follows:
+
+Krzywinski, M. et al. Circos: an Information Aesthetic for Comparative Genomics. Genome Res (2009) 19:1639-1645.
