@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Data input format and its parsing &mdash; MetabX 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MetabX 0.1 documentation" href="index.html" />
+    <link rel="next" title="Calculations and checks" href="calculations.html" />
+    <link rel="prev" title="Using MetabX" href="using_metabx.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="calculations.html" title="Calculations and checks"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="using_metabx.html" title="Using MetabX"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MetabX 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="data-input-format-and-its-parsing">
+<span id="data-input"></span><h1>Data input format and its parsing<a class="headerlink" href="#data-input-format-and-its-parsing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="iot-format-xls">
+<h2>IOT format (xls)<a class="headerlink" href="#iot-format-xls" title="Permalink to this headline">¶</a></h2>
+<p>The program has been built to read the IOT from an excel 2003 spreadsheet, which requires a special formating.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Other formats such as newer Excel formats (.xlsx) and from other programs such as Libre Office (.ods) are not accepted;
+not even text-based formats such as cvs or others.</p>
+</div>
+<p>The spreadsheet can have any file name but must entail the following 4 spreadsheets <strong>with identical names</strong>, in any order:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">title</span> <span class="pre">and</span> <span class="pre">comments</span></tt>, in which only three values from the first column are read:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the first cell entails the title of the IOT</li>
+<li>the second cell entails the units</li>
+<li>the thirs cell entail any comments you wish to add.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Z</span></tt>, in which the intersectoral matrix and sectoral labels of the IOT is contained:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the first row contains all sectoral labels</li>
+<li>the first column also contains the sectoral labels</li>
+<li>the intersectoral matrix is aligned with its corresponding row and column labels</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">r</span></tt>, in which the primary resources are contained</p>
+<blockquote>
+<div><ul class="simple">
+<li>the first cell of the first row contains the title of the primary inputs</li>
+<li>the rest of the first row contains the primary inputs for all sectors</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only one row for primary resources is allowed.</p>
+</div>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">f</span></tt>, in which the final outputs are contained (i.e. final goods and emissions):</p>
+<blockquote>
+<div><ul>
+<li><p class="first">the first row contains the labels for the final goods and emissions.</p>
+<blockquote>
+<div><ul class="simple">
+<li>the final goods must be in the first column</li>
+<li>the emissions must all start with the w character (e.g. w0, w_MSW, ...).</li>
+<li>No limited number of emissions.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">The column below each label contains the data, in the same order as in the intersectoral matrix.</p>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only one column for final goods is allowed.</p>
+</div>
+</div>
+<div class="section" id="parsing-of-the-xls-and-storing-the-different-components">
+<h2>Parsing of the xls and storing the different components<a class="headerlink" href="#parsing-of-the-xls-and-storing-the-different-components" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="storing-the-labels">
+<h2>Storing the labels<a class="headerlink" href="#storing-the-labels" title="Permalink to this headline">¶</a></h2>
+<p>When MetabX is run, it prompts for the input file to read from (formated as above).
+It then reads it an stored the information as follows:</p>
+<p>All labels are stored in the <tt class="docutils literal"><span class="pre">label_dictionary</span></tt>, as follows</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">label_dictionary['title']</span></tt>: stores the title</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['units']</span></tt>: stores the units</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['comments']</span></tt>: stores the comment</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['resource_labels']</span></tt>: stores the label of the primary resources</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['row_sector_labels']</span></tt>: stores the row labels of all sectors</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['column_sector_labels']</span></tt>: stores the column labels of all sectors</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['waste_labels']</span></tt>:  stores the labels of all wastes</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['fd_labels']</span></tt>: stores the label for the final demand</li>
+<li><tt class="docutils literal"><span class="pre">label_dictionary['final_outputs_labels']</span></tt>: stores the labels for the final demand and wastes together</li>
+</ul>
+</div>
+<div class="section" id="storing-the-data">
+<h2>Storing the data<a class="headerlink" href="#storing-the-data" title="Permalink to this headline">¶</a></h2>
+<p>The data is stored in the <tt class="docutils literal"><span class="pre">actual_structure_dictionary</span></tt>, as follows (for more details see next sections <a class="reference internal" href="internal_data_structure.html#internal-data-structure"><em>Internal structure of variables</em></a> and <a class="reference internal" href="calculations.html#calculations"><em>Calculations and checks</em></a> ):</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['r']</span></tt>: stores the primary resources</li>
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['Z']</span></tt>: stores the intersectoral matrix</li>
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['fd']</span></tt>: stores the final goods</li>
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['w'm]</span></tt>: stores each waste type where <em>m</em> is the type of waste, ordered according to the order provided in the <tt class="docutils literal"><span class="pre">f</span></tt> spreadsheet.</li>
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['w']</span></tt>: all emissions aggregated</li>
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['tot_final_outputs']</span></tt>: all emissions aggregated plus the final goods</li>
+<li><tt class="docutils literal"><span class="pre">actual_structure_dictionary['x']</span></tt>: total outputs (which are calculated from the above)</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Data input format and its parsing</a><ul>
+<li><a class="reference internal" href="#iot-format-xls">IOT format (xls)</a></li>
+<li><a class="reference internal" href="#parsing-of-the-xls-and-storing-the-different-components">Parsing of the xls and storing the different components</a></li>
+<li><a class="reference internal" href="#storing-the-labels">Storing the labels</a></li>
+<li><a class="reference internal" href="#storing-the-data">Storing the data</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="using_metabx.html"
+                        title="previous chapter">Using MetabX</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="calculations.html"
+                        title="next chapter">Calculations and checks</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/data_input.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="calculations.html" title="Calculations and checks"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="using_metabx.html" title="Using MetabX"
+             >previous</a> |</li>
+        <li><a href="index.html">MetabX 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Aleix Altimiras-Martin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

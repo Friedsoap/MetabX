@@ -1,0 +1,167 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation requirements &mdash; MetabX 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MetabX 0.1 documentation" href="index.html" />
+    <link rel="next" title="Using MetabX" href="using_metabx.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="using_metabx.html" title="Using MetabX"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MetabX 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation-requirements">
+<span id="install"></span><h1>Installation requirements<a class="headerlink" href="#installation-requirements" title="Permalink to this headline">¶</a></h1>
+<p>MetabX does two separate things: decomposes an IOT between its cyclic and acyclic structure and between its direct and indirect structures, for which only the Python components are required.
+Additionally, it can draw the data in a circular graph of the results parsing the IOT data in a specific format and for which Circos <a class="reference internal" href="#mik09">[MIK09]</a> is required, a program originally thought to represent the human genome.
+For a rationale why to use circular graphs to view IOTs, see <a class="reference internal" href="internal_data_structure.html#aam13">[AAM13]</a>.</p>
+<p>The program is compatible in either Linux and windows machines (I believe Mac (i.e. BSD) also works but did not have the chance to test it).</p>
+<div class="section" id="python-requirements">
+<span id="python-req"></span><h2>Python requirements<a class="headerlink" href="#python-requirements" title="Permalink to this headline">¶</a></h2>
+<p>First you need to install Python, version 2.7 suffices.</p>
+<p>Then, the easiest thing to do is to install Spyder, which is a scientific Integrated Development Interface (IDE).
+Installing Spyderlib will also automatically install almost all python components you need.</p>
+<p>In addition to Spyder, you need the module NetworkX.</p>
+<p>Finally, you need to download this program and copy it in your preferred working directory.</p>
+<p>Reference sites:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.python.org/">Python</a></li>
+<li><a class="reference external" href="https://code.google.com/p/spyderlib/">Spyder</a></li>
+<li><a class="reference external" href="http://networkx.github.io/">NetworkX</a></li>
+<li>MetabX (TODO: ADD SITE)</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In major Linux distributions, you can find them all through your package manager.</p>
+</div>
+</div>
+<div class="section" id="circos-requirements">
+<span id="circos-req"></span><h2>Circos requirements<a class="headerlink" href="#circos-requirements" title="Permalink to this headline">¶</a></h2>
+<p>This following requirements are only necessary if you wish to draw the circular diagrams of the IOTs.</p>
+<p>Circos requires Perl (v5.14.2 suffices), a different scripting language and some of its packages.</p>
+<p>Once you installed perl, you need the following packages:</p>
+<ul class="simple">
+<li>populate list from circos manual + the one in the book.</li>
+</ul>
+<p>Then, you need to install circos. It is recommended to get the latest version their <a class="reference external" href="http://circos.ca">site</a>.</p>
+<p class="rubric">Bibligraphy</p>
+<table class="docutils citation" frame="void" id="aam13" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[AAM13]</a></td><td>Altimiras-Martin, Aleix (2013) PhD  thesis</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="mik09" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[MIK09]</a></td><td>Krzywinski, Martin I, Jacqueline E Schein, Inanc Birol, Joseph Connors, Randy Gascoyne, Doug Horsman, Steven J Jones, and Marco A Marra. 2009. “Circos: An Information Aesthetic for Comparative Genomics.” Genome Research (June 18). doi:10.1101/gr.092759.109. http://genome.cshlp.org/content/early/2009/06/15/gr.092759.109.abstract.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation requirements</a><ul>
+<li><a class="reference internal" href="#python-requirements">Python requirements</a></li>
+<li><a class="reference internal" href="#circos-requirements">Circos requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="using_metabx.html"
+                        title="next chapter">Using MetabX</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/installation_requirements.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="using_metabx.html" title="Using MetabX"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="index.html">MetabX 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Aleix Altimiras-Martin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

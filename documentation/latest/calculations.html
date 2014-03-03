@@ -1,0 +1,212 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Calculations and checks &mdash; MetabX 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="MetabX 0.1 documentation" href="index.html" />
+    <link rel="next" title="Internal structure of variables" href="internal_data_structure.html" />
+    <link rel="prev" title="Data input format and its parsing" href="data_input.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="internal_data_structure.html" title="Internal structure of variables"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data_input.html" title="Data input format and its parsing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MetabX 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="calculations-and-checks">
+<span id="calculations"></span><h1>Calculations and checks<a class="headerlink" href="#calculations-and-checks" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="integrity-check-of-original-data">
+<h2>Integrity check of original data<a class="headerlink" href="#integrity-check-of-original-data" title="Permalink to this headline">¶</a></h2>
+<p>The program checks whether the IOT is balanced.
+If the total outputs differ from the total inputs by a difference superior to 0.001%, it stops. You can adjust this by changing the variable called <tt class="docutils literal"><span class="pre">max_balancing_difference</span></tt>.</p>
+</div>
+<div class="section" id="iot-components-aggregate-structure">
+<span id="iot-comp"></span><h2>IOT components (aggregate structure)<a class="headerlink" href="#iot-components-aggregate-structure" title="Permalink to this headline">¶</a></h2>
+<p>The analysis starts with a given IOT provided by an external file (see <a class="reference internal" href="data_input.html#data-input"><em>Data input format and its parsing</em></a>).
+All IOT components are read from it and stored into the <tt class="docutils literal"><span class="pre">actual_structure_dictionary</span></tt> array:</p>
+<ol class="arabic simple">
+<li>the primary resources  <tt class="docutils literal"><span class="pre">r</span></tt></li>
+<li>the intersectoral flows <tt class="docutils literal"><span class="pre">Z</span></tt></li>
+<li>the emissions: <tt class="docutils literal"><span class="pre">w</span></tt><sub>m</sub> (also aggregated as``w``)</li>
+<li>the final demand <tt class="docutils literal"><span class="pre">fd</span></tt></li>
+<li>the total outputs <tt class="docutils literal"><span class="pre">x</span></tt></li>
+<li>the total final outputs <tt class="docutils literal"><span class="pre">tot_final_outputs</span></tt> which is <tt class="docutils literal"><span class="pre">fd</span></tt> +  <tt class="docutils literal"><span class="pre">w</span></tt></li>
+</ol>
+</div>
+<div class="section" id="ioa-components-aggregate-structure">
+<span id="ioa-comp"></span><h2>IOA components (aggregate structure)<a class="headerlink" href="#ioa-components-aggregate-structure" title="Permalink to this headline">¶</a></h2>
+<p>Then, the IOA components are calculated from the original structure and stored into <tt class="docutils literal"><span class="pre">actual_structure_dictionary</span></tt> only:</p>
+<ol class="arabic simple">
+<li>the technical coefficient matrix  <tt class="docutils literal"><span class="pre">A</span></tt></li>
+<li>the Leontief matrix <tt class="docutils literal"><span class="pre">L</span></tt></li>
+<li>the emission intensity matrices <tt class="docutils literal"><span class="pre">E</span></tt><sub>m</sub> and <tt class="docutils literal"><span class="pre">Etot</span></tt>, and</li>
+<li>the primary resource input coefficients <tt class="docutils literal"><span class="pre">r_coefs</span></tt>.</li>
+</ol>
+<p>The Leontief inverse matrix is calculated using a non-conventional
+method required by PIOTs since they produce several final outputs (final goods and several (<em>m</em>) emissions) <a class="reference internal" href="internal_data_structure.html#aam13">[AAM13]</a>.</p>
+</div>
+<div class="section" id="iot-components-product-based-structures">
+<span id="prod-based-comp"></span><h2>IOT components (product based structures)<a class="headerlink" href="#iot-components-product-based-structures" title="Permalink to this headline">¶</a></h2>
+<p>Using the IOA components from above, the IOT components for each product based structure are calculated following <a class="reference internal" href="internal_data_structure.html#aam13">[AAM13]</a>.
+Each set of IOT components are stored in  the``product_based_structures`` array, each complete set under <tt class="docutils literal"><span class="pre">product_based_structures['prod_based_struct_n]</span></tt> where <em>n</em> is the sector for which the product-based decomposition was run. Recall NumPy starts numbering at 0, so <tt class="docutils literal"><span class="pre">product_based_structures['prod_based_struct_0]</span></tt> contains all IOT components of the product-based decomposition for the first sector. The IOT set is the same as for the aggregate structure:</p>
+<ol class="arabic simple">
+<li>the primary resources  <tt class="docutils literal"><span class="pre">r</span></tt></li>
+<li>the intersectoral flows <tt class="docutils literal"><span class="pre">Z</span></tt></li>
+<li>the emissions: <tt class="docutils literal"><span class="pre">w</span></tt><sub>m</sub> (also aggregated as``w``)</li>
+<li>the final demand <tt class="docutils literal"><span class="pre">fd</span></tt></li>
+<li>the total outputs <tt class="docutils literal"><span class="pre">x</span></tt></li>
+<li>the total final outputs <tt class="docutils literal"><span class="pre">tot_final_outputs</span></tt> which is <tt class="docutils literal"><span class="pre">fd</span></tt> +  <tt class="docutils literal"><span class="pre">w</span></tt></li>
+</ol>
+</div>
+<div class="section" id="macroscopic-indicators">
+<span id="macro-ind"></span><h2>Macroscopic Indicators<a class="headerlink" href="#macroscopic-indicators" title="Permalink to this headline">¶</a></h2>
+<p>Some top-level macroscopic indicators are then calculated for the aggregated structure and each product-based structure.</p>
+</div>
+<div class="section" id="overlapped-cyclic-acyclic-and-direct-indirect-structures-for-the-product-based-and-aggregate-structures">
+<span id="overl-str"></span><h2>Overlapped cyclic-acyclic and direct-indirect structures for the product-based and aggregate structures<a class="headerlink" href="#overlapped-cyclic-acyclic-and-direct-indirect-structures-for-the-product-based-and-aggregate-structures" title="Permalink to this headline">¶</a></h2>
+<p>Then, the program run an <em>n</em>-iteration to find all cyclic-acyclic and direct-indirect structural elements of the <em>n</em> product-based structure.
+At the end of each iteration the cyclic-acyclic and direct-indirect of the aggregated structure is updated with the corresponding share of the product-based structure it has been found. So, at the end of that iteration all product-based structures and the aggregate structure are found.</p>
+<p>TODO: explain in detail the calculations.
+explain last check of data.</p>
+</div>
+<div class="section" id="finding-the-cyclic-acyclic-and-direct-indirect-meta-structures-for-the-product-based-and-aggregate-structures">
+<span id="meta-str"></span><h2>Finding the cyclic-acyclic and direct-indirect meta-structures for the product-based and aggregate structures<a class="headerlink" href="#finding-the-cyclic-acyclic-and-direct-indirect-meta-structures-for-the-product-based-and-aggregate-structures" title="Permalink to this headline">¶</a></h2>
+<p>Since finding the cyclic-acyclic and direct-indirect meta-structures is a matter of aggregating the overlapped cyclic-acyclic and direct-indirect components derived in the previous section, the meta-structures for each product-based structure are calculated at the end of the previous iteration.</p>
+<p>However, since all overlapped cyclic-acyclic and direct-indirect components of the aggregate structure must be calculated before they they can be aggregated, finding the cyclic-acyclic and direct-indirect meta-structures for the aggregate structure is only performed after the iteration calculating the product-based structures.</p>
+</div>
+<div class="section" id="calculating-structural-indicators-of-the-cyclic-structure-for-the-product-based-structures">
+<span id="cyc-indic"></span><h2>Calculating structural indicators of the cyclic structure for the product-based structures<a class="headerlink" href="#calculating-structural-indicators-of-the-cyclic-structure-for-the-product-based-structures" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="internal_data_structure.html#aam13">[AAM13]</a></p>
+</div>
+<div class="section" id="calculating-structural-indicators-of-the-cyclic-structure-for-the-aggregated-structure">
+<h2>Calculating structural indicators of the cyclic structure for the aggregated structure<a class="headerlink" href="#calculating-structural-indicators-of-the-cyclic-structure-for-the-aggregated-structure" title="Permalink to this headline">¶</a></h2>
+<p>They are calculated as a weighted average of the former.</p>
+</div>
+<div class="section" id="calculating-structural-indicators-of-the-indirect-structure-for-the-product-based-structures">
+<span id="ind-indic"></span><h2>Calculating structural indicators of the indirect structure for the product-based structures<a class="headerlink" href="#calculating-structural-indicators-of-the-indirect-structure-for-the-product-based-structures" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference internal" href="internal_data_structure.html#aam13">[AAM13]</a></p>
+</div>
+<div class="section" id="calculating-structural-indicators-of-the-indirect-structure-for-the-aggregated-structure">
+<h2>Calculating structural indicators of the indirect structure for the aggregated structure<a class="headerlink" href="#calculating-structural-indicators-of-the-indirect-structure-for-the-aggregated-structure" title="Permalink to this headline">¶</a></h2>
+<p>They are calculated as a weighted average of the former.</p>
+<p class="rubric">Bibligraphy</p>
+<table class="docutils citation" frame="void" id="aam13" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[AAM13]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>, <a class="fn-backref" href="#id3">3</a>, <a class="fn-backref" href="#id4">4</a>)</em> Altimiras-Martin, Aleix (2013) PhD  thesis</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Calculations and checks</a><ul>
+<li><a class="reference internal" href="#integrity-check-of-original-data">Integrity check of original data</a></li>
+<li><a class="reference internal" href="#iot-components-aggregate-structure">IOT components (aggregate structure)</a></li>
+<li><a class="reference internal" href="#ioa-components-aggregate-structure">IOA components (aggregate structure)</a></li>
+<li><a class="reference internal" href="#iot-components-product-based-structures">IOT components (product based structures)</a></li>
+<li><a class="reference internal" href="#macroscopic-indicators">Macroscopic Indicators</a></li>
+<li><a class="reference internal" href="#overlapped-cyclic-acyclic-and-direct-indirect-structures-for-the-product-based-and-aggregate-structures">Overlapped cyclic-acyclic and direct-indirect structures for the product-based and aggregate structures</a></li>
+<li><a class="reference internal" href="#finding-the-cyclic-acyclic-and-direct-indirect-meta-structures-for-the-product-based-and-aggregate-structures">Finding the cyclic-acyclic and direct-indirect meta-structures for the product-based and aggregate structures</a></li>
+<li><a class="reference internal" href="#calculating-structural-indicators-of-the-cyclic-structure-for-the-product-based-structures">Calculating structural indicators of the cyclic structure for the product-based structures</a></li>
+<li><a class="reference internal" href="#calculating-structural-indicators-of-the-cyclic-structure-for-the-aggregated-structure">Calculating structural indicators of the cyclic structure for the aggregated structure</a></li>
+<li><a class="reference internal" href="#calculating-structural-indicators-of-the-indirect-structure-for-the-product-based-structures">Calculating structural indicators of the indirect structure for the product-based structures</a></li>
+<li><a class="reference internal" href="#calculating-structural-indicators-of-the-indirect-structure-for-the-aggregated-structure">Calculating structural indicators of the indirect structure for the aggregated structure</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data_input.html"
+                        title="previous chapter">Data input format and its parsing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="internal_data_structure.html"
+                        title="next chapter">Internal structure of variables</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/calculations.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="internal_data_structure.html" title="Internal structure of variables"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data_input.html" title="Data input format and its parsing"
+             >previous</a> |</li>
+        <li><a href="index.html">MetabX 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Aleix Altimiras-Martin.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
