@@ -8,4 +8,4 @@ All rights reserved.
 Distributed with a GNU GPL license; see LICENSE.txt.
 If you are using MetabX for your work, please cite as in CITATION.txt.
 
-See http://  for more information. 
+See http://a-altimiras-martin.github.io/MetabX/  for more information. 
